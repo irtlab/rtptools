@@ -1,0 +1,12 @@
+USEUNIT("..\rtpdump.c");
+USEUNIT("..\rd.c");
+USEUNIT("..\host2ip.c");
+USEUNIT("..\nt\utilnt.c");
+USEUNIT("..\nt\getopt.c");
+USEUNIT("..\hpt.c");
+USEUNIT("..\nt\yplib.c");
+USEUNIT("..\NT\gettimeofday.c");
+//---------------------------------------------------------------------------
+This file is used by the project manager only and should be treated like the project file
+
+main
