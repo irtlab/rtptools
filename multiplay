@@ -1,0 +1,50 @@
+#!/bin/sh
+# Run multiple rtpplays simultaneously.
+
+USAGE="usage: multidump [-F format] [-t minutes] [-x bytes] filebase [[addr]/port[/ttl] ...]"
+
+args=""  # The flags to pass to each rtpplay
+pids=""  # The list process IDs of the rtpplay processes
+count=1  # The count of rtpplay sessions.
+
+# Catch signals that need to be passed down to rtpplay.
+trap 'kill $pids' 1   # SIGHUP
+trap 'kill $pids' 2   # SIGINT
+trap 'kill $pids' 15  # SIGTERM
+
+# Parse the flags.  Using getopt is the easiest way to tell where the
+# options start.
+while getopts 'p:Tv' c
+do
+    case $c in
+    p)          args="${args} -$c ${OPTARG}";;
+    t | v)      args="$args -$c";;
+    \?)     echo $USAGE
+	    exit 2;;
+    esac
+done
+shift `expr $OPTIND - 1`
+
+# Make sure we have a filebase, and get it.
+if expr $# \< 1 > /dev/null
+then
+    echo $USAGE
+    exit 2;
+fi
+filebase=$1
+shift
+
+# Get each of the destination addresses, and start an rtpdump for it.
+# Its output goes to filebase.count.
+while expr $# \> 0 > /dev/null
+do
+    echo "rtpplay $args -f $filebase.$count $1 > /dev/null &"
+    rtpplay $args -f $filebase.$count $1 > /dev/null &
+    pids="$pids $!"
+    count=`expr $count + 1`
+    shift
+done
+
+# Wait for all the processes to finish.
+wait $pids
+

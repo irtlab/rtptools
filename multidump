@@ -1,0 +1,50 @@
+#!/bin/sh
+# Run multiple rtpdumps simultaneously.
+
+USAGE="usage: multidump [-F format] [-t minutes] [-x bytes] filebase [[addr]/port ...]"
+
+args=""  # The flags to pass to each rtpdump
+pids=""  # The list process IDs of the rtpdump processes
+count=1  # The count of rtpdump sessions.
+
+# Catch signals that need to be passed down to rtpdump.
+trap 'kill -1  $pids' 1   # SIGHUP
+trap 'kill -2  $pids' 2   # SIGINT
+trap 'kill -15 $pids' 15  # SIGTERM
+
+# Parse the flags.  Using getopt is the easiest way to tell where the
+# options start.
+while getopts 't:F:x:' c
+do
+    case $c in
+    t | F | x)      args="${args} -$c ${OPTARG}";;
+    \?)     echo $USAGE
+	    exit 2;;
+    esac
+done
+shift `expr $OPTIND - 1`
+
+# Make sure we have a filebase, and get it.
+if expr $# \< 1 > /dev/null
+then
+    echo $USAGE
+    exit 2;
+fi
+filebase=$1
+shift
+
+# Get each of the destination addresses, and start an rtpdump for it.
+# Its output goes to filebase.count.
+while expr $# \> 0 > /dev/null
+do
+    echo "rtpdump $args $1 > $filebase.$count &"
+    rtpdump $args $1 > $filebase.$count &
+    pids="$pids $!"
+    count=`expr $count + 1`
+    shift
+done
+
+# Wait for all the processes to finish, if we used the -t option.
+# If we didn't, rtpdump will never exit; our process exit will be handled
+# by the traps above.
+wait $pids
