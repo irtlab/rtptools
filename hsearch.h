@@ -49,7 +49,7 @@ typedef enum {
         FIND, ENTER
 } ACTION;
 
-int      hcreate __P((unsigned int));
+int      hcreate __P((size_t));
 void     hdestroy __P((void));
 ENTRY   *hsearch __P((ENTRY, ACTION));
 
