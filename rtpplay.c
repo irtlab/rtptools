@@ -23,6 +23,7 @@
 #include <sys/socket.h>  /* struct sockaddr */
 #include <netinet/in.h>
 #include <arpa/inet.h>   /* inet_ntoa() */
+#include <netdb.h>       /* gethostbyname() */
 #include <time.h>
 #include <stdio.h>       /* stderr, printf() */
 #include <string.h>
@@ -344,6 +345,22 @@ int main(int argc, char *argv[])
   if (optind < argc) {
     if (hpt(argv[optind], (struct sockaddr *)&sin, &ttl) < 0) {
       usage(argv[0]);
+      exit(1);
+    }
+    if (sin.sin_addr.s_addr == -1) {
+      fprintf(stderr, "%s: Invalid host. %s\n", argv[0], argv[optind]);
+      usage(argv[0]);
+      exit(1);
+    }
+    if (sin.sin_addr.s_addr == INADDR_ANY) {
+      struct hostent *host;
+      struct in_addr *local;
+      if ((host = gethostbyname("localhost")) == NULL) {
+        perror("gethostbyname()");
+        exit(1);
+      }
+      local = (struct in_addr *)host->h_addr_list[0];
+      sin.sin_addr = *local;
     }
   }
 

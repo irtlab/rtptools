@@ -143,7 +143,7 @@ int create_stream(int addr, int next)
     last=new_stream;
     return new_stream->seq;
   }
-    
+
   for(elem=head;elem->next!=NULL;elem=elem->next) {
     if(elem->next->addr>addr) {
       new_stream->next=elem->next;
@@ -232,13 +232,14 @@ static Notify_value socket_handler(Notify_client client, int sock)
   /* do not translate packets that already use RTP or arrive over the unicast
    link*/
   if ((rtp_hdr->version==2)||((sock!=multi_sock[0])&&(sock!=multi_sock[1]))) {
-    rtp_hdr=(rtp_hdr_t *)packet;   
+    rtp_hdr=(rtp_hdr_t *)packet;
     for (i = 0; i < hostc; i++) {
-      if (side[i][proto].sock != sock) {
+      if (side[i][proto].sock != sock
+          && side[i][proto].sin.sin_addr.s_addr != INADDR_ANY) {
         if (sendto(side[i][2].sock, packet, len, 0,
           (struct sockaddr *)&side[i][proto].sin,sizeof(side[i][proto].sin))<0)
-          ;
 //        perror("sendto RTCP");
+          ;
       }
     }
   }
@@ -443,13 +444,14 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (optind == argc) {
+  if (argc - optind < 2) {
+    fprintf(stderr, "%s: Requires two host/port[/tll].\n", argv[0]);
     usage(argv[0]);
     exit(1);
   }
 
   /* Parse host descriptions. */
-  for (i = 0; i < argc-optind; i++) {
+  for (i = 0; i < argc - optind; i++) {
     char *s;
 
     if (i >= MAX_HOST) break;
@@ -468,7 +470,8 @@ int main(int argc, char *argv[])
       port = atoi(s+1);
       if (port & 1) {
         fprintf(stderr, "%s: Port must be even.\n", argv[0]);
-        /* exit(1); */
+        usage(argv[0]);
+        exit(1);
       }
       host[i].sin.sin_port = htons(port);
       s = strchr(s+1, '/');
@@ -477,6 +480,11 @@ int main(int argc, char *argv[])
       }
     }
     host[i].sin.sin_addr = host2ip(host[i].name);
+    if (host[i].sin.sin_addr.s_addr == -1) {
+      fprintf(stderr, "%s: Invalid host. %s\n", argv[0], host[i].name);
+      usage(argv[0]);
+      exit(1);
+    }
     if (IN_CLASSD(ntohl(host[i].sin.sin_addr.s_addr))) {
       host[i].mreq.imr_multiaddr        = host[i].sin.sin_addr;
       host[i].mreq.imr_interface.s_addr = htonl(INADDR_ANY);
