@@ -47,13 +47,11 @@
 
 #ifdef __BORLANDC__
 #include <io.h>
-typedef void (_USERENTRY *sigfunc)(int);
 #define strcasecmp stricmp
 #define strncasecmp strnicmp
-#endif
+#endif /* __BORLANDC__ */
 
 #ifdef _MSC_VER
-typedef void (__cdecl *sigfunc)(int);
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
 #define open _open
@@ -61,7 +59,7 @@ typedef void (__cdecl *sigfunc)(int);
 #define close _close
 #define ftime _ftime
 #define timeb _timeb
-#endif
+#endif /* _MSC_VER */
 
 #ifndef SIGBUS
 #define SIGBUS SIGINT
@@ -75,9 +73,7 @@ typedef void (__cdecl *sigfunc)(int);
 #define SIGPIPE SIGINT
 #endif
 
-#ifndef ssize_t
-#define ssize_t SSIZE_T
-#endif
+typedef int     ssize_t;
 
 #if 0
 typedef long pid_t;
@@ -87,7 +83,6 @@ typedef unsigned long u_long;
 typedef unsigned int u_int;
 typedef unsigned short u_short;
 typedef unsigned char u_char;
-typedef int     ssize_t;
 #endif
 
 typedef char *   caddr_t;        /* core address */
