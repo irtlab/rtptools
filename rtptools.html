@@ -293,18 +293,22 @@ white space on the next line.  Comment lines start with #.  Strings are
 enclosed in quotation marks.
 
 <pre>
-&lt;<var>time</var>> RTP v=&lt;<var>version</var>>
+&lt;<var>time</var>> RTP 
+   v=&lt;<var>version</var>>
+   p=&lt;<var>padding</var>>
+   x=&lt;<var>extension</var>>
    m=&lt;<var>marker</var>>
    pt=&lt;<var>payload type</var>>
    ts=&lt;<var>time stamp</var>>
    seq=&lt;<var>sequence number</var>>
-   cc=&lt;<var>CSRC count</var>>
-   data=&lt;<var>hex payload</var>>
    ssrc=&lt;<var>SSRC</var>>
-   x=&lt;<var>extension?</var>>
+   cc=&lt;<var>CSRC count</var>>
+   csrc=&lt;<var>CSRC</var>>
+   data=&lt;<var>hex payload</var>>
    ext_type=&lt;<var>type of extension</var>>
    ext_len=&lt;<var>length of extension header</var>>
    ext_data=&lt;<var>hex extension data</var>>
+   len=&lt;<var>packet size in bytes(including header)</var>>
 &lt;<var>time</var>> RTCP (SDES v=&lt;<var>version</var>> 
               (src=&lt;source> cname="..." name="...")
               (src=&lt;source> ...)
