@@ -84,7 +84,7 @@ rtptrans_SOURCES = $(COMMON) rtptrans.c
 #rpm: rtptools-$(VERSION).spec $(bin_PROGRAMS)
 #	rpm -ba 
 
-EXTRA_DIST = ChangeLog ChangeLog.html COPYRIGHT rtptools.html bark.rtp         nt/*.c nt/include/*.h         nt/include/arpa/*.h nt/include/netinet/*.h         nt/include/rpcsvc/*.h nt/include/sys/*.h         nt/include/utilnt/*.h         hsearch.h hsearch.c multidump multiplay         rtptools.dsw rtpdump.dsp rtpplay.dsp rtpsend.dsp rtptrans.dsp         bcb/*.bp? bcb/obj/*
+EXTRA_DIST = ChangeLog.html COPYRIGHT rtptools.html bark.rtp         nt/*.c nt/include/*.h         nt/include/arpa/*.h nt/include/netinet/*.h         nt/include/rpcsvc/*.h nt/include/sys/*.h         nt/include/utilnt/*.h         hsearch.h hsearch.c multidump multiplay         rtptools.dsw rtpdump.dsp rtpplay.dsp rtpsend.dsp rtptrans.dsp         bcb/*.bp? bcb/obj/* rtptools.spec
 
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -119,9 +119,8 @@ CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
-DIST_COMMON =  README ChangeLog Makefile.am Makefile.in aclocal.m4 \
-config.guess config.sub configure configure.in install-sh missing \
-mkinstalldirs
+DIST_COMMON =  README Makefile.am Makefile.in aclocal.m4 config.guess \
+config.sub configure configure.in install-sh missing mkinstalldirs
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
@@ -401,6 +400,9 @@ mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
+# make rpm_spec
+# This will automatically generate rtptools-VERSION.spec file 
+# which is required for making Linux's RPM/SRPM package.
 rpm_spec: rtptools.spec
 	@echo "Generating RPM spec file"
 	@echo "# Generated automatically from rtptools.spec"  > rtptools-$(VERSION).spec
