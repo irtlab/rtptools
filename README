@@ -1,5 +1,7 @@
 RTP Tools
 
+Please refer the rtptools.html for details.
+
 Description
 
 The rtptools distribution consists of a number of small applications that
@@ -31,28 +33,28 @@ multiplay
 Installation
 
 The RTP tools should compile on any Posix-compliant platform supporting
-sockets as well as on Windows NT/Win32. For Unix systems, type
+sockets as well as on Windows NT/Win32. 
+
+For Unix systems, type
 
 ./configure; make
 
-To install RTP tools on NT machine, please follow the following steps:
+To install RTP tools on Windows (NT, 98, 2000) machines, please follow
+the following steps:
 
 *.dsp files are project files. *.dsw file and workspace file. 
 User can open the workspace file and use 'batch compile' to compile all
 the projects.
 
-1. In Visual C++ 5.0/6.0, open workspace file rtptools.dsw
+1. In Visual C++ 6.0, open workspace file rtptools.dsw.
 
-2. In VC menu Tools -- Options, change the include directory, add
-   the following directories to the include directory:
-   <...>\rtptools-1.14       (rtptools source code directory)
-   <...>\rtptools-1.14\nt\include
-   <...>\rtptools-1.14\nt\include\utilnt
+2. In VC menu Build, use Batch Build to build all the tools.
 
-3. In VC menu Build, use Batch Build to build all the tools
+3. All the rtptools will be created under "debug\" directory.
 
 ----------------------------------------------------------------------------
 Henning Schulzrinne
 schulzrinne@cs.columbia.edu
 
 Xiaotao Wu
+Akira Tsukamoto
