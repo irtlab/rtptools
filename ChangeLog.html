@@ -17,23 +17,34 @@
 
 <dl>
 <dt>1.18 (September 2002)
-<dd>
+<dd>Changes made by Akira Tsukamoto unless otherwise noted.
 <ul>
-<li>Large ts and ssrc values would overflow; replaced strtol() with
-strtoul().
+
+<li>Check for errors when resolving host name.
+
+<li>For rtpdump, <tt>-F hex</tt>, <tt>-F rtcp</tt>, format fix.
+
+<li>Update IANA payload types in rtpdump.
+
+<li>Avoid allocating 8000 bytes buffer, copying and
+destroying it every iteration.
+
+<li>For bark.rtp, add RTCP packet, so the RAT could successfully receive
+and play.  Originally, it was only containing RTP payload.
+
+<li>Large ts and ssrc values would overflow; replaced <tt>strtol()</tt> with
+<tt>strtoul()</tt>.
 
 <li>Fixed out of range timeval, which led a spike on jitter in rare case.
-(Akira Tsukamoto)
 
 <li>Fixed CPU 100% utilization problem for <tt>rtptrans</tt> (both Unix
-and win32) <tt>rtpplay</tt>, <tt>rtpsend</tt> (only win32) (Akira
-Tsukamoto)<br>
+and win32) <tt>rtpplay</tt>, <tt>rtpsend</tt> (only win32)
 
-<li>Fixed broken compilation on Win32. (Akira Tsukamoto)
+<li>Fixed broken compilation on Win32.
 
 <li>For Win32, modified to use hi-resolution counter (win32 API) for
 <tt>gettimeodday()</tt> from <tt>ftime()</tt>.  It was creating a large
-jitter.  (Akira Tsukamoto)
+jitter.
 
 <li>For <tt>rtpplay</tt>, add <samp>-s</samp> flag to allow setting
 source port of packets. (Ping Pan and Akira Tsukamoto)
