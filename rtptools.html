@@ -46,9 +46,9 @@ available from <a
 href="http://www.cs.columbia.edu/~hgs/software/rtptools/src">http://www.cs.columbia.edu/~hgs/rtptools/software/src</a>.
 
 <p>The RTP tools should compile on any Posix-compliant platform
-supporting sockets, as well as Windows/NT/95/98 (Win32).  They have been
-tested on SunOS 4.1, SunOS 5.x (Solaris), Linux, NT 4.0, SGI Irix, and
-HP-UX.  Edit the directories and libraries at the top of
+supporting sockets, as well as Windows/NT/95/98/2000 (Win32).  They have
+been tested on SunOS 4.1, SunOS 5.x (Solaris), Linux, NT 4.0, SGI Irix,
+and HP-UX.  Edit the directories and libraries at the top of
 <samp>Makefile</samp> and type <kbd>make</kbd>.  The compiler must
 support ANSI C:  <samp>gcc</samp> does, Sun's old
 <samp>/usr/ucb/cc</samp> does not.
@@ -118,8 +118,6 @@ which may not be available on all operating systems.
 <p><sample>rtpdump</samp> listens on the <var>address</var> and
 <var>port</var> pair for RTP and RTCP packets and dumps a processed
 version to <var>outputfile</var> if specified or stdout otherwise. 
-Note: For Windows, <samp>-f</samp> <b>must</b> be used since files
-written to stdout will not be readable by other platforms.
 
 <p>If <var>file</var> is specified, the file is used instead of the
 network address.  If no network address is given, file input is expected

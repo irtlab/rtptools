@@ -13,8 +13,8 @@
 <p><dt>1.17 (April 2001)
 <dd>Added <samp>-o</samp> option to <tt>rtpdump</tt>, so that output can
 be directed to a file.  This is necessary so that the file can be opened
-in binary mode.  Otherwise, stdout on Win32 is opened in text mode, with
-\n to \n\r translation.  (hgs)
+in binary mode.  Also configured stdout on Win32 for binary mode,
+disabling the typical \n to \n\r translation.  (hgs)
 
 <p><dt>1.16 (July 2000)
 <dd>

@@ -40,6 +40,7 @@
 #include <unistd.h>      /* select(), perror() */
 #include <stdlib.h>      /* getopt(), atoi() */
 #include <math.h>        /* fmod() */
+#include <fcntl.h>       /* O_BINARY on Win32 */
 #include "rtp.h"
 #include "vat.h"
 #include "rtpdump.h"
@@ -668,6 +669,15 @@ int main(int argc, char *argv[])
       break;
     }
   }
+
+#if defined(WIN32)
+  if (out == stdout) {
+    setmode(fileno(stdout), O_BINARY);
+  }
+  if (in == stdin) {
+    setmode(fileno(stdin), O_BINARY);
+  }
+#endif
 
   /*
    * Set up payload type map. We should be able to read this in
