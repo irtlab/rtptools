@@ -29,4 +29,4 @@ EXTRA_DIST = ChangeLog ChangeLog.html COPYRIGHT rtptools.html bark.rtp \
         nt/include/utilnt/*.h \
         hsearch.h multidump multiplay \
         rtptools.dsw rtpdump.dsp rtpplay.dsp rtpsend.dsp rtptrans.dsp \
-        bcb/*.bp? bcb/*.mak bcb/obj/*
+        bcb/*.bp? bcb/obj/*
