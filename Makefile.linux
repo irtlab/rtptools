@@ -1,0 +1,18 @@
+SYSFLAGS = -DRTP_LITTLE_ENDIAN=1
+SYSLIBS = -lresolv -lsocket -lnsl -ldl
+LIB_DIR = -L/usr/local/lib -Wl,-rpath,/usr/local/lib
+HSEARCH_LIB = $(OBJ_DIR)/libhsearch.a
+
+# Because this gets included before 'all', let this be the first target in
+# the file
+truetarget: all
+
+$(OBJ_DIR)/libhsearch.a: $(OBJ_DIR)/hsearch.o $(OBJ_DIR)/hsearch_r.o
+	$(AR) rv $@ $?
+	$(RANLIB) $@
+
+$(OBJ_DIR)/hsearch.o: $(ARCH)/hsearch.c
+	$(CC) -c $(CFLAGS) $? -o $@
+
+$(OBJ_DIR)/hsearch_r.o: $(ARCH)/hsearch_r.c
+	$(CC) -c $(CFLAGS) $? -o $@
