@@ -98,7 +98,6 @@ static void hex(FILE *out, char *buf, int len)
   for (i = 0; i < len; i++) {
     fprintf(out, "%02x", (unsigned char)buf[i]);
   }
-  fprintf(out, "\n");
 } /* hex */
 
 
@@ -115,6 +114,12 @@ static int open_network(char *host, int data, int sock[], struct
 
   if (hpt(host, (struct sockaddr *)sin, 0) < 0) {
     usage("");
+    exit(1);
+  }
+  if (sin->sin_addr.s_addr == -1) {
+    fprintf(stderr, "Invalid multicast.\n");
+    usage("");
+    exit(1);
   }
 
   /* multicast */
@@ -266,15 +271,15 @@ static int parse_data(FILE *out, char *buf, int len)
          len, r->cc);
       return hlen;
     }
-    fprintf(out, 
+    fprintf(out,
     "v=%d p=%d x=%d cc=%d m=%d pt=%d (%s,%d,%d) seq=%u ts=%lu ssrc=0x%lx ",
-      r->version, r->p, r->x, r->cc, r->m, 
+      r->version, r->p, r->x, r->cc, r->m,
       r->pt, pt_map[r->pt].enc, pt_map[r->pt].ch, pt_map[r->pt].rate,
-      ntohs(r->seq), 
-      (unsigned long)ntohl(r->ts), 
+      ntohs(r->seq),
+      (unsigned long)ntohl(r->ts),
       (unsigned long)ntohl(r->ssrc));
     for (i = 0; i < r->cc; i++) {
-      fprintf(out, "csrc[%d] = %0x ", i, r->csrc[i]);
+      fprintf(out, "csrc[%d] = %0lx ", i, r->csrc[i]);
     }
     if (r->x) {  /* header extension */
       ext = (rtp_hdr_ext_t *)((char *)buf + hlen);
@@ -287,11 +292,7 @@ static int parse_data(FILE *out, char *buf, int len)
         fprintf(out, "ext_data=");
         hex(out, (char *)(ext+1), (ext_len*4));
       }
-      else
-        fprintf(out, "\n");
     }
-    else
-      fprintf(out, "\n");
   }
   else {
     fprintf(out, "RTP version wrong (%d).\n", r->version);
@@ -417,7 +418,7 @@ static int parse_control(FILE *out, char *buf, int len)
 
       switch (r->common.pt) {
       case RTCP_SR:
-        fprintf(out, " (SR ssrc=0x%lx p=%d count=%d len=%d\n", 
+        fprintf(out, " (SR ssrc=0x%lx p=%d count=%d len=%d\n",
           (unsigned long)ntohl(r->r.rr.ssrc),
           r->common.p, r->common.count,
           ntohs(r->common.length));
@@ -516,9 +517,8 @@ static int parse_control(FILE *out, char *buf, int len)
 * Process one packet and write it to file 'out' using format 'format'.
 */
 void packet_handler(FILE *out, t_format format, int trunc,
-  double dstart, struct timeval now, int ctrl, 
-  struct sockaddr_in sin, int len, RD_buffer_t
-  packet)
+  double dstart, struct timeval now, int ctrl,
+  struct sockaddr_in sin, int len, RD_buffer_t *packet)
 {
   double dnow = tdbl(&now);
   int hlen;   /* header length */
@@ -527,35 +527,35 @@ void packet_handler(FILE *out, t_format format, int trunc,
   switch(format) {
     case F_header:
       offset = (dnow - dstart) * 1000;
-      packet.p.hdr.offset = htonl(offset);
-      packet.p.hdr.plen   = ctrl ? 0 : htons(len);
+      packet->p.hdr.offset = htonl(offset);
+      packet->p.hdr.plen   = ctrl ? 0 : htons(len);
       /* leave only header */
-      if (ctrl == 0) len = parse_header(packet.p.data);
-      packet.p.hdr.length = htons(len + sizeof(packet.p.hdr));
-      if (fwrite((char *)&packet, len + sizeof(packet.p.hdr), 1, out) == 0) {
+      if (ctrl == 0) len = parse_header(packet->p.data);
+      packet->p.hdr.length = htons(len + sizeof(packet->p.hdr));
+      if (fwrite((char *)&packet, len + sizeof(packet->p.hdr), 1, out) == 0) {
         perror("fwrite");
         exit(1);
       }
       break;
 
     case F_dump:
-      hlen = ctrl ? len : parse_header(packet.p.data);
+      hlen = ctrl ? len : parse_header(packet->p.data);
       offset = (dnow - dstart) * 1000;
-      packet.p.hdr.offset = htonl(offset);
-      packet.p.hdr.plen   = ctrl ? 0 : htons(len);
+      packet->p.hdr.offset = htonl(offset);
+      packet->p.hdr.plen   = ctrl ? 0 : htons(len);
       /* truncation of payload */
       if (!ctrl && (len - hlen > trunc)) len = hlen + trunc;
-      packet.p.hdr.length = htons(len + sizeof(packet.p.hdr));
-      if (fwrite((char *)&packet, len + sizeof(packet.p.hdr), 1, out) == 0) {
+      packet->p.hdr.length = htons(len + sizeof(packet->p.hdr));
+      if (fwrite((char *)packet, len + sizeof(packet->p.hdr), 1, out) == 0) {
         perror("fwrite");
         exit(1);
       }
       break;
 
     case F_payload:
-      /* XXX should check header format. */
       if (ctrl == 0) {
-        if (fwrite(&packet.p.data[12], len - 12, 1, out) == 0) {
+        hlen = parse_header(packet->p.data);
+        if (fwrite(packet->p.data + hlen, len - hlen, 1, out) == 0) {
           perror("fwrite");
           exit(1);
         }
@@ -563,24 +563,34 @@ void packet_handler(FILE *out, t_format format, int trunc,
       break;
 
     case F_short:
-      if (ctrl == 0) parse_short(out, now, packet.p.data, len);
+      if (ctrl == 0) parse_short(out, now, packet->p.data, len);
       break;
 
-    case F_rtcp:
     case F_hex:
-      case F_ascii:
+    case F_ascii:
+      if (ctrl == 0) {
         fprintf(out, "%8ld.%06ld %s len=%d from=%s:%u ",
-            now.tv_sec, now.tv_usec, parse_type(ctrl, packet.p.data),
-            len, inet_ntoa(sin.sin_addr), ntohs(sin.sin_port));
+                now.tv_sec, now.tv_usec, parse_type(ctrl, packet->p.data),
+                len, inet_ntoa(sin.sin_addr), ntohs(sin.sin_port));
+        parse_data(out, packet->p.data, len);
         if (format == F_hex) {
-          hex(out, packet.p.data, trunc < len ? trunc : len);
+          hlen = parse_header(packet->p.data);
+          fprintf(out, "data=");
+          hex(out, packet->p.data + hlen, trunc < len ? trunc : len - hlen);
         }
-        ctrl ? parse_control(out, packet.p.data, len) : 
-              parse_data(out, packet.p.data, len);
-        break;
+        fprintf(out, "\n");
+      }
+    case F_rtcp:
+      if (ctrl == 1) {
+        fprintf(out, "%8ld.%06ld %s len=%d from=%s:%u ",
+                now.tv_sec, now.tv_usec, parse_type(ctrl, packet->p.data),
+                len, inet_ntoa(sin.sin_addr), ntohs(sin.sin_port));
+        parse_control(out, packet->p.data, len);
+      }
+      break;
 
-     case F_invalid:
-        break;
+    case F_invalid:
+      break;
   }
 } /* packet_handler */
 
@@ -696,9 +706,9 @@ int main(int argc, char *argv[])
     pt_map[i].rate = 0;
     pt_map[i].ch   = 0;
   }
-  /* Updated 25 Jul 1997 to reflect IANA assignments: */
-  /* <ftp://ftp.isi.edu/in-notes/iana/assignments/rtp-av-payload-types> */
-  /* Marked items are indicated as 'reserved' by the IANA */
+  /* Updated 11 May 2002 by Akira Tsukamoto with current IANA assignments: */
+  /* http://www.iana.org/assignments/rtp-parameters */
+  /* Marked *r* items are indicated as 'reserved' by the IANA */
   pt_map[  0].enc = "PCMU"; pt_map[  0].rate =  8000; pt_map[  0].ch = 1;
   pt_map[  1].enc = "1016"; pt_map[  1].rate =  8000; pt_map[  1].ch = 1;
   pt_map[  2].enc = "G721"; pt_map[  2].rate =  8000; pt_map[  2].ch = 1;
@@ -707,25 +717,28 @@ int main(int argc, char *argv[])
   pt_map[  5].enc = "DVI4"; pt_map[  5].rate =  8000; pt_map[  5].ch = 1;
   pt_map[  6].enc = "DVI4"; pt_map[  6].rate = 16000; pt_map[  6].ch = 1;
   pt_map[  7].enc = "LPC "; pt_map[  7].rate =  8000; pt_map[  7].ch = 1;
-  pt_map[  8].enc = "PCMA"; pt_map[  8].rate =  8000; pt_map[  7].ch = 1;
-  pt_map[  9].enc = "G722"; pt_map[  9].rate =  8000; pt_map[  7].ch = 1;
+  pt_map[  8].enc = "PCMA"; pt_map[  8].rate =  8000; pt_map[  8].ch = 1;
+  pt_map[  9].enc = "G722"; pt_map[  9].rate =  8000; pt_map[  9].ch = 1;
   pt_map[ 10].enc = "L16 "; pt_map[ 10].rate = 44100; pt_map[ 10].ch = 2;
   pt_map[ 11].enc = "L16 "; pt_map[ 11].rate = 44100; pt_map[ 11].ch = 1;
+  pt_map[ 12].enc = "QCELP"; pt_map[ 12].rate = 8000; pt_map[ 12].ch = 1;
   pt_map[ 14].enc = "MPA "; pt_map[ 14].rate = 90000; pt_map[ 14].ch = 0;
   pt_map[ 15].enc = "G728"; pt_map[ 15].rate =  8000; pt_map[ 15].ch = 1;
   pt_map[ 16].enc = "DVI4"; pt_map[ 16].rate = 11025; pt_map[ 16].ch = 1;
   pt_map[ 17].enc = "DVI4"; pt_map[ 17].rate = 22050; pt_map[ 17].ch = 1;
-  pt_map[ 23].enc = "SCR "; pt_map[ 23].rate = 90000; pt_map[ 23].ch = 0; /**/
-  pt_map[ 24].enc = "MPEG"; pt_map[ 24].rate = 90000; pt_map[ 24].ch = 0; /**/
-  pt_map[ 25].enc = "CelB"; pt_map[ 25].rate = 90000; pt_map[ 26].ch = 0;
+  pt_map[ 18].enc = "G729"; pt_map[ 18].rate =  8000; pt_map[ 18].ch = 1;
+  pt_map[ 23].enc = "SCR "; pt_map[ 23].rate = 90000; pt_map[ 23].ch = 0; /*r*/
+  pt_map[ 24].enc = "MPEG"; pt_map[ 24].rate = 90000; pt_map[ 24].ch = 0; /*r*/
+  pt_map[ 25].enc = "CelB"; pt_map[ 25].rate = 90000; pt_map[ 25].ch = 0;
   pt_map[ 26].enc = "JPEG"; pt_map[ 26].rate = 90000; pt_map[ 26].ch = 0;
-  pt_map[ 27].enc = "CUSM"; pt_map[ 27].rate = 90000; pt_map[ 27].ch = 0; /**/
+  pt_map[ 27].enc = "CUSM"; pt_map[ 27].rate = 90000; pt_map[ 27].ch = 0; /*r*/
   pt_map[ 28].enc = "nv  "; pt_map[ 28].rate = 90000; pt_map[ 28].ch = 0;
-  pt_map[ 29].enc = "PicW"; pt_map[ 29].rate = 90000; pt_map[ 29].ch = 0; /**/
-  pt_map[ 30].enc = "CPV "; pt_map[ 30].rate = 90000; pt_map[ 30].ch = 0; /**/
+  pt_map[ 29].enc = "PicW"; pt_map[ 29].rate = 90000; pt_map[ 29].ch = 0; /*r*/
+  pt_map[ 30].enc = "CPV "; pt_map[ 30].rate = 90000; pt_map[ 30].ch = 0; /*r*/
   pt_map[ 31].enc = "H261"; pt_map[ 31].rate = 90000; pt_map[ 31].ch = 0;
   pt_map[ 32].enc = "MPV "; pt_map[ 32].rate = 90000; pt_map[ 32].ch = 0;
   pt_map[ 33].enc = "MP2T"; pt_map[ 33].rate = 90000; pt_map[ 33].ch = 0;
+  pt_map[ 34].enc = "H263"; pt_map[ 34].rate = 90000; pt_map[ 34].ch = 0;
 
   /* set maximum time to gather packets */
   timeout.tv_usec = 0;
@@ -787,9 +800,9 @@ int main(int argc, char *argv[])
           timeout.tv_sec = duration - (dnow - dstart);
           if (timeout.tv_sec < 0) timeout.tv_sec = 0;
 
-          len = recvfrom(sock[i], packet.p.data, sizeof(packet.p.data), 
+          len = recvfrom(sock[i], packet.p.data, sizeof(packet.p.data),
             0, (struct sockaddr *)&sin, &alen);
-          packet_handler(out, format, trunc, dstart, now, i, sin, len, packet);
+          packet_handler(out, format, trunc, dstart, now, i, sin, len, &packet);
         }
       }
     }
@@ -803,7 +816,7 @@ int main(int argc, char *argv[])
       i = (packet.p.hdr.plen == 0);
       /* arbitrary, obviously invalid value */
       sin.sin_addr.s_addr = INADDR_ANY; sin.sin_port = 0;
-      packet_handler(out, format, trunc, dstart, now, i, sin, len, packet);
+      packet_handler(out, format, trunc, dstart, now, i, sin, len, &packet);
     }
   }
   return 0;
