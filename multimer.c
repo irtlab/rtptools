@@ -1,27 +1,27 @@
 /********************************************************************
  *                                                                  *
- * 	Voice Terminal (VT)                                             *
- *	June, 1991                                                      *
+ *  Voice Terminal (VT)                                             *
+ *  June, 1991                                                      *
  *                                                                  *
- *	Written at USC/Information Sciences Institute from an earlier   *
- *	version developed by Bolt Beranek and Newman Inc.               *
+ *  Written at USC/Information Sciences Institute from an earlier   *
+ *  version developed by Bolt Beranek and Newman Inc.               *
  *                                                                  *
- *	Copyright (c) 1991 University of Southern California.           *
- *	All rights reserved.                                            *
+ *  Copyright (c) 1991 University of Southern California.           *
+ *  All rights reserved.                                            *
  *                                                                  *
- *	Redistribution and use in source and binary forms are permitted	*
- * 	provided that the above copyright notice and this paragraph are	*
- * 	duplicated in all such forms and that any documentation,        *
- * 	advertising materials, and other materials related to such      *
- * 	distribution and use acknowledge that the software was          *
- *	developed by the University of Southern California, Information *
- *	Sciences Institute.  The name of the University may not be used *
- *	to endorse or promote products derived from this software       *
- * 	without specific prior written permission.                      *
- *	THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR	*
- * 	IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED	*
- * 	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR      *
- * 	PURPOSE.                                                        *
+ *  Redistribution and use in source and binary forms are permitted *
+ *  provided that the above copyright notice and this paragraph are *
+ *  duplicated in all such forms and that any documentation,        *
+ *  advertising materials, and other materials related to such      *
+ *  distribution and use acknowledge that the software was          *
+ *  developed by the University of Southern California, Information *
+ *  Sciences Institute.  The name of the University may not be used *
+ *  to endorse or promote products derived from this software       *
+ *  without specific prior written permission.                      *
+ *  THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR    *
+ *  IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED  *
+ *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR      *
+ *  PURPOSE.                                                        *
  *                                                                  *
  *******************************************************************/
 
@@ -30,14 +30,14 @@
 /******                     Multiple Timer Package                     ******/
 /******                                                                ******/
 /****************************************************************************/
-/*						        		    */
-/*	These routines manage an ordered queue of interval timers so   	    */
+/*                                                                          */
+/*      These routines manage an ordered queue of interval timers so        */
 /*      that a single process may have multiple, independent timers         */
 /*      pending.  Each timer is identified by an opaque client handle.      */
-/*      These routines are intended to multiplex the timers onto the   	    */
+/*      These routines are intended to multiplex the timers onto the        */
 /*      timeout mechanism of the select() call, or onto the single          */
 /*      interval timer provided by setitimer().                             */
-/*									    */
+/*                                                                          */
 /****************************************************************************/
 
 #include "notify.h"      /* Notify_func */
@@ -70,7 +70,7 @@ void timeradd(struct timeval *a, struct timeval *b,
   struct timeval *sum)
 {
   sum->tv_usec = a->tv_usec + b->tv_usec;
-  if (sum->tv_usec > 1000000L) {
+  if (sum->tv_usec >= 1000000L) {       /* > to >=  by Akira 12/29/01 */
     sum->tv_sec = a->tv_sec + b->tv_sec + 1;
     sum->tv_usec -= 1000000L;
   }
@@ -117,23 +117,23 @@ void timer_check(void)
 struct timeval *timer_set(struct timeval *interval, 
   Notify_func func, Notify_client client, int relative)
 {
-  register struct TQE *np, *op, *tp;	/* To scan the timer queue */
+  register struct TQE *np, *op, *tp;    /* To scan the timer queue */
 
   /* scan the timer queue to see if client has pending timer */
-  op = (struct TQE *)&timerQ;		/* Fudge OK since link is first */
+  op = (struct TQE *)&timerQ;           /* Fudge OK since link is first */
   for (np = timerQ; np; op = np, np = np->link)
     if (np->client == client) {
-      op->link = np->link;		/* Yes, remove the timer from Q */
-      break;				/*  and stop the search */
+      op->link = np->link;              /* Yes, remove the timer from Q */
+      break;                            /*  and stop the search */
     }
 
   /*  if the requested interval is zero, just free the timer  */
   if (interval == 0) {
-    if (np) {			/* If we found a timer, */
-      np->link = freeTQEQ;	/* link TQE at head of free Q */
+    if (np) {                   /* If we found a timer, */
+      np->link = freeTQEQ;      /* link TQE at head of free Q */
       freeTQEQ = np;
     }
-    return 0;			/* return, no timer set */
+    return 0;                   /* return, no timer set */
   }
 
   /*  nonzero interval, calculate new expiration time  */
@@ -157,14 +157,14 @@ struct timeval *timer_set(struct timeval *interval,
   }
   else tp->time = *interval;
 #ifdef DEBUG
-  printf("timer_set: %d.%06d\n", tp->time.tv_sec, tp->time.tv_usec);
+  printf("timer_set(): %d.%06d\n", tp->time.tv_sec, tp->time.tv_usec);
 #endif
   tp->func   = func;
   tp->client = client;
   tp->which  = ITIMER_REAL;
 
   /*  insert new timer into timer queue  */
-  op = (struct TQE *)&timerQ;		/* fudge OK since link is first */
+  op = (struct TQE *)&timerQ;           /* fudge OK since link is first */
   for (np = timerQ; np; op = np, np=np->link) {
     if (timerless(&tp->time, &np->time)) break;
   }
@@ -188,8 +188,8 @@ struct timeval *timer_set(struct timeval *interval,
 */
 struct timeval *timer_get(struct timeval *timeout)
 {
-  register struct TQE *tp;	/* to scan the timer queue */
-  struct timeval now;		/* current time */
+  register struct TQE *tp;      /* to scan the timer queue */
+  struct timeval now;           /* current time */
 
   timer_check(); /*DEBUG*/
   for (;;) {

@@ -6,7 +6,9 @@
 * -f         file to read
 * -b         begin time
 * -e         end time
+* -s         local binding port
 * -p [file]  profile of RTP PT to frequency mappings
+* destination/port[/ttl]
 *
 * Program reads ahead by READAHEAD packets to compensate for reordering.
 * Currently does not correct SR/RR absolute (NTP) timestamps,
@@ -26,6 +28,7 @@
 #include <string.h>
 #include <stdlib.h>      /* perror() */
 #include <unistd.h>      /* write() */
+#include "sysdep.h"
 #if HAVE_SEARCH_H
 #include <search.h>      /* hash table */
 #else
@@ -37,7 +40,6 @@
 #include "rtpdump.h"     /* RD_packet_t */
 #include "multimer.h"    /* timer_set() */
 #include "ansi.h"
-#include "sysdep.h"
 
 #define READAHEAD 16 /* must be power of 2 */
 
@@ -46,7 +48,7 @@ static int verbose = 0;        /* be chatty about packets sent */
 static int wallclock = 0;      /* use wallclock time rather than timestamps */
 static u_int32 begin = 0;      /* time of first packet to send */
 static u_int32 end = UINT_MAX; /* when to stop sending */ 
-static FILE *in;	       /* input file */
+static FILE *in;               /* input file */
 static int sock[2];            /* output sockets */
 static int first = -1;         /* time offset of first packet */
 static RD_buffer_t buffer[READAHEAD];
@@ -93,7 +95,8 @@ static double period[128] = {  /* ms per timestamp difference */
 static void usage(char *argv0)
 {
   fprintf(stderr,
-"Usage: %s [-v] [-T] [-p profile] [-f file] [-b begin time] [-e end time] destination/port[/ttl]\n",
+"Usage: %s [-v] [-T] [-p profile] [-f file] [-b begin time] [-e end time] \
+[-s localport] destination/port[/ttl]\n",
   argv0);
   exit(1);
 } /* usage */
@@ -245,7 +248,7 @@ static Notify_value play_handler(Notify_client client)
     ssrc[0] = '\0';
   }
 
-  if (next.tv_usec > 1000000) {
+  if (next.tv_usec >= 1000000) {
     next.tv_usec -= 1000000;
     next.tv_sec  += 1;
   }
@@ -288,6 +291,9 @@ int main(int argc, char *argv[])
 {
   char ttl = 1;
   static struct sockaddr_in sin;
+  static struct sockaddr_in from;
+  int sourceport = 0;  /* source port */
+  int on = 1;          /* flag */
   int i;
   int c;
   extern char *optarg;
@@ -300,7 +306,7 @@ int main(int argc, char *argv[])
   in = stdin; /* Changed below if -f specified */
 
   /* parse command line arguments */
-  while ((c = getopt(argc, argv, "b:e:f:p:Tv")) != EOF) {
+  while ((c = getopt(argc, argv, "b:e:f:p:Ts:vh")) != EOF) {
     switch(c) {
     case 'b':
       begin = atof(optarg) * 1000;
@@ -320,6 +326,9 @@ int main(int argc, char *argv[])
     case 'T':
       wallclock = 1;
       break;
+    case 's':  /* locked source port */
+      sourceport = atoi(optarg);
+      break;
     case 'v':
       verbose = 1;
       break;
@@ -330,7 +339,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  ftell(in);
+//  ftell(in);
 
   if (optind < argc) {
     if (hpt(argv[optind], (struct sockaddr *)&sin, &ttl) < 0) {
@@ -354,20 +363,35 @@ int main(int argc, char *argv[])
       }
       sin.sin_port = htons(ntohs(sin.sin_port) + i);
 
+      if (sourceport) {
+        memset((char *)(&from), 0, sizeof(struct sockaddr_in));
+        from.sin_family      = PF_INET;
+        from.sin_addr.s_addr = INADDR_ANY;
+        from.sin_port        = htons(sourceport + i);
+
+        if (setsockopt(sock[i], SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
+          perror("SO_REUSEADDR");
+          exit(1);
+        }
+
+  #ifdef SO_REUSEPORT
+        if (setsockopt(sock[i], SOL_SOCKET, SO_REUSEPORT, &on, sizeof(on)) < 0) {
+          perror("SO_REUSEPORT");
+          exit(1);
+        }
+  #endif
+
+        if (bind(sock[i], (struct sockaddr *)&from, sizeof(from)) < 0) {
+          perror("bind");
+          exit(1);
+        }
+      }
+
       if (connect(sock[i], (struct sockaddr *)&sin, sizeof(sin)) < 0) {
         perror("connect");
         exit(1);
       }
 
-      /*
-	   * We have to set the socket array when we use 'select' in NT,
-	   * otherwise the 'select' function in NT will consider all the
-	   * three fd_sets are NULL and return an error.  Error code
-	   * WSAEINVAL means The timeout value is not valid, or all three
-	   * descriptor parameters were NULL but the timeout value is valid.
-	   * After setting Writefds, the program runs ok.
-       */
-      notify_set_socket(sock[i], 1);
       if (IN_CLASSD(ntohl(sin.sin_addr.s_addr)) && 
           (setsockopt(sock[i], IPPROTO_IP, IP_MULTICAST_TTL, &ttl,
                    sizeof(ttl)) < 0)) {
@@ -376,6 +400,27 @@ int main(int argc, char *argv[])
       }
     }
   }
+
+#if defined(WIN32)
+  /*
+   * We have to set the socket array when we use 'select' in NT,
+   * otherwise the 'select' function in NT will consider all the
+   * three fd_sets are NULL and return an error.  Error code
+   * WSAEINVAL means The timeout value is not valid, or all three
+   * descriptor parameters were NULL but the timeout value is valid.
+   * After setting Writefds, the program runs ok.
+   */
+//  notify_set_socket(sock[i], 1);
+  /*
+   * Modified by Wenyu and Akira 12/27/01
+   * setting Writefds was causing 
+   *   1)consuming CPU 100% (behave polling)
+   *   2)slow
+   *   3)large jitter
+   * therefore, we changed it to set dummy fd to Readfds.
+   */
+  notify_set_socket(winfd_dummy, 0);
+#endif
 
   /* initialize event queue */
   first = -1;

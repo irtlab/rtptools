@@ -56,7 +56,8 @@ typedef struct node {
 
 static void usage(char *argv0)
 {
-  fprintf(stderr, "Usage: %s [-lav] [-f file] destination/port/ttl\n",
+  fprintf(stderr, 
+    "Usage: %s [-lav] [-s localport] [-f file] destination/port[/ttl]\n",
     argv0);
   exit(1);
 } /* usage */
@@ -378,7 +379,7 @@ static int rtcp_rr(node_t *list, char *packet)
 /*
  * Number of seconds between 1-Jan-1900 and 1-Jan-1970
  */
-#define GETTIMEOFDAY_TO_NTP_OFFSET 2208988800
+#define GETTIMEOFDAY_TO_NTP_OFFSET 2208988800UL
 
 
 /*
@@ -914,7 +915,7 @@ int main(int argc, char *argv[])
       memset((char *)(&from), 0, sizeof(struct sockaddr_in));
       from.sin_family      = PF_INET;
       from.sin_addr.s_addr = INADDR_ANY;
-      from.sin_port        = htons(sourceport);
+      from.sin_port        = htons(sourceport + i);
 
       if (setsockopt(sock[i], SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
         perror("SO_REUSEADDR");
@@ -939,7 +940,6 @@ int main(int argc, char *argv[])
       exit(1);
     }
 
-    notify_set_socket(sock[i], 1);
     if (IN_CLASSD(sin.sin_addr.s_addr) && 
         (setsockopt(sock[i], IPPROTO_IP, IP_MULTICAST_TTL, &ttl,
                    sizeof(ttl)) < 0)) {
@@ -953,6 +953,27 @@ int main(int argc, char *argv[])
       exit(1);
     }
   }
+
+#if defined(WIN32)
+  /*
+   * We have to set the socket array when we use 'select' in NT,
+   * otherwise the 'select' function in NT will consider all the
+   * three fd_sets are NULL and return an error.  Error code
+   * WSAEINVAL means The timeout value is not valid, or all three
+   * descriptor parameters were NULL but the timeout value is valid.
+   * After setting Writefds, the program runs ok.
+   */
+//  notify_set_socket(sock[i], 1);
+  /*
+   * Modified by Wenyu and Akira 12/27/01
+   * setting Writefds was causing 
+   *   1)consuming CPU 100% (behave polling)
+   *   2)slow
+   *   3)large jitter
+   * therefore, we changed it to set dummy fd to Readfds.
+   */
+  notify_set_socket(winfd_dummy, 0);
+#endif
 
   send_handler((Notify_client)in);
   notify_start();

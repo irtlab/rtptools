@@ -20,37 +20,47 @@
 
 /* end of 'if unix' */
 
-#elif defined(WIN32)
+#elif defined(WIN32) || defined(__WIN32__)
 
+#include <winsock2.h>  /* For NT socket */
+#include <ws2tcpip.h>  /* IP_ADD_MEMBERSHIP */
+#include <windows.h>
+#include <time.h>      /* time_t */
+#include <utilNT.h>    /* For function and struct in UNIX but not in NT */
+
+#ifndef EADDRNOTAVAIL
+#define EADDRNOTAVAIL WSAEADDRNOTAVAIL
+#endif
 
 #define NOLONGLONG
 #define RTP_LITTLE_ENDIAN 1
 #define nextstep
 
-#include <winsock2.h> /* For NT socket */
-#include <sys/timeb.h> /* For _ftime() */
-#include <sol_search.h> /* ENTRY, hsearch() */
-#include <nterrno.h>
-#include <utilNT.h> /* For function and struct in UNIX but not in NT */
+/* Determine if the C(++) compiler requires complete function prototype  */
+#ifndef __P
+#if defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
+#define __P(x) x
+#else
+#define __P(x) ()
+#endif
+#endif
 
-#ifndef strcasecmp
+#ifdef __BORLANDC__
+#include <io.h>
+typedef void (_USERENTRY *sigfunc)(int);
+#define strcasecmp stricmp
+#define strncasecmp strnicmp
+#endif
+
+#ifdef _MSC_VER
+typedef void (__cdecl *sigfunc)(int);
 #define strcasecmp _stricmp
-#endif
-
-#ifndef strncasecmp
 #define strncasecmp _strnicmp
-#endif
-
-#ifndef open
 #define open _open
-#endif
-
-#ifndef write
 #define write _write
-#endif
-
-#ifndef close
 #define close _close
+#define ftime _ftime
+#define timeb _timeb
 #endif
 
 #ifndef SIGBUS
@@ -65,6 +75,11 @@
 #define SIGPIPE SIGINT
 #endif
 
+#ifndef ssize_t
+#define ssize_t SSIZE_T
+#endif
+
+#if 0
 typedef long pid_t;
 typedef long gid_t;
 typedef long uid_t;
@@ -73,12 +88,14 @@ typedef unsigned int u_int;
 typedef unsigned short u_short;
 typedef unsigned char u_char;
 typedef int     ssize_t;
+#endif
+
 typedef char *   caddr_t;        /* core address */
-typedef	long	fd_mask;
-#define	NBBY	8		/* number of bits in a byte */
-#define	NFDBITS	(sizeof(fd_mask) * NBBY)	/* bits per mask */
+typedef long  fd_mask;
+#define NBBY  8   /* number of bits in a byte */
+#define NFDBITS (sizeof(fd_mask) * NBBY)  /* bits per mask */
 #ifndef howmany
-#define	howmany(x, y)	(((x) + ((y) - 1)) / (y))
+#define howmany(x, y) (((x) + ((y) - 1)) / (y))
 #endif
 
 struct msghdr {
@@ -102,10 +119,12 @@ struct passwd {
         char    *pw_shell;
 };
 
+#if 0
 struct ip_mreq {
         struct in_addr  imr_multiaddr;  /* IP multicast address of group */
         struct in_addr  imr_interface;  /* local IP address of interface */
 };
+#endif
 
 #define  ITIMER_REAL     0       /* Decrements in real time */
 
@@ -133,13 +152,6 @@ struct  itimerval {
 #define fork() 0
 #define setsid() {}
 
-
-#ifndef startupSocket
-#define startupSocket() {WSADATA wsaData;  \
-  if (WSAStartup(0x0101, &wsaData))    \
-    fprintf(stderr, "Could not start up WinSock.\n"); }
-#endif
-
 #ifndef FILE_SOCKET
 #define FILE_SOCKET int
 #endif
@@ -152,6 +164,7 @@ struct  itimerval {
 #define fclose_socket(f) closesocket(*f)
 #endif
 
+extern int winfd_dummy;  /* for WinNT see unitNT.c by Akira 12/27/01 */
 extern char getc_socket(FILE_SOCKET *f);
 extern ssize_t write_socket(int fildes, const void *buf, size_t nbyte);
 extern int sendmsg(int s, const struct msghdr *msg, int flags);

@@ -76,7 +76,7 @@ rtpplay_SOURCES = $(COMMON) rd.c rtpplay.c
 rtpsend_SOURCES = $(COMMON) rtpsend.c
 rtptrans_SOURCES = $(COMMON) rtptrans.c
 
-EXTRA_DIST = ChangeLog ChangeLog.html COPYRIGHT rtptools.html bark.rtp         nt/*.c nt/include/*.h         nt/include/arpa/*.h nt/include/netinet/*.h         nt/include/rpcsvc/*.h nt/include/sys/*.h         nt/include/utilnt/*.h         hsearch.h multidump multiplay         rtptools.dsw rtpdump.dsp rtpplay.dsp rtpsend.dsp rtptrans.dsp
+EXTRA_DIST = ChangeLog ChangeLog.html COPYRIGHT rtptools.html bark.rtp         nt/*.c nt/include/*.h         nt/include/arpa/*.h nt/include/netinet/*.h         nt/include/rpcsvc/*.h nt/include/sys/*.h         nt/include/utilnt/*.h         hsearch.h multidump multiplay         rtptools.dsw rtpdump.dsp rtpplay.dsp rtpsend.dsp rtptrans.dsp         bcb/*.bp? bcb/*.mak bcb/obj/*
 
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -114,7 +114,7 @@ configure configure.in install-sh missing mkinstalldirs
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/host2ip.P .deps/hpt.P .deps/multimer.P .deps/notify.P \
 .deps/rd.P .deps/rtpdump.P .deps/rtpplay.P .deps/rtpsend.P \
@@ -269,14 +269,14 @@ distdir: $(DISTFILES)
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
 	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign Makefile
-	$(mkinstalldirs) $(distdir)/nt $(distdir)/nt/include \
-	   $(distdir)/nt/include/arpa $(distdir)/nt/include/netinet \
-	   $(distdir)/nt/include/rpcsvc $(distdir)/nt/include/sys \
-	   $(distdir)/nt/include/utilnt
+	$(mkinstalldirs) $(distdir)/bcb $(distdir)/bcb/obj $(distdir)/nt \
+	   $(distdir)/nt/include $(distdir)/nt/include/arpa \
+	   $(distdir)/nt/include/netinet $(distdir)/nt/include/rpcsvc \
+	   $(distdir)/nt/include/sys $(distdir)/nt/include/utilnt
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

@@ -2,7 +2,7 @@
 * RTP translator.
 *
 * Usage:
-*   rtptrans host/port/ttl host/port/ttl [...]
+*   rtptrans [host]/port[/ttl] [host]/port[/ttl] [...]
 *
 * Forwards RTP/RTCP packets from one of the named sockets to all
 * others.  Addresses can be a multicast or unicast.  TTL values for
@@ -237,7 +237,8 @@ static Notify_value socket_handler(Notify_client client, int sock)
       if (side[i][proto].sock != sock) {
         if (sendto(side[i][2].sock, packet, len, 0,
           (struct sockaddr *)&side[i][proto].sin,sizeof(side[i][proto].sin))<0)
-        perror("sendto RTCP");
+          ;
+//        perror("sendto RTCP");
       }
     }
   }
@@ -293,9 +294,9 @@ static Notify_value socket_handler(Notify_client client, int sock)
 
 #if defined(Linux) || defined(WIN32)
       /* 
-	   * Stupid little Linux and stupid big Win32 does not support
-	   * sendmsg(), thus, use copying instead; contributed by Lutz
-	   * Grueneberg <gruen@rvs.uni-hannover.de>.
+       * Stupid little Linux and stupid big Win32 does not support
+       * sendmsg(), thus, use copying instead; contributed by Lutz
+       * Grueneberg <gruen@rvs.uni-hannover.de>.
        */
       {
         unsigned char mbuf[10000];
@@ -404,9 +405,9 @@ static Notify_value socket_handler(Notify_client client, int sock)
 void usage(char *argv0)
 {
   fprintf(stderr, 
-"Usage: %s \
-[address]/port/ttl\
-[address]/port/ttl [...]\n",
+"Usage: %s\
+ host/port[/ttl]\
+ host/port[/ttl] [...]\n",
  argv0);
 }
 

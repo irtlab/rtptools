@@ -68,7 +68,8 @@ static struct {
 static void usage(char *argv0)
 {
   fprintf(stderr, 
-"Usage: %s [-F [hex|ascii|rtcp|short|payload|dump|header] [-t minutes] [-o outputfile] [-b bytes] [multicast]/port > file\n", 
+"Usage: %s [-F [hex|ascii|rtcp|short|payload|dump|header] [-t minutes]\
+ [-o outputfile] [-f inputfile] [-x bytes] [multicast]/port > file\n", 
   argv0);
 }
 
@@ -151,7 +152,7 @@ static int open_network(char *host, int data, int sock[], struct
 
 #ifdef SO_REUSEPORT /* BSD 4.4 */
     if (setsockopt(sock[i], SOL_SOCKET, SO_REUSEPORT, (char *) &one,
-		   sizeof(one)) == -1)
+           sizeof(one)) == -1)
       perror("setsockopt: reuseport");
 #endif
 
@@ -376,7 +377,7 @@ static char *rtp_read_sdes(FILE *out, char *b, int len)
     total_len += rsp->length + 2;
   }
   if (total_len >= len) {
-	fprintf(stderr, 
+    fprintf(stderr, 
       "Remaining length of %d bytes for SSRC item too short (has %u bytes)\n",
       len, total_len);
     return 0;
@@ -410,7 +411,7 @@ static int parse_control(FILE *out, char *buf, int len)
       if (len < 0) {
         /* something wrong with packet format */
         fprintf(out, "Illegal RTCP packet length %d words.\n",
-	       ntohs(r->common.length));
+           ntohs(r->common.length));
         return -1;
       }
 
@@ -419,7 +420,7 @@ static int parse_control(FILE *out, char *buf, int len)
         fprintf(out, " (SR ssrc=0x%lx p=%d count=%d len=%d\n", 
           (unsigned long)ntohl(r->r.rr.ssrc),
           r->common.p, r->common.count,
-	      ntohs(r->common.length));
+          ntohs(r->common.length));
         fprintf(out, "  ntp=%lu.%lu ts=%lu psent=%lu osent=%lu\n",
           (unsigned long)ntohl(r->r.sr.ntp_sec),
           (unsigned long)ntohl(r->r.sr.ntp_frac),
@@ -442,7 +443,7 @@ static int parse_control(FILE *out, char *buf, int len)
       case RTCP_RR:
         fprintf(out, " (RR ssrc=0x%lx p=%d count=%d len=%d\n", 
           (unsigned long)ntohl(r->r.rr.ssrc), r->common.p, r->common.count,
-	      ntohs(r->common.length));
+          ntohs(r->common.length));
         for (i = 0; i < r->common.count; i++) {
           fprintf(out, "  (ssrc=0x%lx fraction=%g lost=%lu last_seq=%lu jit=%lu lsr=%lu dlsr=%lu )\n",
             (unsigned long)ntohl(r->r.rr.rr[i].ssrc),
@@ -462,7 +463,7 @@ static int parse_control(FILE *out, char *buf, int len)
         buf = (char *)&r->r.sdes;
         for (i = 0; i < r->common.count; i++) {
           int remaining = (ntohs(r->common.length) << 2) -
-	                      (buf - (char *)&r->r.sdes);
+                          (buf - (char *)&r->r.sdes);
 
           fprintf(out, "  (src=0x%lx ", 
             (unsigned long)ntohl(((struct rtcp_sdes *)buf)->src));
@@ -619,7 +620,7 @@ int main(int argc, char *argv[])
   extern double tdbl(struct timeval *);
 
   startupSocket();
-  while ((c = getopt(argc, argv, "b:F:f:t:x:")) != EOF) {
+  while ((c = getopt(argc, argv, "F:f:o:t:x:h")) != EOF) {
     switch(c) {
     /* output format */
     case 'F':
@@ -671,9 +672,16 @@ int main(int argc, char *argv[])
   }
 
 #if defined(WIN32)
-  if (out == stdout) {
-    setmode(fileno(stdout), O_BINARY);
-  }
+  /* 
+   * If using dump or binary format, make stdout and stdin use binary
+   * format on Win32, to assure that files generated can be read on both
+   * Unix and Windows systems. 
+   */
+  if (format == F_dump || format == F_header) {
+    if (out == stdout) {
+      setmode(fileno(stdout), O_BINARY);
+    }
+  } 
   if (in == stdin) {
     setmode(fileno(stdin), O_BINARY);
   }

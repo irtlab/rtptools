@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *      The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Margo Seltzer.
@@ -15,8 +15,8 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
+ *      This product includes software developed by the University of
+ *      California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -33,19 +33,24 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)search.h	8.1 (Berkeley) 6/4/93
+ *      @(#)search.h    8.1 (Berkeley) 6/4/93
  */
+
+#ifndef _SEARCH_H
+#define _SEARCH_H
 
 /* Backward compatibility to hsearch interface. */
 typedef struct entry {
-	char *key;
-	char *data;
+        char *key;
+        char *data;
 } ENTRY;
 
 typedef enum {
-	FIND, ENTER
+        FIND, ENTER
 } ACTION;
 
-int	 hcreate __P((unsigned int));
-void	 hdestroy __P((void));
-ENTRY	*hsearch __P((ENTRY, ACTION));
+int      hcreate __P((unsigned int));
+void     hdestroy __P((void));
+ENTRY   *hsearch __P((ENTRY, ACTION));
+
+#endif  /* _SEARCH_H */

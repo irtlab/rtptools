@@ -1,12 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <html>
 <head>
-<title>RTP Tools 1.17</title>
+<title>RTP Tools 1.18</title>
 <meta name="author" content="Henning Schulzrinne">
 <meta name="keywords" content="RTP; rtptools; debugging">
 </head>
 <body bgcolor="#38B0DE">
-<h1>RTP Tools (Version 1.17)</h1>
+<h1>RTP Tools (Version 1.18)</h1>
 
 <font color=red><big>
 The authors <b>cannot</b> provide support for compiling or running the
@@ -43,7 +43,8 @@ translates between VAT and RTP formats.
 
 <p>Sources for a variety of platforms and binaries for Windows NT are
 available from <a
-href="http://www.cs.columbia.edu/~hgs/software/rtptools/src">http://www.cs.columbia.edu/~hgs/rtptools/software/src</a>.
+href="http://www.cs.columbia.edu/~hgs/software/rtptools/src">
+http://www.cs.columbia.edu/~hgs/rtptools/software/src</a>.
 
 <p>The RTP tools should compile on any Posix-compliant platform
 supporting sockets, as well as Windows/NT/95/98/2000 (Win32).  They have
@@ -56,6 +57,29 @@ support ANSI C:  <samp>gcc</samp> does, Sun's old
 <p><em>Note</em>:  You must use the <code>sun4</code> architecture for
 SunOS 4.1.x and <code>sun5</code> for SunOS 5.x (Solaris).  You will get
 system call errors if you do not.
+
+<dl>
+<dt>For Unix systems, type
+<dd><kbd>./configure; make</kbd>
+</dl>
+
+<dl>
+<dt>To install RTP tools on WIN32 machine, please follow the following steps:
+<dd>
+*.dsp files are project files. *.dsw file and workspace file. <br>
+User can open the workspace file and use 'batch compile' to compile all
+the projects.
+<ol>
+<li>In Visual C++ 6.0, open workspace file rtptools.dsw.
+<li>In VC menu Build, use Batch Build to build all the tools.
+<li>All the rtptools will be created under "debug\" directory.
+</ol>
+</dl>
+
+<p>For quite a character, who desire to compile on Borland C++ Builder, 
+please open dump_bcb.bpr, play_bcb.bpr, send_bcb.bpr and trans_bcb.bpr under 
+bcb directory.  Only pressing ctr-F9 needed for compilation, and the tool 
+will be generated on the same directory.
 
 <h2><a name="usage">General Usage Hints</a></h2>
 
@@ -74,21 +98,31 @@ generated in <code>rtpdump -F dump</code> format.
 
 <h2><a name="rtpplay">rtpplay</a></h2>
 
-<samp>rtpplay</samp> [-T] [-v] [-f file] [-p profile]
-[-b begin] [-e end]
-<var>destination/port/[ttl]</var>
+<samp>rtpplay</samp> [-T] [-v]
+[<samp>-f</samp> <var>file</var>] 
+[<samp>-p</samp> <var>profile</var>]
+[<samp>-s</samp> <var>sourceport</var>]
+[<samp>-b</samp> <var>begin</var>] 
+[<samp>-e</samp> <var>end</var>]
+<var>destination/port</var>[<var>/ttl</var>]
 
 <p><samp>rtpplay</samp> reads RTP session data, recorded by
 <samp>rtpdump -F dump</samp> from either the <var>file</var> or stdin,
 if <var>file</var> is not specified, sending it to network address
 <var>destination</var> and port <var>port</var> with a time-to-live
-value of <var>ttl</var>.  If the flag <code>-T</code> is given, the
+value of <var>ttl</var>.  
+
+<p>If the flag <code>-T</code> is given, the
 timing between packets corresponds to the arrival timing rather than the
 RTP timestamps.  Otherwise, for RTP data packets, the timing given by
 the RTP timestamps is used, smoothing interarrival jitter and restoring
 packet sequence.  RTCP packets are still sent with their original
 timing.  This may cause the relative order of RTP and RTCP packets to be
 changed. 
+
+<p>The source port(localport) for outgoing packets can be set with the
+<samp>-s</samp> flag. A random port is chosen if this flag is not
+specified.
 
 <p>The whole file is played unless the <var>begin</var> or
 <var>end</var> times are specified. Times are measured in seconds and
@@ -111,8 +145,12 @@ which may not be available on all operating systems.
 
 <h2><a name="rtpdump">rtpdump</a></h2>
 
-<samp>rtpdump</samp> -F <var>format</var> -t <var>duration</var> -x
-<var>bytes</var> -f <var>file</var> -o <var>outputfile</var>
+<samp>rtpdump</samp> 
+[<samp>-F</samp> <var>format</var>] 
+[<samp>-t</samp> <var>duration</var>] 
+[<samp>-x</samp> <var>bytes</var>] 
+[<samp>-f</samp> <var>file</var>] 
+[<samp>-o</samp> <var>outputfile</var>]
 <var>address/port</var>
 
 <p><sample>rtpdump</samp> listens on the <var>address</var> and
@@ -122,8 +160,16 @@ version to <var>outputfile</var> if specified or stdout otherwise.
 <p>If <var>file</var> is specified, the file is used instead of the
 network address.  If no network address is given, file input is expected
 from stdin.  The file must have been recorded using the rtpdump
-<code>dump</code> format.  Supported <var>formats</var> are:
+<code>dump</code> format.  
 
+<p>The recording <var>duration</var> is measured in minutes.  
+
+<p>From each packet,
+only the first <var>bytes</var> of the payload are dumped (only
+applicable for "dump" and "hex" formats).
+
+<p>Supported <var>formats</var> are:
+<p>
 <table border=1>
 <tr>
 <th><samp>format</samp>
@@ -211,10 +257,6 @@ where a - indicates a set marker bit. The sequence number
 
 </table>
 
-<p>The <var>duration</var> is measured in minutes.  From each packet,
-only the first <var>bytes</var> of the payload are dumped (only
-applicable for "dump" and "hex" formats).
-
 <h2><a name="rtpsend">rtpsend</a></h2>
 
 <p><var>rtpsend</var> sends an RTP packet stream with configurable
@@ -222,17 +264,18 @@ parameters.  This is intended to test RTP features.  The RTP or RTCP
 headers are read from a file, generated by hand, a test program or <a
 href="#rtpdump">rtpdump</a> (format "ascii").
 
-<p><samp>rtpsend [-a] [-l]</samp> 
-[<samp>-s</samp><var>sourceport</var>]
-[<samp>-t</samp><var>ttl</var>]
+<p><samp>rtpsend [-a] [-l]</samp>
+[<samp>-s</samp> <var>sourceport</var>]
 [<samp>-f</samp> <var>file</var>]
-<var>destination/port</var>
+<var>destination/port</var>[<var>/ttl</var>]
 
-<p>Packets are sent with a time-to-live value <var>ttl</var>.  If data
-is read from a <var>file</var> instead of stdin, the <samp>-l</samp>
-(loop) flag resends the same sequence of packets again and again.
+<p>Packets are sent with a time-to-live value <var>ttl</var>.  
 
-<p>The source port for outgoing packets can be set with the
+<p>If data is read from a <var>file</var> instead of stdin, the 
+<samp>-l</samp>(loop) flag resends the same sequence of packets again and 
+again.
+
+<p>The source port(localport) for outgoing packets can be set with the
 <samp>-s</samp> flag. A random port is chosen if this flag is not
 specified.
 
@@ -287,8 +330,9 @@ enclosed in quotation marks.
 
 <h2><a name="rtptrans">rtptrans</a></h2>
 
-<samp>rtptrans</samp> <var>host/port[/ttl]</var>
-<var>host/port[/ttl]</var> [...]
+<samp>rtptrans</samp> 
+[<var>host</var>]/<var>port</var>[/<var>ttl</var>]
+[<var>host</var>]/<var>port</var>[/<var>ttl</var>] [...]
 
 <p>rtptrans RTP/RTCP packets arriving from one of the addresses to all
 other addresses.  Addresses can be a multicast or unicast.  TTL values

@@ -10,6 +10,8 @@ Copyright 1993 by AT&T Bell Laboratories; all rights reserved
 #include <stdio.h>     /*DEBUG, fprintf() */
 #include <stdlib.h>    /* malloc() */
 #include <unistd.h>    /* select() */
+#include <errno.h>     /* EINTR,    Added by Akira 12/11/01 */
+#include <string.h>    /* memset(), Added by Akira 12/11/01 */
 #include "sysdep.h"
 #include "notify.h"
 #include "multimer.h"
@@ -61,6 +63,20 @@ static event_t *search(
   return 0;
 } /* search */
 
+/* Clear all three "fd-set"s.
+ * This is called only once in the first call for initilaization.
+ */
+void check_clr_fd(void)
+{
+  static int cleared = -1;
+  
+  if (cleared == -1) {
+    FD_ZERO(&Readfds);
+    FD_ZERO(&Writefds);
+    FD_ZERO(&Exceptfds);
+    cleared = 0;  /* set for only once */
+  }
+}
 
 /*
 * Find maximum file descriptor number used.
@@ -87,6 +103,7 @@ Notify_func_input notify_set_input_func(
 {
   event_t *e, *prev;
 
+  check_clr_fd();
   e = search(client, fd, N_input, &prev);
   if (!e) {  /* create new event */
     if (func == NOTIFY_FUNC_INPUT_NULL) return func;
@@ -138,15 +155,20 @@ Notify_func notify_set_itimer_func(
 /*
 * Don't wait if there are no other events.
 */
-static struct timeval *timer_get_pending(struct timeval *timeout, int max_fd) {
+static struct timeval *timer_get_pending(struct timeval *timeout, int max_fd) 
+{
   struct timeval *tvp;
 
   tvp = timer_get(timeout);
   if (!tvp && !max_fd) {
     timeout->tv_sec = timeout->tv_usec = 0;
     notify_stop();
+    return timeout;     /* added by Akira 12/11/01 */
   }
-  return timeout;
+  if (!tvp) 
+    return timeout;     /* return 0.100000 sec, by Akira 12/11/01 */
+
+  return tvp;           /* return first timer event, by Akira 12/11/01 */
 } /* timer_get_pending */
 
 
@@ -167,28 +189,44 @@ Notify_error notify_start(void)
     writefds  = Writefds;
     exceptfds = Exceptfds;
     timeout.tv_sec  = 0;
-    timeout.tv_usec = 0;
+    timeout.tv_usec = 100000;     /* modified from 0 by Akira 12/11/01 */
 
     found = select(max_fd+1, (CAST)&readfds, (CAST)&writefds, (CAST)&exceptfds, 
-      timer_get_pending(&timeout, max_fd));
+                    timer_get_pending(&timeout, max_fd));
 
-    /* found = 0: just a timer -> do nothing */
-    if (found < 0) {
+#if defined(WIN32)
+    if (found < 0 && WSAGetLastError() != WSAEINVAL) {
+      fprintf(stderr, "select(): WSAErrono: %d\n", WSAGetLastError());
+      return -1;
+    }
+#else
+    /* For not to catch signal as an error
+     * EINTR added by Akira T. 12/11/01 */
+    if (found < 0 && errno != EINTR) {
       fprintf(stderr, "Timeout: %lu.%06lu\n", timeout.tv_sec, timeout.tv_usec);
       return -1;
     }
-    for (fd = 0; fd <= max_fd && found > 0; fd++) {
-      if (FD_ISSET(fd, &readfds)) {
-        e = search((Notify_client)0, fd, N_input, &prev);
-        if (e) {
-          if (e->func) (e->func)(e->client, fd);
+#endif
+
+    /* found = 0: just a timer -> do nothing, 
+                  timer_get() will execute the handler */
+    /* found > 0: scan the fd_event */
+    if (found) {
+      for (fd = 0; fd <= max_fd && found > 0; fd++) {
+        if (FD_ISSET(fd, &readfds)) {
+          e = search((Notify_client)0, fd, N_input, &prev);
+          if (e) {
+            if (e->func) (e->func)(e->client, fd);
+          }
+          else {
+            fprintf(stderr, "No handler for fd %d\n", fd);
+          }
         }
-        else {
-          fprintf(stderr, "No handler for fd %d\n", fd);
-        }
-      }
-    };
-  }
+      } /* for() */
+    }
+
+  } /* while() */
+
   return 0;
 } /* notify_start */
 
@@ -233,6 +271,7 @@ Notify_func_signal notify_set_signal_func(Notify_client client,
  */
 void notify_set_socket(int sock, int flag)
 {
+  check_clr_fd();
   switch (flag) {
   case 0:
     FD_SET(sock, &Readfds);
