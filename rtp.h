@@ -14,6 +14,15 @@ typedef unsigned int   u_int32;
 typedef          short int16;
 
 /*
+ * System endianness -- determined by autoconf.
+ */
+#ifdef WORDS_BIGENDIAN
+#define RTP_BIG_ENDIAN 1
+#else
+#define RTP_LITTLE_ENDIAN 1
+#endif
+
+/*
  * Current protocol version.
  */
 #define RTP_VERSION    2
@@ -84,7 +93,7 @@ typedef struct {
 #error Define one of RTP_LITTLE_ENDIAN or RTP_BIG_ENDIAN
 #endif
     unsigned int pt:8;        /* RTCP packet type */
-    u_int16 length;           /* pkt len in words, w/o this word */
+    unsigned int length:16;   /* pkt len in words, w/o this word */
 } rtcp_common_t;
 
 /*
