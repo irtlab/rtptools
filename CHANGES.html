@@ -10,6 +10,38 @@
 <h1><a href="rtptools.html">RTP tools</a> change history</h1>
 
 <dl>
+<dt>1.14 (October 1999)
+<dd>
+<ul>
+<li>Various portability fixes; now tested to compile on Solaris 2.6,
+Linux 2.2.10, FreeBSD 2.2.7, and FreeBSD 3.3. (Jonathan Lennox)
+</ul>
+
+<dt>1.13 (August 1999)
+<dd>
+<ul>
+<li>Change to autoconf format [<a href="mailto:pere@hungry.com">Petter
+Reinholdtsen</a>]
+
+<li>rtpplay, rtptrans:  compile fixes for HP/UX 10.20 and Irix 6.5. 
+[<a href="mailto:pere@hungry.com">Petter Reinholdtsen</a>]
+
+<li>rtpsend: htonl(seq) should be htons(seq). [Bruce Levens]
+
+<li>Makefile: BIN directory wasn't created. [Mike Brescia]
+<li>rtpsend: fix usage and commandline parsing [Mike Brescia].
+<li>rtpsend: use absolute rather than relative timing [Mike Brescia];
+this also removes an extra call to gettimeofday for each packet.
+<li>rtpdump: endianness bug in line
+<pre>
+packet.p.hdr.plen   = ctrl ? 0 : len;
+</pre>
+[David M., davidm@cs.ucsb.edu]
+
+<li>Changed 'u_int16 length' to 'unsigned int length:16' [<a
+href="mailto:jori@lumumba.luc.ac.be">Jori</a>]
+</ul>
+
 <dt>1.11 (January 1999)
 <dd>
 <ul>

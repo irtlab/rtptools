@@ -1,2 +1,0 @@
-SYSLIBS =  -lresolv
-SYSFLAGS = -DRTP_BIG_ENDIAN=1
