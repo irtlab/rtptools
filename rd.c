@@ -5,6 +5,7 @@
 #include <arpa/inet.h>   /* inet_ntoa() */
 #include <string.h>      /* strncmp() */
 #include <sys/time.h>
+#include <time.h>        /* localtime() added by Akira 12/27/01 */
 #include "types.h"
 #include "rtpdump.h"
 #define RTPFILE_VERSION "1.0"
