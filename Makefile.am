@@ -22,7 +22,7 @@ rtpplay_SOURCES = $(COMMON) rd.c rtpplay.c
 rtpsend_SOURCES = $(COMMON) rtpsend.c
 rtptrans_SOURCES= $(COMMON) rtptrans.c
 
-EXTRA_DIST = CHANGES.html COPYRIGHT rtptools.html bark.rtp \
+EXTRA_DIST = ChangeLog ChangeLog.html COPYRIGHT rtptools.html bark.rtp \
         nt/*.c nt/include/*.h \
         nt/include/arpa/*.h nt/include/netinet/*.h \
         nt/include/rpcsvc/*.h nt/include/sys/*.h \

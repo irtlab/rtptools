@@ -18,12 +18,14 @@
 *  -t d:    recording duration in minutes
 *  -x n:    number of payload bytes to dump per packet (hex, dump)
 *  -f name: name of input file, using "dump" format
+*  -o name: name of output file
 *
 * To record in chunks, simply build a shell script that loops,
 *  with suitably chosen file names. Each such file will be
 *  individually playable. (Gaps?)
 *
-* Copyright (c) 1995-1998 by H. Schulzrinne (Columbia U.)
+* Copyright (c) 1995-2001 by H. Schulzrinne and Ping Pan (Columbia University)
+*   All Rights Reserved
 */
 
 #include <sys/types.h>
@@ -65,7 +67,7 @@ static struct {
 static void usage(char *argv0)
 {
   fprintf(stderr, 
-"Usage: %s [-F [hex|ascii|rtcp|short|payload|dump|header] [-t minutes] [-b bytes] [multicast]/port > file\n", 
+"Usage: %s [-F [hex|ascii|rtcp|short|payload|dump|header] [-t minutes] [-o outputfile] [-b bytes] [multicast]/port > file\n", 
   argv0);
 }
 
@@ -75,19 +77,26 @@ static void done(int sig)
   exit(0);
 }
 
+/*
+* Convert timeval 'a' to double.
+*/
 static double tdbl(struct timeval *a)
 {
   return a->tv_sec + a->tv_usec/1e6;
 }
 
-static void hex(char *buf, int len)
+
+/*
+* Print buffer 'buf' of length 'len' bytes in hex format to file 'out'.
+*/
+static void hex(FILE *out, char *buf, int len)
 {
   int i;
 
   for (i = 0; i < len; i++) {
-    printf("%02x ", (unsigned char)buf[i]);
+    fprintf(out, "%02x", (unsigned char)buf[i]);
   }
-  printf("\n");
+  fprintf(out, "\n");
 } /* hex */
 
 
@@ -115,7 +124,7 @@ static int open_network(char *host, int data, int sock[], struct
   /* unicast */
   else {
     mreq.imr_multiaddr.s_addr = INADDR_ANY;
-    sin->sin_addr.s_addr       = INADDR_ANY;
+    sin->sin_addr.s_addr      = INADDR_ANY;
   }
 
   /* create/bind sockets */
@@ -196,7 +205,7 @@ static void rtpdump_header(FILE *out, struct sockaddr_in *sin,
 
 
 /*
-* Return type of packet.
+* Return type of packet, either "RTP", "RTCP", "VATD" or "VATC".
 */
 static char *parse_type(int type, char *buf)
 {
@@ -212,7 +221,7 @@ static char *parse_type(int type, char *buf)
 
 
 /*
-* Return header length.
+* Return header length of RTP packet contained in 'buf'.
 */
 static int parse_header(char *buf)
 {
@@ -234,39 +243,56 @@ static int parse_header(char *buf)
 /*
 * Return header length.
 */
-static int parse_data(char *buf, int len)
+static int parse_data(FILE *out, char *buf, int len)
 {
   rtp_hdr_t *r = (rtp_hdr_t *)buf;
-  int i;
+  rtp_hdr_ext_t *ext;
+  int i, ext_len;
   int hlen = 0;
 
   /* Show vat format packets. */
   if (r->version == 0) {
     vat_hdr_t *v = (vat_hdr_t *)buf;
-    printf("nsid=%d flags=0x%x confid=%u ts=%u\n",
+    fprintf(out, "nsid=%d flags=0x%x confid=%u ts=%u\n",
       v->nsid, v->flags, v->confid, v->ts);
     hlen = 8 + v->nsid * 4;
   }
   else if (r->version == RTP_VERSION) {
     hlen = 12 + r->cc * 4;
     if (len < hlen) {
-      printf("RTP header too short (%d bytes for %d CSRCs).\n",
+      fprintf(out, "RTP header too short (%d bytes for %d CSRCs).\n",
          len, r->cc);
       return hlen;
     }
-    printf(
-    "v=%d p=%d x=%d cc=%d m=%d pt=%d (%s,%d,%d) seq=%u ts=%lu ssrc=0x%lx\n",
+    fprintf(out, 
+    "v=%d p=%d x=%d cc=%d m=%d pt=%d (%s,%d,%d) seq=%u ts=%lu ssrc=0x%lx ",
       r->version, r->p, r->x, r->cc, r->m, 
       r->pt, pt_map[r->pt].enc, pt_map[r->pt].ch, pt_map[r->pt].rate,
       ntohs(r->seq), 
       (unsigned long)ntohl(r->ts), 
       (unsigned long)ntohl(r->ssrc));
     for (i = 0; i < r->cc; i++) {
-      printf("csrc[%d] = %0x ", i, r->csrc[i]);
+      fprintf(out, "csrc[%d] = %0x ", i, r->csrc[i]);
     }
+    if (r->x) {  /* header extension */
+      ext = (rtp_hdr_ext_t *)((char *)buf + hlen);
+      ext_len = ntohs(ext->len);
+
+      fprintf(out, "ext_type=0x%x ", ntohs(ext->ext_type));
+      fprintf(out, "ext_len=%d ", ext_len);
+
+      if (ext_len) {
+        fprintf(out, "ext_data=");
+        hex(out, (char *)(ext+1), (ext_len*4));
+      }
+      else
+        fprintf(out, "\n");
+    }
+    else
+      fprintf(out, "\n");
   }
   else {
-    printf("RTP version wrong (%d).\n", r->version);
+    fprintf(out, "RTP version wrong (%d).\n", r->version);
   }
   return hlen;
 } /* parse_data */
@@ -275,28 +301,31 @@ static int parse_data(char *buf, int len)
 /*
 * Print minimal per-packet information: time, timestamp, sequence number.
 */
-static void parse_short(struct timeval now, char *buf, int len)
+static void parse_short(FILE *out, struct timeval now, char *buf, int len)
 {
   rtp_hdr_t *r = (rtp_hdr_t *)buf;
 
   if (r->version == 0) {
     vat_hdr_t *v = (vat_hdr_t *)buf;
-    printf("%ld.%06ld %lu\n",
+    fprintf(out, "%ld.%06ld %lu\n",
       (v->flags ? -now.tv_sec : now.tv_sec), now.tv_usec,
       (unsigned long)ntohl(v->ts));
   }
   else if (r->version == 2) {
-    printf("%ld.%06ld %lu %u\n",
+    fprintf(out, "%ld.%06ld %lu %u\n",
       (r->m ? -now.tv_sec : now.tv_sec), now.tv_usec,
       (unsigned long)ntohl(r->ts), ntohs(r->seq));
   }
   else {
-    printf("RTP version wrong (%d).\n", r->version);
+    fprintf(out, "RTP version wrong (%d).\n", r->version);
   }
 } /* parse_short */
 
 
-void member_sdes(member_t m, rtcp_sdes_type_t t, char *b, int len)
+/*
+* Show SDES information for one member.
+*/
+void member_sdes(FILE *out, member_t m, rtcp_sdes_type_t t, char *b, int len)
 {
   static struct {
     rtcp_sdes_type_t t;
@@ -321,7 +350,7 @@ void member_sdes(member_t m, rtcp_sdes_type_t t, char *b, int len)
   for (i = 0; map[i].name; i++) {
     if (map[i].t == t) break;
   }
-  printf("%s=\"%*.*s\" ",
+  fprintf(out, "%s=\"%*.*s\" ",
     map[i].name ? map[i].name : num, len, len, b);
 } /* member_sdes */
 
@@ -330,7 +359,7 @@ void member_sdes(member_t m, rtcp_sdes_type_t t, char *b, int len)
 * Parse one SDES chunk (one SRC description). Total length is 'len'.
 * Return new buffer position or zero if error.
 */
-static char *rtp_read_sdes(char *b, int len)
+static char *rtp_read_sdes(FILE *out, char *b, int len)
 {
   rtcp_sdes_item_t *rsp;
   u_int32 src = *(u_int32 *)b;
@@ -342,7 +371,7 @@ static char *rtp_read_sdes(char *b, int len)
   }
   rsp = (rtcp_sdes_item_t *)(b + 4);
   for (; rsp->type; rsp = (rtcp_sdes_item_t *)((char *)rsp + rsp->length + 2)) {
-    member_sdes(src, rsp->type, rsp->data, rsp->length);
+    member_sdes(out, src, rsp->type, rsp->data, rsp->length);
     total_len += rsp->length + 2;
   }
   if (total_len >= len) {
@@ -360,7 +389,7 @@ static char *rtp_read_sdes(char *b, int len)
 /*
 * Return length parsed, -1 on error.
 */
-static int parse_control(char *buf, int len)
+static int parse_control(FILE *out, char *buf, int len)
 {
   rtcp_t *r;         /* RTCP header */
   int i;
@@ -370,34 +399,34 @@ static int parse_control(char *buf, int len)
   if (r->common.version == 0) {
     struct CtrlMsgHdr *v = (struct CtrlMsgHdr *)buf;
 
-    printf("flags=0x%x type=0x%x confid=%u\n",
+    fprintf(out, "flags=0x%x type=0x%x confid=%u\n",
       v->flags, v->type, v->confid); 
   }
   else if (r->common.version == RTP_VERSION) {
-    printf("\n");
+    fprintf(out, "\n");
     while (len > 0) {
       len -= (ntohs(r->common.length) + 1) << 2;
       if (len < 0) {
         /* something wrong with packet format */
-        printf("Illegal RTCP packet length %d words.\n",
+        fprintf(out, "Illegal RTCP packet length %d words.\n",
 	       ntohs(r->common.length));
         return -1;
       }
 
       switch (r->common.pt) {
       case RTCP_SR:
-        printf(" (SR ssrc=0x%lx p=%d count=%d len=%d\n", 
+        fprintf(out, " (SR ssrc=0x%lx p=%d count=%d len=%d\n", 
           (unsigned long)ntohl(r->r.rr.ssrc),
           r->common.p, r->common.count,
 	      ntohs(r->common.length));
-        printf("ntp=%lu.%lu ts=%lu psent=%lu osent=%lu\n",
+        fprintf(out, "  ntp=%lu.%lu ts=%lu psent=%lu osent=%lu\n",
           (unsigned long)ntohl(r->r.sr.ntp_sec),
           (unsigned long)ntohl(r->r.sr.ntp_frac),
           (unsigned long)ntohl(r->r.sr.rtp_ts),
           (unsigned long)ntohl(r->r.sr.psent),
           (unsigned long)ntohl(r->r.sr.osent));
         for (i = 0; i < r->common.count; i++) {
-          printf("  (ssrc=%0lx fraction=%g lost=%lu last_seq=%lu jit=%lu lsr=%lu dlsr=%lu)\n",
+          fprintf(out, "  (ssrc=0x%lx fraction=%g lost=%lu last_seq=%lu jit=%lu lsr=%lu dlsr=%lu )\n",
            (unsigned long)ntohl(r->r.sr.rr[i].ssrc),
            r->r.sr.rr[i].fraction / 256.,
            (unsigned long)ntohl(r->r.sr.rr[i].lost), /* XXX I'm pretty sure this is wrong */
@@ -406,15 +435,15 @@ static int parse_control(char *buf, int len)
            (unsigned long)ntohl(r->r.sr.rr[i].lsr),
            (unsigned long)ntohl(r->r.sr.rr[i].dlsr));
         }
-        printf(" )\n"); 
+        fprintf(out, " )\n"); 
         break;
 
       case RTCP_RR:
-        printf(" (RR ssrc=0x%lx p=%d count=%d len=%d\n", 
+        fprintf(out, " (RR ssrc=0x%lx p=%d count=%d len=%d\n", 
           (unsigned long)ntohl(r->r.rr.ssrc), r->common.p, r->common.count,
 	      ntohs(r->common.length));
         for (i = 0; i < r->common.count; i++) {
-          printf("(ssrc=%0lx fraction=%g lost=%lu last_seq=%lu jit=%lu lsr=%lu dlsr=%lu)\n",
+          fprintf(out, "  (ssrc=0x%lx fraction=%g lost=%lu last_seq=%lu jit=%lu lsr=%lu dlsr=%lu )\n",
             (unsigned long)ntohl(r->r.rr.rr[i].ssrc),
             r->r.rr.rr[i].fraction / 256.,
             (unsigned long)ntohl(r->r.rr.rr[i].lost),
@@ -423,21 +452,21 @@ static int parse_control(char *buf, int len)
             (unsigned long)ntohl(r->r.rr.rr[i].lsr),
             (unsigned long)ntohl(r->r.rr.rr[i].dlsr));
         }
-        printf(" )\n"); 
+        fprintf(out, " )\n"); 
         break;
 
       case RTCP_SDES:
-        printf(" (SDES p=%d count=%d len=%d\n", 
+        fprintf(out, " (SDES p=%d count=%d len=%d\n", 
           r->common.p, r->common.count, ntohs(r->common.length));
         buf = (char *)&r->r.sdes;
         for (i = 0; i < r->common.count; i++) {
           int remaining = (ntohs(r->common.length) << 2) -
-	    (buf - (char *)&r->r.sdes);
+	                      (buf - (char *)&r->r.sdes);
 
-          printf("  (src=0x%lx ", 
+          fprintf(out, "  (src=0x%lx ", 
             (unsigned long)ntohl(((struct rtcp_sdes *)buf)->src));
           if (remaining > 0) {
-            buf = rtp_read_sdes(buf, 
+            buf = rtp_read_sdes(out, buf, 
               (ntohs(r->common.length) << 2) - (buf - (char *)&r->r.sdes));
             if (!buf) return -1;
           }
@@ -445,28 +474,29 @@ static int parse_control(char *buf, int len)
             fprintf(stderr, "Missing at least %d bytes.\n", -remaining);
             return -1;
           }
-          printf(")\n"); 
+          fprintf(out, ")\n"); 
         }
-        printf(" )\n"); 
+        fprintf(out, " )\n"); 
         break;
 
       case RTCP_BYE:
-        printf(" (BYE p=%d count=%d len=%d\n", 
+        fprintf(out, " (BYE p=%d count=%d len=%d\n", 
           r->common.p, r->common.count, ntohs(r->common.length));
         for (i = 0; i < r->common.count; i++) {
-          printf("ssrc[%d]=%0lx ", i, 
+          fprintf(out, "  (ssrc[%d]=0x%0lx ", i, 
             (unsigned long)ntohl(r->r.bye.src[i]));
         }
+        fprintf(out, ")\n");
         if (ntohs(r->common.length) > r->common.count) {
           buf = (char *)&r->r.bye.src[r->common.count];
-          printf("reason=\"%*.*s\"", *buf, *buf, buf+1); 
+          fprintf(out, "reason=\"%*.*s\"", *buf, *buf, buf+1); 
         }
-        printf(")\n");
+        fprintf(out, " )\n");
         break;
 
       /* invalid type */
       default:
-        printf("(? pt=%d src=0x%lx)\n", r->common.pt, 
+        fprintf(out, "(? pt=%d src=0x%lx)\n", r->common.pt, 
           (unsigned long)ntohl(r->r.sdes.src));
       break;
       }
@@ -474,17 +504,18 @@ static int parse_control(char *buf, int len)
     }
   }
   else {
-    printf("invalid version %d\n", r->common.version);
+    fprintf(out, "invalid version %d\n", r->common.version);
   }
   return len;
 } /* parse_control */
 
 
 /*
-* Process one packet.
+* Process one packet and write it to file 'out' using format 'format'.
 */
-void packet_handler(t_format format, int trunc, double dstart, struct
-  timeval now, int ctrl, struct sockaddr_in sin, int len, RD_buffer_t
+void packet_handler(FILE *out, t_format format, int trunc,
+  double dstart, struct timeval now, int ctrl, 
+  struct sockaddr_in sin, int len, RD_buffer_t
   packet)
 {
   double dnow = tdbl(&now);
@@ -499,7 +530,7 @@ void packet_handler(t_format format, int trunc, double dstart, struct
       /* leave only header */
       if (ctrl == 0) len = parse_header(packet.p.data);
       packet.p.hdr.length = htons(len + sizeof(packet.p.hdr));
-      if (fwrite((char *)&packet, len + sizeof(packet.p.hdr), 1, stdout) == 0) {
+      if (fwrite((char *)&packet, len + sizeof(packet.p.hdr), 1, out) == 0) {
         perror("fwrite");
         exit(1);
       }
@@ -513,7 +544,7 @@ void packet_handler(t_format format, int trunc, double dstart, struct
       /* truncation of payload */
       if (!ctrl && (len - hlen > trunc)) len = hlen + trunc;
       packet.p.hdr.length = htons(len + sizeof(packet.p.hdr));
-      if (fwrite((char *)&packet, len + sizeof(packet.p.hdr), 1, stdout) == 0) {
+      if (fwrite((char *)&packet, len + sizeof(packet.p.hdr), 1, out) == 0) {
         perror("fwrite");
         exit(1);
       }
@@ -522,7 +553,7 @@ void packet_handler(t_format format, int trunc, double dstart, struct
     case F_payload:
       /* XXX should check header format. */
       if (ctrl == 0) {
-        if (fwrite(&packet.p.data[12], len - 12, 1, stdout) == 0) {
+        if (fwrite(&packet.p.data[12], len - 12, 1, out) == 0) {
           perror("fwrite");
           exit(1);
         }
@@ -530,20 +561,20 @@ void packet_handler(t_format format, int trunc, double dstart, struct
       break;
 
     case F_short:
-      if (ctrl == 0) parse_short(now, packet.p.data, len);
+      if (ctrl == 0) parse_short(out, now, packet.p.data, len);
       break;
 
     case F_rtcp:
     case F_hex:
       case F_ascii:
-        printf("%8ld.%06ld %s len=%d from=%s:%u ",
+        fprintf(out, "%8ld.%06ld %s len=%d from=%s:%u ",
             now.tv_sec, now.tv_usec, parse_type(ctrl, packet.p.data),
             len, inet_ntoa(sin.sin_addr), ntohs(sin.sin_port));
         if (format == F_hex) {
-          hex(packet.p.data, trunc < len ? trunc : len);
+          hex(out, packet.p.data, trunc < len ? trunc : len);
         }
-        ctrl ? parse_control(packet.p.data, len) : 
-              parse_data(packet.p.data, len);
+        ctrl ? parse_control(out, packet.p.data, len) : 
+              parse_data(out, packet.p.data, len);
         break;
 
      case F_invalid:
@@ -578,6 +609,7 @@ int main(int argc, char *argv[])
   enum {FromFile, FromNetwork} source;
   int sock[2];
   FILE *in = stdin;         /* input file to use instead of sockets */
+  FILE *out = stdout;       /* output file */
   fd_set readfds;
   extern char *optarg;
   extern int optind;
@@ -605,7 +637,15 @@ int main(int argc, char *argv[])
 
     /* input file (instead of network connection) */
     case 'f':
-      if (!(in = fopen(optarg, "r"))) {
+      if (!(in = fopen(optarg, "rb"))) {
+        perror(optarg);
+        exit(1);
+      }
+      break;
+
+    /* output file */
+    case 'o':
+      if (!(out = fopen(optarg, "wb"))) {
         perror(optarg);
         exit(1);
       }
@@ -690,7 +730,7 @@ int main(int argc, char *argv[])
 
   /* write header for dump file */
   if (format == F_dump || format == F_header)
-    rtpdump_header(stdout, &sin, &start);
+    rtpdump_header(out, &sin, &start);
 
   /* signal handler */
   signal(SIGINT, done);
@@ -731,7 +771,7 @@ int main(int argc, char *argv[])
 
           len = recvfrom(sock[i], packet.p.data, sizeof(packet.p.data), 
             0, (struct sockaddr *)&sin, &alen);
-          packet_handler(format, trunc, dstart, now, i, sin, len, packet);
+          packet_handler(out, format, trunc, dstart, now, i, sin, len, packet);
         }
       }
     }
@@ -745,7 +785,7 @@ int main(int argc, char *argv[])
       i = (packet.p.hdr.plen == 0);
       /* arbitrary, obviously invalid value */
       sin.sin_addr.s_addr = INADDR_ANY; sin.sin_port = 0;
-      packet_handler(format, trunc, dstart, now, i, sin, len, packet);
+      packet_handler(out, format, trunc, dstart, now, i, sin, len, packet);
     }
   }
   return 0;

@@ -231,7 +231,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
 
   /* do not translate packets that already use RTP or arrive over the unicast
    link*/
-  if((rtp_hdr->version==2)||((sock!=multi_sock[0])&&(sock!=multi_sock[1]))) {
+  if ((rtp_hdr->version==2)||((sock!=multi_sock[0])&&(sock!=multi_sock[1]))) {
     rtp_hdr=(rtp_hdr_t *)packet;   
     for (i = 0; i < hostc; i++) {
       if (side[i][proto].sock != sock) {
@@ -243,16 +243,16 @@ static Notify_value socket_handler(Notify_client client, int sock)
   }
   else {
     struct msghdr msg;
-    if (!proto) { /*translate VAT packets */
+    if (!proto) { /* translate VAT packets */
       struct iovec iov[2];
       char type; 
       int samples = len-VAT_LEN;
       vat_hdr=(vat_hdr_t *)packet;   
 
       if(vat_hdr->flags&VATHF_NEWTS)
-        rtp_hdr_send.m=1;
+        rtp_hdr_send.m = 1;
       else
-        rtp_hdr_send.m=0;
+        rtp_hdr_send.m = 0;
       type= vat_hdr->flags&VATHF_FMTMASK;
 
       switch (type) {
@@ -325,8 +325,8 @@ static Notify_value socket_handler(Notify_client client, int sock)
           msg.msg_name = (caddr_t ) &side[i][proto].sin;
           msg.msg_namelen = sizeof(side[i][proto].sin);
 #if defined(__FreeBSD__) || defined(__linux__) /* Or presumably other BSD 4.4 systems */
-	  msg.msg_control = 0;
-	  msg.msg_controllen = 0;
+          msg.msg_control = 0;
+          msg.msg_controllen = 0;
 #else
           msg.msg_accrights = 0;
           msg.msg_accrightslen = 0;
@@ -510,11 +510,6 @@ int main(int argc, char *argv[])
         if (!multi_sock[j]) {
           multi_sock[j]=side[i][j].sock;  /* save number of multicast socket */
         }
-        if (j < 2 && setsockopt(side[i][j].sock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-            (char *)&host[i].mreq, sizeof(host[i].mreq)) < 0) {
-            perror("IP_ADD_MEMBERSHIP");
-            exit(1);
-        }
         if (j==2 && setsockopt(side[i][j].sock, IPPROTO_IP, IP_MULTICAST_TTL,
             (char *)&host[i].ttl, sizeof(host[i].ttl)) < 0) {
           perror("IP_MULTICAST_TTL");
@@ -531,10 +526,14 @@ again:
             exit(1);
           }
         }
+        if (j < 2 && setsockopt(side[i][j].sock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+            (char *)&host[i].mreq, sizeof(host[i].mreq)) < 0) {
+          perror("IP_ADD_MEMBERSHIP");
+          exit(1);
+        }
         if (j==2 && setsockopt(side[i][j].sock, IPPROTO_IP, IP_MULTICAST_LOOP,
             (char *)&loop, sizeof(loop)) < 0) {
           perror("IP_MULTICAST_LOOP");
-          exit(1);
         }
       } /* multicast */
       /* unicast */

@@ -10,14 +10,65 @@
 <h1><a href="rtptools.html">RTP tools</a> change history</h1>
 
 <dl>
-<dt>1.14 (October 1999)
+<p><dt>1.17 (April 2001)
+<dd>Added <samp>-o</samp> option to <tt>rtpdump</tt>, so that output can
+be directed to a file.  This is necessary so that the file can be opened
+in binary mode.  Otherwise, stdout on Win32 is opened in text mode, with
+\n to \n\r translation.  (hgs)
+
+<p><dt>1.16 (July 2000)
+<dd>
+<ul>
+<li>For <tt>rtpsend</tt>, add <samp>-s</samp> flag to allow setting
+source port of packets. (Ping Pan)
+
+<li>For <tt>rtpsend</tt>, set RTCP timestamp to current value.  (Ping
+Pan)
+
+<li>Compile fixes for Linux. (Jori)
+</ul>
+
+<p><dt>1.15 (March 2000)
+<dd>
+<ul>
+<li>For <tt>rtpsend</tt>, in function <tt>rtpsend()</tt>, added support
+for transmiting RTCP messages, leading to a rewrite of
+<tt>rtcp_packet()</tt> and the addition of the <tt>rtcp_write_XXX()</tt>
+routines. (Ping Pan)
+
+<li>Bug fix:  in <code>rtpsend()</code>, the <code>parse()</code>
+routine should store <code>unsigned long</code> into <var>n->num</var>,
+instead of <code>int</code>.  This caused an error for large SSRC
+values.  (Ping Pan)
+
+<li>In <tt>rtpdump()</tt>, the print-out for RTCP SR/RR report blocks
+should have a space before the ')'.  This confused the <code>parse()</code>
+routine in <code>rtpsend()</code>.  (Ping Pan)
+
+<li><tt>rtpdump</tt> in <var>-F ascci</var> mode generated an ntp line
+without preceding space, crashing rtpsend.  Fixed rtpdump.  (Wenyu
+Jiang)
+
+<li><tt>rtpsend</tt> sets X (extension) bit correctly and allows to
+specify the extension header.  (Ping Pan)
+
+<li><tt>rtpsend</tt> has <samp>-a</samp> flag to set the router alert
+option when sending RTCP packets. This features is only useful for
+testing YESSIR resource reservation.
+
+<li><tt>rtpsend</tt> made more robust against invalid input.  Exits if
+invalid input is found rather than trying to soldier on.
+
+</ul>
+
+<p><dt>1.14 (October 1999)
 <dd>
 <ul>
 <li>Various portability fixes; now tested to compile on Solaris 2.6,
 Linux 2.2.10, FreeBSD 2.2.7, and FreeBSD 3.3. (Jonathan Lennox)
 </ul>
 
-<dt>1.13 (August 1999)
+<p><dt>1.13 (August 1999)
 <dd>
 <ul>
 <li>Change to autoconf format [<a href="mailto:pere@hungry.com">Petter
@@ -42,7 +93,7 @@ packet.p.hdr.plen   = ctrl ? 0 : len;
 href="mailto:jori@lumumba.luc.ac.be">Jori</a>]
 </ul>
 
-<dt>1.11 (January 1999)
+<p><dt>1.11 (January 1999)
 <dd>
 <ul>
 <li>Marc Eaddy found that MSVC++ 5.0 only works if seq is declared
@@ -55,7 +106,7 @@ Reinholdtsen</a>
 
 </ul>
 
-<dt>1.10 (March 1998)
+<p><dt>1.10 (March 1998)
 <dd>
 <ul>
 <li>Bill Fenner:  "I've been experimenting with real short clips, and
@@ -78,7 +129,7 @@ a selected portion of the file.
 the preceding RTCP packet.
 </ul>
 
-<dt>1.9 (August 1997)
+<p><dt>1.9 (August 1997)
 <dd>
 <ul>
 <li><tt>rtptrans</tt> also has non-sendmsg ifdef for Linux and similarly
@@ -101,13 +152,13 @@ be identical).
 numbers.
 </ul>
 
-<dt>1.8 (July 1997)
+<p><dt>1.8 (July 1997)
 <dd>
 <ul>
 <li>Bug in parsing of RR fixed.
 </ul>
 
-<dt>1.6 (October 1996)
+<p><dt>1.6 (October 1996)
 <dd>
 
 <ul>
@@ -125,7 +176,7 @@ RTP/RTCP and media headers are logged.
 <li>Fixed: random address information in header.
 </ul>
 
-<dt>1.0 (December 1995)
+<p><dt>1.0 (December 1995)
 
 <dd>
 <ul>

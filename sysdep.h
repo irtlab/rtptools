@@ -106,9 +106,6 @@ struct ip_mreq {
         struct in_addr  imr_multiaddr;  /* IP multicast address of group */
         struct in_addr  imr_interface;  /* local IP address of interface */
 };
-#define IP_ADD_MEMBERSHIP       0x13    /* add  an IP group membership     */
-#define IP_MULTICAST_TTL        0x11    /* set/get IP multicast timetolive */
-#define IP_MULTICAST_LOOP       0x12    /* set/get IP multicast loopback   */
 
 #define  ITIMER_REAL     0       /* Decrements in real time */
 
@@ -164,7 +161,7 @@ extern int sendmsg(int s, const struct msghdr *msg, int flags);
 #error "Not Unix or WIN32 -- what system is this?"
 #endif
 
-#if !defined(sun4) && !defined(hp) && !defined(nextstep)
+#if !defined(sun4) && !defined(hp) && !defined(nextstep) && !defined(linux)
 #include <sys/select.h>  /* select() */
 #endif
 

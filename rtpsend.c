@@ -15,7 +15,8 @@
 *             )
 *
 *
-* (c) 1998-1999 Henning Schulzrinne (Columbia University), all rights reserved
+* (c) 1998-2000 Henning Schulzrinne and Ping Pan (Columbia University), 
+*   all rights reserved
 */
 
 #include <stdio.h>
@@ -48,14 +49,14 @@ static int sock[2];  /* output sockets */
 typedef struct node {
   struct node *next, *list;  /* parameter in list, level down */ 
   char *type;    /* parameter type */
-  int num;       /* numeric value */
+  unsigned long num;       /* numeric value */
   char *string;  /* string value */
 } node_t;
 
 
 static void usage(char *argv0)
 {
-  fprintf(stderr, "Usage: %s [-lv] [-f file] destination/port/ttl\n",
+  fprintf(stderr, "Usage: %s [-lav] [-f file] destination/port/ttl\n",
     argv0);
   exit(1);
 } /* usage */
@@ -76,12 +77,11 @@ static int hex(char *text, char *buffer)
   byte[2] = '\0';
   for (s = text; *s; s++) {
     if (isspace((int)*s)) continue;
-    else {
-      byte[nibble++] = *s;
-      if (nibble == 2) {
-        nibble = 0;
-        buffer[len++] = strtol(byte, (char **)NULL, 16);
-      }
+    
+    byte[nibble++] = *s;
+    if (nibble == 2) {
+      nibble = 0;
+      buffer[len++] = strtol(byte, (char **)NULL, 16);
     }
   }
   return len;
@@ -154,7 +154,7 @@ static node_t *parse(char *text)
           char *v = e+1;
 
           *e = '\0';
-          if (isdigit((int)*v)) n->num = strtol(v, (char **)NULL, 0);
+          if (isdigit((int)*v)) n->num = (unsigned long)strtoul(v, (char **)NULL, 0);
           else {
             n->string = malloc(strlen(v+1) + 1);
             /* strip quotation marks */
@@ -183,7 +183,7 @@ static node_t *parse(char *text)
 static u_int32 parse_int(char *word)
 {
   char *s;
-  u_int32 value;
+  u_int32 value = 0;
 
   if ((s = strchr(word, '='))) {
     value = strtol(s+1, (char **)NULL, 0);    
@@ -266,7 +266,7 @@ static int rtcp_sdes(node_t *list, char *packet)
   for (n = list; n; n = n->next) {
     if (n->type) {
       if (strcmp(n->type, "src") == 0) {
-        sdes->src = n->num;
+        sdes->src = htonl(n->num);
       }
       else {
         len = rtcp_sdes_item(n->type, n->string, packet);
@@ -287,82 +287,39 @@ static int rtcp_sdes(node_t *list, char *packet)
 } /* rtcp_sdes */
 
 
-static int rtcp_sr(node_t *n, char *packet)
-{
-  int length = 0;
+#define RTCP_SDES_HDR_LEN  4  /* SDES default length (common) */
 
-  return length;
-} /* rtcp_sr */
-
-
-static int rtcp_rr(node_t *n, char *packet)
-{
-  int length = 0;
-
-  return length;
-} /* rtcp_rr */
-
-
-static int rtcp_bye(node_t *n, char *packet)
-{
-  int length = 0;
-
-  return length;
-} /* rtcp_bye */
-
-
-/*
-* Based on list of parameters in 'n', assemble RTCP packet.
-*/
-static int rtcp_packet(node_t *list, char *packet)
+static int rtcp_write_sdes(node_t *list, char *packet)
 {
   node_t *n;
-  int len = 0, total = 4, count = 0;
+  int len = 0, total = RTCP_SDES_HDR_LEN, count = 0;
   rtcp_t *r = (rtcp_t *)packet;
-  int (*f)(node_t *list, char *packet);
   
   r->common.length  = 0;
   r->common.count   = 0;
   r->common.version = RTP_VERSION;
+  r->common.pt      = RTCP_SDES;
   r->common.p       = 0;
-  packet += 4; /* skip common header */
+
+  packet += RTCP_SDES_HDR_LEN; /* skip common header */
+
   for (n = list; n; n = n->next) {
     if (n->type) {
-      if (strcmp(n->type, "SDES") == 0) {
-        f = rtcp_sdes;
-        r->common.pt = RTCP_SDES;
-      }
-      else if (strcmp(n->type, "RR") == 0) {
-        f = rtcp_rr;
-        r->common.pt = RTCP_RR;
-      }
-      else if (strcmp(n->type, "SR") == 0) {
-        f = rtcp_sr;
-        r->common.pt = RTCP_SR;
-      }
-      else if (strcmp(n->type, "BYE") == 0) {
-        f = rtcp_bye;
-        r->common.pt = RTCP_BYE;
-      }
-      else if (strcmp(n->type, "pt") == 0) {
-        r->common.pt = n->num;
-      }
-      else if (strcmp(n->type, "v") == 0) {
-        r->common.version = n->num;
-      }
-      else if (strcmp(n->type, "p") == 0) {
+      if (strcmp(n->type, "SDES") == 0)
+        continue;
+      else if (strcmp(n->type, "p") == 0)
         r->common.p = n->num;
-      }
-      else if (strcmp(n->type, "count") == 0) {
+      else if (strcmp(n->type, "count") == 0)
         r->common.count = n->num;
-      }
-      else if (strcmp(n->type, "len") == 0) {
-        r->common.length = n->num;
+      else if (strcmp(n->type, "len") == 0)
+        r->common.length = htons(n->num);
+      else  {
+        fprintf(stderr, "Invalid RTCP type %s\n", n->type);
+        exit(2);
       }
     }
-    /* list: type-specific parts */
-    else {
-      len = (*f)(n->list, packet);
+    else { /* list: type-specific parts */
+      len = rtcp_sdes(n->list, packet);
       packet += len;
       total += len;
       count++;
@@ -370,11 +327,286 @@ static int rtcp_packet(node_t *list, char *packet)
   }
   /* if no length or count given, fill in */
   if (r->common.length == 0) {
-    r->common.length = (total - 4) / 4;
+    r->common.length = htons((total - 4) / 4);
   }
-  if (r->common.count == 0) r->common.count = count;
+  if (r->common.count == 0)
+    r->common.count = count;
 
   return total;
+} /* rtcp_write_sdes */
+
+
+
+/*
+* Create RR entries for single report block.
+* Return length.
+*/
+static int rtcp_rr(node_t *list, char *packet)
+{
+  node_t *n;
+  rtcp_rr_t *rr = (rtcp_rr_t *)packet;
+
+  for (n = list; n; n = n->next) {
+    if (n->type) {
+      if (strcmp(n->type, "ssrc") == 0)
+        rr->ssrc = htonl(n->num);
+      else if (strcmp(n->type, "fraction") == 0)
+        rr->fraction = (n->num)*256;
+      else if (strcmp(n->type, "lost") == 0)   /* PP: alignment OK? */
+        rr->lost = htonl(n->num);
+      else if (strcmp(n->type, "last_seq") == 0)
+        rr->last_seq = htonl(n->num);
+      else if (strcmp(n->type, "jit") == 0)
+        rr->jitter = htonl(n->num);
+      else if (strcmp(n->type, "lsr") == 0)
+        rr->lsr = htonl(n->num);
+      else if (strcmp(n->type, "dlsr") == 0)
+        rr->dlsr = htonl(n->num);
+      else  {
+        fprintf(stderr, "Invalid RTCP RR type %s\n", n->type);
+        exit(2);
+      }
+    }
+  }
+
+  return  sizeof(rtcp_rr_t);
+} /* rtcp_rr */
+
+
+#define RTCP_SR_HDR_LEN  28  /* SR default length (common + ssrc... ) */
+
+/*
+ * Number of seconds between 1-Jan-1900 and 1-Jan-1970
+ */
+#define GETTIMEOFDAY_TO_NTP_OFFSET 2208988800
+
+
+/*
+ * convert microseconds to fraction of second * 2^32 (i.e., the lsw of
+ * a 64-bit ntp timestamp).  This routine uses the factorization
+ * 2^32/10^6 = 4096 + 256 - 1825/32 which results in a max conversion
+ * error of 3 * 10^-7 and an average error of half that.
+ */
+u_int usec2ntp(u_int usec)
+{
+  u_int t = (usec * 1825) >> 5;
+  return ((usec << 12) + (usec << 8) - t);
+} /* usec2ntp */
+
+
+static int rtcp_write_sr(node_t *list, char *packet)
+{
+  node_t *n;
+  int len = 0, total = RTCP_SR_HDR_LEN, count = 0;
+  rtcp_t *r = (rtcp_t *)packet;
+  struct timeval now;
+  
+  gettimeofday(&now, 0);
+  r->common.length  = 0;
+  r->common.count   = 0;
+  r->common.version = RTP_VERSION;
+  r->common.pt      = RTCP_SR;
+  r->common.p       = 0;
+  r->r.sr.ntp_sec   = htonl((u_int32)now.tv_sec + GETTIMEOFDAY_TO_NTP_OFFSET);
+  r->r.sr.ntp_frac  = htonl(usec2ntp((u_int)now.tv_usec)); 
+
+  packet += RTCP_SR_HDR_LEN; /* skip common header and ssrc */
+
+  for (n = list; n; n = n->next) {
+    if (n->type) {
+      if (strcmp(n->type, "SR") == 0)
+        continue;
+      else if (strcmp(n->type, "ssrc") == 0)
+        r->r.sr.ssrc = htonl(n->num);
+      else if (strcmp(n->type, "p") == 0)
+        r->common.p = n->num;
+      else if (strcmp(n->type, "count") == 0)
+        r->common.count = n->num;
+      else if (strcmp(n->type, "len") == 0)
+        r->common.length = htons(n->num);
+      else if (strcmp(n->type, "ntp") == 0)  /* PP: two words */
+        r->r.sr.ntp_sec = htonl(n->num);
+      else if (strcmp(n->type, "ts") == 0)
+        r->r.sr.rtp_ts = htonl(n->num);
+      else if (strcmp(n->type, "psent") == 0)
+        r->r.sr.psent = htonl(n->num);
+      else if (strcmp(n->type, "osent") == 0)
+        r->r.sr.osent = htonl(n->num);
+      else  {
+        fprintf(stderr, "Invalid RTCP type %s\n", n->type);
+        exit(2);
+      }
+    }
+    else { /* list: type-specific parts */
+      len = rtcp_rr(n->list, packet);
+      packet += len;
+      total += len;
+      count++;
+    }
+  }
+  /* if no length or count given, fill in */
+  if (r->common.length == 0) {
+    r->common.length = htons((total - 4) / 4);
+  }
+  if (r->common.count == 0)
+    r->common.count = count;
+
+  return total;
+} /* rtcp_write_sr */
+
+
+
+#define RTCP_RR_HDR_LEN  8  /* RR default length (common + ssrc) */
+
+static int rtcp_write_rr(node_t *list, char *packet)
+{
+  node_t *n;
+  int len = 0, total = RTCP_RR_HDR_LEN, count = 0;
+  rtcp_t *r = (rtcp_t *)packet;
+  
+  r->common.length  = 0;
+  r->common.count   = 0;
+  r->common.version = RTP_VERSION;
+  r->common.pt      = RTCP_RR;
+  r->common.p       = 0;
+
+  packet += RTCP_RR_HDR_LEN; /* skip common header and ssrc */
+
+  for (n = list; n; n = n->next) {
+    if (n->type) {
+      if (strcmp(n->type, "RR") == 0)
+        continue;
+      else if (strcmp(n->type, "ssrc") == 0)
+        r->r.rr.ssrc = htonl(n->num);
+      else if (strcmp(n->type, "p") == 0)
+        r->common.p = n->num;
+      else if (strcmp(n->type, "count") == 0)
+        r->common.count = n->num;
+      else if (strcmp(n->type, "len") == 0)
+        r->common.length = htons(n->num);
+      else  {
+        fprintf(stderr, "Invalid RTCP type %s\n", n->type);
+        exit(2);
+      }
+    }
+    else { /* list: type-specific parts */
+      len = rtcp_rr(n->list, packet);
+      packet += len;
+      total += len;
+      count++;
+    }
+  }
+  /* if no length or count given, fill in */
+  if (r->common.length == 0) {
+    r->common.length = htons((total - 4) / 4);
+  }
+  if (r->common.count == 0)
+    r->common.count = count;
+
+  return total;
+} /* rtcp_write_rr */
+
+
+static int rtcp_bye(node_t *list, char *packet)
+{
+  node_t *n;
+  u_int32 *bye = (u_int32 *)packet;
+
+  for (n = list; n; n = n->next) {
+    if (n->type) {
+      if (strcmp(n->type, "ssrc") == 0)
+        *bye = htonl(n->num);
+    }
+  }
+  return sizeof(u_int32);
+} /* rtcp_bye */
+
+
+#define RTCP_BYE_HDR_LEN  4  /* BYE default length (common) */
+
+static int rtcp_write_bye(node_t *list, char *packet)
+{
+  node_t *n;
+  int len = 0, total = RTCP_BYE_HDR_LEN, count = 0;
+  rtcp_t *r = (rtcp_t *)packet;
+  
+  r->common.length  = 0;
+  r->common.count   = 0;
+  r->common.version = RTP_VERSION;
+  r->common.pt      = RTCP_BYE;
+  r->common.p       = 0;
+
+  packet += RTCP_BYE_HDR_LEN; /* skip common header */
+
+  for (n = list; n; n = n->next) {
+    if (n->type) {
+      if (strcmp(n->type, "BYE") == 0)
+        continue;
+      else if (strcmp(n->type, "p") == 0)
+        r->common.p = n->num;
+      else if (strcmp(n->type, "count") == 0)
+        r->common.count = n->num;
+      else if (strcmp(n->type, "len") == 0)
+        r->common.length = htons(n->num);
+      else  {
+        fprintf(stderr, "Invalid RTCP type %s\n", n->type);
+        exit(2);
+      }
+    }
+    else { /* list: type-specific parts */
+      len = rtcp_bye(n->list, packet);
+      packet += len;
+      total += len;
+      count++;
+    }
+  }
+  /* if no length or count given, fill in */
+  if (r->common.length == 0) {
+    r->common.length = htons((total - 4) / 4);
+  }
+  if (r->common.count == 0)
+    r->common.count = count;
+
+  return total;
+} /* rtcp_write_bye */
+
+
+static int rtcp_write_app(node_t *list, char *packet)
+{
+  return 0;
+}
+
+/*
+ * Based on list of parameters in 'n', assemble RTCP packet.
+ */
+static int rtcp_packet(node_t *list, char *packet)
+{
+  struct {
+    char *pt;
+    int  (*rtcp_write)(node_t *list, char *packet);
+  } rtcp_map[] = {
+    { "SDES",  rtcp_write_sdes },
+    { "RR",  rtcp_write_rr },
+    { "SR",  rtcp_write_sr },
+    { "BYE",  rtcp_write_bye },
+    { "APP",  rtcp_write_app },
+  };
+  int max = sizeof(rtcp_map) / sizeof(rtcp_map[0]);
+  int i;
+  node_t *n;
+
+  for (n = list; n; n = n->next) {
+    if (!n->type)
+      continue;
+
+    for (i=0; i < max; i++) {
+      if (strcmp(n->type, rtcp_map[i].pt) == 0)
+        return rtcp_map[i].rtcp_write(list, packet);
+    }
+  }
+
+  fprintf(stderr, "No RTCP payload type\n");
+  exit(2);
 } /* rtcp_packet */
 
 
@@ -409,10 +641,12 @@ static int rtp(char *text, char *packet)
 {
   char *word;
   int pl = 0;  /* payload length */
+  int ext_pl = 0;  /* extension payload length */
   int wc = 0;
   int cc = 0;
   int pad = 0;
   rtp_hdr_t *h = (rtp_hdr_t *)packet;
+  rtp_hdr_ext_t *ext;
   int length = 0;
   u_int32 value;
 
@@ -441,6 +675,9 @@ static int rtp(char *text, char *packet)
     else if (strcmp(word, "m") == 0) {
       h->m = value;
     }
+    else if (strcmp(word, "x") == 0) {
+      h->x = value;
+    }
     else if (strcmp(word, "v") == 0) {
       h->version = value;
     }
@@ -452,9 +689,25 @@ static int rtp(char *text, char *packet)
       h->csrc[k] = value;
       if (k > cc) cc = k;
     } 
+    /* we'd better have h->cc already */
+    else if (strcmp(word, "ext_type") == 0) {
+      ext = (rtp_hdr_ext_t *)(packet + 12 + h->cc*4);
+      ext->ext_type = htons(value);
+      ext_pl += sizeof(rtp_hdr_ext_t);
+    }
+    else if (strcmp(word, "ext_len") == 0) {
+      ext = (rtp_hdr_ext_t *)(packet + 12 + h->cc*4);
+      ext_pl += value * 4;
+      ext->len = htons(value);
+    }
+    /* we'd better have a valid ext_pl already */
+    else if (strcmp(word, "ext_data") == 0) {
+      int dummy;
+      dummy = hex(&word[9], packet + 12 + h->cc*4 + 4);
+    } 
     /* data is in hex; words may be separated by spaces */
     else if (strcmp(word, "data") == 0) {
-      pl = hex(&word[5], packet + 12 + h->cc*4);
+      pl = hex(&word[5], packet + 12 + h->cc*4 + ext_pl);
     }
     else if (strcmp(word, "len") == 0) {
       length = value;
@@ -463,7 +716,7 @@ static int rtp(char *text, char *packet)
   }
   /* fill in default values if not set */
   if (h->cc == 0) h->cc = cc;
-  if (length == 0) length = 12 + h->cc * 4 + pl;
+  if (length == 0) length = 12 + h->cc * 4 + pl + ext_pl;
 
   /* insert padding */
 
@@ -481,7 +734,10 @@ static int generate(char *text, char *data, double *time, int *type)
   char type_name[100];
 
   if (verbose) printf("%s", text);
-  sscanf(text, "%lf %s", time, type_name);
+  if (sscanf(text, "%lf %s", time, type_name) < 2) {
+    fprintf(stderr, "Line %s is invalid.\n", text);
+    exit(2);
+  }
   if (strcmp(type_name, "RTP") == 0) {
     length = rtp(strstr(text, "RTP") + 3, data);
     *type = 0;
@@ -489,6 +745,9 @@ static int generate(char *text, char *data, double *time, int *type)
   else if (strcmp(type_name, "RTCP") == 0) {
     length = rtcp(strstr(text, "RTCP") + 4, data);
     *type = 1;
+  } else {
+    fprintf(stderr, "Type %s is not supported.\n", type_name);
+    exit(2);
   }
   return length;
 } /* generate */
@@ -587,9 +846,14 @@ int main(int argc, char *argv[])
 {
   char ttl = 16;
   static struct sockaddr_in sin;
+  static struct sockaddr_in from;
   int i;
   int c;
-  int loop = 0;   /* play file indefinitely */
+  int loop = 0;        /* play file indefinitely */
+  int alert = 0;       /* insert IP router alert option if possible */
+  int sourceport = 0;  /* source port */
+  int on = 1;          /* flag */
+  static u_char ra[4] = {148, 4, 0, 1};  /* router alert option for RTP */
   char *filename = 0;
   extern char *optarg;
   extern int optind;
@@ -597,13 +861,19 @@ int main(int argc, char *argv[])
 
   /* parse command line arguments */
   startupSocket();
-  while ((c = getopt(argc, argv, "f:lv?h")) != EOF) {
+  while ((c = getopt(argc, argv, "f:als:v?h")) != EOF) {
     switch(c) {
     case 'f':
       filename = optarg;
       break;
-    case 'l':
+    case 'a':
+      alert = 1;
+      break;
+    case 'l':  /* loop */
       loop = 1;
+      break;
+    case 's':  /* locked source port */
+      sourceport = atoi(optarg);
       break;
     case 'v':
       verbose = 1;
@@ -640,6 +910,30 @@ int main(int argc, char *argv[])
     }
     sin.sin_port = htons(ntohs(sin.sin_port) + i);
 
+    if (sourceport) {
+      memset((char *)(&from), 0, sizeof(struct sockaddr_in));
+      from.sin_family      = PF_INET;
+      from.sin_addr.s_addr = INADDR_ANY;
+      from.sin_port        = htons(sourceport);
+
+      if (setsockopt(sock[i], SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
+        perror("SO_REUSEADDR");
+        exit(1);
+      }
+
+#ifdef SO_REUSEPORT
+      if (setsockopt(sock[i], SOL_SOCKET, SO_REUSEPORT, &on, sizeof(on)) < 0) {
+        perror("SO_REUSEPORT");
+        exit(1);
+      }
+#endif
+
+      if (bind(sock[i], (struct sockaddr *)&from, sizeof(from)) < 0) {
+        perror("bind");
+        exit(1);
+      }
+    }
+
     if (connect(sock[i], (struct sockaddr *)&sin, sizeof(sin)) < 0) {
       perror("connect");
       exit(1);
@@ -650,6 +944,12 @@ int main(int argc, char *argv[])
         (setsockopt(sock[i], IPPROTO_IP, IP_MULTICAST_TTL, &ttl,
                    sizeof(ttl)) < 0)) {
       perror("IP_MULTICAST_TTL");
+      exit(1);
+    }
+    if (alert && 
+        (setsockopt(sock[i], IPPROTO_IP, IP_OPTIONS, (void *)ra,
+                  sizeof(ra)) < 0)) {
+      perror("IP router alert option");
       exit(1);
     }
   }

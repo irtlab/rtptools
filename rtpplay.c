@@ -161,7 +161,8 @@ static Notify_value play_handler(Notify_client client)
 
     if (buffer[b].p.hdr.plen) {
       r = (rtp_hdr_t *)buffer[b].p.data;
-      printf(" ssrc=%8lx %cts=%9lu seq=%5u",
+      printf(" pt=%u ssrc=%8lx %cts=%9lu seq=%5u",
+        (unsigned int)r->pt,
         (unsigned long)ntohl(r->ssrc), r->m ? '*' : ' ',
         (unsigned long)ntohl(r->ts), ntohs(r->seq));
     }
@@ -222,8 +223,8 @@ static Notify_value play_handler(Notify_client client)
       next.tv_sec  = t->rt.tv_sec  + (int)d;
       next.tv_usec = t->rt.tv_usec + (d - (int)d) * 1000000;
       if (verbose)
-        printf(". %1.3f t=%6lu ts=%lu,%lu rp=%2d b=%d d=%f\n", tdbl(&next), 
-        (unsigned long)buffer[rp].p.hdr.offset, 
+        printf(". %1.3f t=%6lu pt=%u ts=%lu,%lu rp=%2d b=%d d=%f\n", tdbl(&next), 
+        (unsigned long)buffer[rp].p.hdr.offset, (unsigned int)r->pt,
         (unsigned long)ts, (unsigned long)t->ts,
         rp, b, d);
     } else { /* If not on source list, insert and play based on wallclock. */

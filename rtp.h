@@ -77,6 +77,13 @@ typedef struct {
     u_int32 csrc[1];          /* optional CSRC list */
 } rtp_hdr_t;
 
+/* RTP Header Extension 
+ */
+typedef struct {
+    u_int16 ext_type;         /* defined by profile */
+    u_int16 len;              /* extension length in 32-bit word */
+} rtp_hdr_ext_t;
+
 /*
  * RTCP common header word
  */
