@@ -26,7 +26,11 @@
 #include <string.h>
 #include <stdlib.h>      /* perror() */
 #include <unistd.h>      /* write() */
+#if HAVE_SEARCH_H
 #include <search.h>      /* hash table */
+#else
+#include "hsearch.h"
+#endif
 #include "notify.h"      /* notify_start(), ... */
 #include "rtp.h"         /* RTP headers */
 #include "types.h"
@@ -42,7 +46,7 @@ static int verbose = 0;        /* be chatty about packets sent */
 static int wallclock = 0;      /* use wallclock time rather than timestamps */
 static u_int32 begin = 0;      /* time of first packet to send */
 static u_int32 end = UINT_MAX; /* when to stop sending */ 
-static FILE *in = stdin;       /* input file */
+static FILE *in;	       /* input file */
 static int sock[2];            /* output sockets */
 static int first = -1;         /* time offset of first packet */
 static RD_buffer_t buffer[READAHEAD];
@@ -225,7 +229,8 @@ static Notify_value play_handler(Notify_client client)
     } else { /* If not on source list, insert and play based on wallclock. */
       item.key  = malloc(strlen(ssrc)+1);
       strcpy(item.key, ssrc);
-      item.data = (void *)t = (struct rt_ts *)malloc(sizeof(struct rt_ts));
+      t = (struct rt_ts *)malloc(sizeof(struct rt_ts));
+      item.data = (void *)t;
       next.tv_sec  = start.tv_sec  + buffer[rp].p.hdr.offset/1000;
       next.tv_usec = start.tv_usec + (buffer[rp].p.hdr.offset%1000) * 1000;
       e = hsearch(item, ENTER);
@@ -290,6 +295,8 @@ int main(int argc, char *argv[])
 
   /* For NT, we need to start the socket; dummy function otherwise */
   startupSocket();
+
+  in = stdin; /* Changed below if -f specified */
 
   /* parse command line arguments */
   while ((c = getopt(argc, argv, "b:e:f:p:Tv")) != EOF) {

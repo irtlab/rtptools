@@ -54,7 +54,6 @@
 #include <stdio.h>
 #include <signal.h>
 #include <errno.h>
-#include <values.h>
 #include <unistd.h>      /* select(), perror() */
 #include <stdlib.h>      /* getopt(), atoi() */
 #include <memory.h>      /* memset() */
@@ -68,8 +67,6 @@
 
 #define PAD(x,n) (((n) - ((x) & (n-1))) & (n-1))
 #define MAX_HOST 10
-
-extern int gettimeofday();
 
 static int debug = 0;
 static int hostc = 0;

@@ -7,7 +7,7 @@
 #include <sys/time.h>
 #include "types.h"
 #include "rtpdump.h"
-#define VERSION "1.0"
+#define RTPFILE_VERSION "1.0"
 
 /*
 * Read header. Return -1 if not valid, 0 if ok.
@@ -18,7 +18,7 @@ int RD_header(FILE *in, struct sockaddr_in *sin, int verbose)
   char line[80], magic[80];
 
   if (fgets(line, sizeof(line), in) == NULL) return -1;
-  sprintf(magic, "#!rtpplay%s ", VERSION);
+  sprintf(magic, "#!rtpplay%s ", RTPFILE_VERSION);
   if (strncmp(line, magic, strlen(magic)) != 0) return -1;
   if (fread((char *)&hdr, sizeof(hdr), 1, in) == 0) return -1;
   hdr.start.tv_sec = ntohl(hdr.start.tv_sec);

@@ -35,9 +35,6 @@
 #include <stdio.h>
 #include <signal.h>
 #include <errno.h>
-#if !defined(nextstep)
-#include <values.h>
-#endif
 #include <unistd.h>      /* select(), perror() */
 #include <stdlib.h>      /* getopt(), atoi() */
 #include <math.h>        /* fmod() */
@@ -46,7 +43,7 @@
 #include "rtpdump.h"
 #include "ansi.h"
 #include "sysdep.h"
-#define VERSION "1.0"
+#define RTPFILE_VERSION "1.0"
 
 typedef u_int32 member_t;
 
@@ -185,7 +182,7 @@ static void rtpdump_header(FILE *out, struct sockaddr_in *sin,
 {
   RD_hdr_t hdr;
 
-  fprintf(out, "#!rtpplay%s %s/%d\n", VERSION,
+  fprintf(out, "#!rtpplay%s %s/%d\n", RTPFILE_VERSION,
     inet_ntoa(sin->sin_addr), sin->sin_port);
   hdr.start.tv_sec  = htonl(start->tv_sec);
   hdr.start.tv_usec = htonl(start->tv_usec);
@@ -492,11 +489,13 @@ void packet_handler(t_format format, int trunc, double dstart, struct
 {
   double dnow = tdbl(&now);
   int hlen;   /* header length */
+  int offset;
 
   switch(format) {
     case F_header:
-      packet.p.hdr.offset = htonl((dnow - dstart)*1000);
-      packet.p.hdr.plen   = ctrl ? 0 : len;
+      offset = (dnow - dstart) * 1000;
+      packet.p.hdr.offset = htonl(offset);
+      packet.p.hdr.plen   = ctrl ? 0 : htons(len);
       /* leave only header */
       if (ctrl == 0) len = parse_header(packet.p.data);
       packet.p.hdr.length = htons(len + sizeof(packet.p.hdr));
@@ -508,8 +507,9 @@ void packet_handler(t_format format, int trunc, double dstart, struct
 
     case F_dump:
       hlen = ctrl ? len : parse_header(packet.p.data);
-      packet.p.hdr.offset = htonl((dnow - dstart)*1000);
-      packet.p.hdr.plen   = ctrl ? 0 : len;
+      offset = (dnow - dstart) * 1000;
+      packet.p.hdr.offset = htonl(offset);
+      packet.p.hdr.plen   = ctrl ? 0 : htons(len);
       /* truncation of payload */
       if (!ctrl && (len - hlen > trunc)) len = hlen + trunc;
       packet.p.hdr.length = htons(len + sizeof(packet.p.hdr));

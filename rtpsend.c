@@ -15,7 +15,7 @@
 *             )
 *
 *
-* (c) 1998 Henning Schulzrinne (Columbia University), all rights reserved
+* (c) 1998-1999 Henning Schulzrinne (Columbia University), all rights reserved
 */
 
 #include <stdio.h>
@@ -38,7 +38,7 @@
 
 static char rcsid[] = "$Id$";
 static int verbose = 0;
-static FILE *in = stdin;
+static FILE *in;
 static int sock[2];  /* output sockets */
 
 
@@ -55,7 +55,7 @@ typedef struct node {
 
 static void usage(char *argv0)
 {
-  fprintf(stderr, "Usage: %s [-l] [-f file] destination/port/ttl\n",
+  fprintf(stderr, "Usage: %s [-lv] [-f file] destination/port/ttl\n",
     argv0);
   exit(1);
 } /* usage */
@@ -426,7 +426,7 @@ static int rtp(char *text, char *packet)
       h->ts = htonl(value);
     }
     else if (strcmp(word, "seq") == 0) {
-      h->seq = htonl(value);
+      h->seq = htons(value);
     }
     else if (strcmp(word, "pt") == 0) {
       h->pt = value;
@@ -495,6 +495,29 @@ static int generate(char *text, char *data, double *time, int *type)
 
 
 /*
+* Get time of day as double.
+*/
+static double gettimeofday_d(void)
+{
+  struct timeval tv;
+  gettimeofday(&tv, (struct timezone *)0);
+  return tv.tv_sec + tv.tv_usec / 1e6;
+} /* gettimeofday_d */
+
+
+/*
+* Convert a time in double to a timeval.
+*/
+static struct timeval d2tv(double t)
+{
+  struct timeval tv;
+  tv.tv_sec  = t;
+  tv.tv_usec = (t - tv.tv_sec) * 1e6;
+  return tv;
+} /* d2tv */
+
+
+/*
 * Timer handler; sends any pending packets and parses next one.
 * First packet is played out immediately.
 */
@@ -504,13 +527,15 @@ static Notify_value send_handler(Notify_client client)
     int length;
     double time;
     int type;
-    char data[1024]; 
+    char data[1500]; 
   } packet = { 0, -1, 0};
   FILE *in = (FILE *)client;
   static char line[2048];       /* last line read (may be next packet) */
-  char text[2048];
+  char text[2048];              /* current line from the file, including cont. lines */
+  static int isfirstpacket = 1; /* is this the first packet? */
   double this;                  /* time this packet is being sent */
-  struct timeval delta;         /* next packet generation time */
+  static double basetime;       /* base time (first packet) */ 
+  struct timeval next_tv;       /* time for next packet */
   char *s;
 
   /* send any pending packet */
@@ -540,17 +565,20 @@ static Notify_value send_handler(Notify_client client)
   this = packet.time;
   packet.length = generate(text, packet.data, &packet.time, &packet.type);
   /* very first packet: send immediately */
-  if (this < 0.) this = packet.time;
+  if (isfirstpacket) {
+    isfirstpacket = 0;
+    this = packet.time;
+    basetime = gettimeofday_d() - this;
+  }
   else if (this > packet.time) {
     fprintf(stderr, "Non-monotonic time %f - sent immediately.\n", packet.time);
     this = packet.time;
+    basetime = gettimeofday_d() - this;
   }
 
-  /* compute next playout time */
-  delta.tv_sec = packet.time - this;
-  delta.tv_usec = ((packet.time - this) - delta.tv_sec) * 1e6;
-
-  timer_set(&delta, send_handler, (Notify_client)in, 1);
+  /* compute and set next playout time */
+  next_tv = d2tv(basetime + packet.time);
+  timer_set(&next_tv, send_handler, (Notify_client)in, 0);
   return NOTIFY_DONE;
 } /* send_handler */
 
@@ -569,7 +597,7 @@ int main(int argc, char *argv[])
 
   /* parse command line arguments */
   startupSocket();
-  while ((c = getopt(argc, argv, "f:lt:v")) != EOF) {
+  while ((c = getopt(argc, argv, "f:lv?h")) != EOF) {
     switch(c) {
     case 'f':
       filename = optarg;
