@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<meta name="author" content="Henning Schulzrinne">
+<meta name="keywords" content="RTP; rtptools">
+<title>RTP tools change history</title>
+</head>
+
+<body bgcolor="#38B0DE">
+<h1><a href="rtptools.html">RTP tools</a> change history</h1>
+
+<dl>
+<dt>1.11 (January 1999)
+<dd>
+<ul>
+<li>Marc Eaddy found that MSVC++ 5.0 only works if seq is declared
+unsigned int seq:16.
+
+<li>Additional Linux fixes by <a href="mailto:pere@hungry.com"> Petter
+Reinholdtsen</a>
+
+<li>Windows NT/Win32 port by Xiaotao Wu (Columbia University).
+
+</ul>
+
+<dt>1.10 (March 1998)
+<dd>
+<ul>
+<li>Bill Fenner:  "I've been experimenting with real short clips, and
+discovered that rtpplay exited as soon as it read the last packet
+instead of letting the playout happen, cutting off READAHEAD packets
+(which in most cases was the whole file).  Here are my fixes.  Note that
+I had to (somewhat kludgily) schedule another timeout, since the notify
+system doesn't notice a notify_stop() request which is set from a
+timeout until there's another event." [hgs:  Notify was changed to drop
+out when there are no pending timers and no open file descriptors.]
+
+<li>Jonathan Lennox created <tt>multidump</tt> and <tt>multiplay</tt>.
+
+<li>Catch additional signals.
+
+<li>rtpplay: Add <tt>-b</tt> and <tt>-e</tt> flags for playing back only
+a selected portion of the file.
+
+<li>rtpplay: The first RTP packet is now timed correctly with respect to
+the preceding RTCP packet.
+</ul>
+
+<dt>1.9 (August 1997)
+<dd>
+<ul>
+<li><tt>rtptrans</tt> also has non-sendmsg ifdef for Linux and similarly
+socket-challenged systems (by <a href="mailto:Lutz Grueneberg 
+<gruen@rvs.uni-hannover.de>">Lutz Grueneberg</a>)
+
+<li>Port to FreeBSD (by <a href="mailto:Jonathan Lennox 
+<lennox@cs.columbia.edu>">Jonathan Lennox</a>):
+
+<ul>
+<li>Added necessary architecture Makefile.
+<li>Extracted hsearch code from GNU libc 2.0.4 for rtpplay.
+<li>Massive byte-ordering cleanup (behavior under FreeBSD and Solaris should
+be identical).
+<li>Minor other changes for BSD 4.4 sockets.
+</ul>
+<li><code>rtpdump -f</code> <var>file</var> now shows a "from" address of
+0.0.0.0:0.
+<li>Updated rtpdump, rtpplay's payload type maps to reflect current IANA
+numbers.
+</ul>
+
+<dt>1.8 (July 1997)
+<dd>
+<ul>
+<li>Bug in parsing of RR fixed.
+</ul>
+
+<dt>1.6 (October 1996)
+<dd>
+
+<ul>
+<li>Format flag on <code>rtpdump</code> changed from <code>-f</code>
+to <code>-F</code> for consistency.
+
+<li>Added ability to use RTP timestamps rather than received timing
+for rtpplay, making it more useful for recording.
+
+<li>rtpdump can read from files.
+
+<li><code>-x</code> flag supported for dump format so that only
+RTP/RTCP and media headers are logged.
+
+<li>Fixed: random address information in header.
+</ul>
+
+<dt>1.0 (December 1995)
+
+<dd>
+<ul>
+<li>First independent release of rtptools.
+
+<li>Added rtptools/rtpsend to generate arbitrary RTP packets based on
+text file.  Intended as a debugging and torture/compliance test
+tool.  rtpsend reads files produced by rtpdump (ASCII mode).  For
+replaying recordings, use rtpplay.  Only supports RTP data and SDES
+RTCP packets right now.
+
+</ul>
+</dl>
+
+<hr>
+<p>Last modified 1997-08-08 by <a
+href="http://www.cs.columbia.edu/~hgs/">Henning Schulzrinne</a><br> <a
+href=mailto:schulzrinne@cs.columbia.edu">schulzrinne@cs.columbia.edu</a>
+
+</body>
+</html>
