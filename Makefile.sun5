@@ -1,0 +1,6 @@
+SYSLIBS = -lresolv -lsocket -lnsl -ldl
+SYSFLAGS = -DRTP_BIG_ENDIAN=1
+LIB_DIR = -L/net/step/home/$(ARCH)/lib -R/net/step/home/$(ARCH)/lib \
+  -L/usr/openwin/lib -R/usr/openwin/lib
+LIB_DIR_STATIC = -L/net/step/home/$(ARCH)/lib/static \
+  -L/usr/openwin/lib -R/usr/openwin/lib
