@@ -26,6 +26,7 @@
 #include <sys/socket.h>  /* struct sockaddr */
 #include <netinet/in.h>
 #include <arpa/inet.h>   /* inet_ntoa() */
+#include <netdb.h>       /* gethostbyname() */
 #include <time.h>
 #include <stdio.h>       /* stderr, printf() */
 #include <string.h>
@@ -179,15 +180,15 @@ static node_t *parse(char *text)
 
 /*
 * Parse parameter=value. Return value, word becomes parameter.
-* Value must be integer.
+* Value must be unsigned integer.
 */
-static u_int32 parse_int(char *word)
+static u_int32 parse_uint(char *word)
 {
   char *s;
   u_int32 value = 0;
 
   if ((s = strchr(word, '='))) {
-    value = strtol(s+1, (char **)NULL, 0);    
+    value = strtoul(s+1, (char **)NULL, 0);    
     *s = '\0';
   }
   else {
@@ -656,7 +657,7 @@ static int rtp(char *text, char *packet)
   h->version = RTP_VERSION;
 
   while ((word = strtok(wc ? 0 : text, " "))) {
-    value = parse_int(word);
+    value = parse_uint(word);
     if (strcmp(word, "ts") == 0) {
       h->ts = htonl(value);
     }
@@ -899,7 +900,25 @@ int main(int argc, char *argv[])
   }
 
   if (optind < argc) {
-    if (hpt(argv[optind], (struct sockaddr *)&sin, &ttl) < 0) usage(argv[0]);
+    if (hpt(argv[optind], (struct sockaddr *)&sin, &ttl) < 0) {
+      usage(argv[0]);
+      exit(1);
+    }
+    if (sin.sin_addr.s_addr == -1) {
+      fprintf(stderr, "%s: Invalid host. %s\n", argv[0], argv[optind]);
+      usage(argv[0]);
+      exit(1);
+    }
+    if (sin.sin_addr.s_addr == INADDR_ANY) {
+      struct hostent *host;
+      struct in_addr *local;
+      if ((host = gethostbyname("localhost")) == NULL) {
+        perror("gethostbyname()");
+        exit(1);
+      }
+      local = (struct in_addr *)host->h_addr_list[0];
+      sin.sin_addr = *local;
+    }
   }
 
   /* create/connect sockets */
