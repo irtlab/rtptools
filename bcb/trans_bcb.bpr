@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.05.03"/>
+    <PROJECT value="rtptrans.exe"/>
+    <OBJFILES value="OBJ\rtptrans.obj OBJ\host2ip.obj OBJ\multimer.obj OBJ\notify.obj 
+      OBJ\rd.obj OBJ\yplib.obj OBJ\utilnt.obj OBJ\getopt.obj OBJ\gettimeofday.obj"/>
+    <RESFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES)"/>
+    <LIBFILES value=""/>
+    <LIBRARIES value=""/>
+    <SPARELIBS value=""/>
+    <PACKAGES value="Vcl50.bpi Vclx50.bpi bcbsmp50.bpi Vcldb50.bpi Vclbde50.bpi ibsmp50.bpi 
+      vcldbx50.bpi bcbie50.bpi vclie50.bpi Inetdb50.bpi Inet50.bpi dclocx50.bpi 
+      bcb97axserver50.bpi"/>
+    <PATHCPP value=".;..;..\nt"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
+    <RELEASELIBPATH value="$(BCB)\lib\release"/>
+    <LINKER value="tlink32"/>
+    <USERDEFINES value="_LIBC;__GNU_LIBRARY__"/>
+    <SYSDEFINES value="NO_STRICT;_NO_VCL;USEPACKAGES"/>
+    <MAINSOURCE value="trans_bcb.bpf"/>
+    <INCLUDEPATH value="..\;..;..\nt;..\nt\include\utilNT;..\nt\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="..\;..;..\nt;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <WARNINGS value="-w-par"/>
+  </MACROS>
+  <OPTIONS>
+    <CFLAG1 value="-O2 -H=$(BCB)\lib\vcl50.csm -Hc -w- -Vx -Ve -X- -a8 -b- -k- -vi -tWC -tWM- 
+      -c"/>
+    <PFLAGS value="-N2OBJ -N0OBJ -$Y- -$L- -$D- -v -JPHNE -M"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/mx /w2 /zn"/>
+    <LFLAGS value="-IOBJ -D&quot;&quot; -ap -Tpe -x -Gn"/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="c0x32.obj $(PACKAGES) $(OBJFILES)"/>
+    <ALLRES value="$(RESFILES)"/>
+    <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cw32.lib"/>
+  </LINKER>
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=0
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1041
+CodePage=932
+
+[Version Info Keys]
+CompanyName=
+FileDescription=
+FileVersion=1.0.0.0
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=1.0.0.0
+Comments=
+
+[Excluded Packages]
+$(BCB)\Bin\DCLNFCur50.bpl=フリーカーソル無効化アドイン
+$(BCB)\Bin\DCLNMF50.bpl=NetMasters Fastnet Tools
+$(BCB)\Bin\mfcwizard.bpl=MFC Wizard
+$(BCB)\Bin\dclqrt50.bpl=QuickReport Components
+$(BCB)\Bin\dcltee50.bpl=TeeChart 5.0 Components
+$(BCB)\Bin\dcltqr50.bpl=TeeChart 5.0 for QuickReport Components Design Package
+$(BCB)\Bin\dcl31w50.bpl=Delphi 1.0 Compatibility Components
+$(BCB)\Bin\dclib50.bpl=InterBase Data Access Components
+
+[HistoryLists\hlIncludePath]
+Count=4
+Item0=..\;..;..\nt;..\nt\include\utilNT;..\nt\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\;..\nt;..;..\nt\include\utilNT;..\nt\include;$(BCB)\include;$(BCB)\include\vcl
+Item2=..\nt;..\;..\nt\include\utilNT;..\nt\include;..;$(BCB)\include;$(BCB)\include\vcl
+Item3=C:\C\Project Sum2001\rtptools-1.17;$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=4
+Item0=..\;..;..\nt;$(BCB)\lib\obj;$(BCB)\lib
+Item1=..\;..\nt;..;$(BCB)\lib\obj;$(BCB)\lib
+Item2=..\nt;..\;$(BCB)\lib\obj;$(BCB)\lib
+Item3=C:\C\Project Sum2001\rtptools-1.17;$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=3
+Item0=_LIBC;__GNU_LIBRARY__
+Item1=_DEBUG;_LIBC;__GNU_LIBRARY__
+Item2=_DEBUG
+
+[HistoryLists\hlIntOutputDir]
+Count=1
+Item0=OBJ
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
+  </IDEOPTIONS>
+</PROJECT>
