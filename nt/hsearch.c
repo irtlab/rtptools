@@ -65,23 +65,40 @@ int hcreate(size_t mekments) {
 	return 0;
 }
 
+/*****************************************************/
+/* There are two actions for hsearch, FIND and ENTER */
+/* For FIND, we just compare the item.key, if we got */
+/* the entry, we just return it. For ENTER, we need  */
+/* to compare both the key and the data, if both the */
+/* key and data are the same, we do not need to add  */
+/* it in. For ENTER, the data can not be NULL, but   */
+/* for FIND, the data can be NULL                    */
+/*****************************************************/
+
 ENTRY *hsearch(ENTRY item, ACTION action) {
 	int r;
 	ENTRYB *result;
 
-	/* NULL data can not be added in */
-	if ((item.key == NULL) || (item.data == NULL))
-		return NULL;
+	/* key should not be NULL */
+  if (item.key == NULL)
+    return NULL;
 
 	r = hhash(item.key);
 
 	result = entries[r];
-	while (result->entry != NULL) {
-		if (!strcmp(result->entry->key, item.key) &&
-			!strcmp(result->entry->data, item.data)) {
-			return (result->entry);
+
+  if (result->entry != NULL) {
+    if (!strcmp(result->entry->key, item.key)) {
+      if (action != ENTER)
+        return (result->entry);
+      else 
+        if (result->entry->data != NULL && \
+          item.data != NULL && \
+          !strcmp(result->entry->data, item.data)) 
+			    return (result->entry);
 		}
 	}
+  
 	if (action == ENTER) {
 		if (result->entry != NULL)
 			return result->entry;

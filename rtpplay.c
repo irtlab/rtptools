@@ -301,7 +301,7 @@ int main(int argc, char *argv[])
       end = atof(optarg) * 1000;
       break;
     case 'f':
-      if (!(in = fopen(optarg, "r"))) {
+      if (!(in = fopen(optarg, "rb"))) {
         perror(optarg);
         exit(1);
       }
@@ -321,6 +321,8 @@ int main(int argc, char *argv[])
       break;
     }
   }
+
+  ftell(in);
 
   if (optind < argc) {
     if (hpt(argv[optind], (struct sockaddr *)&sin, &ttl) < 0) {
