@@ -2,6 +2,18 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT(multimer.c)
 AM_INIT_AUTOMAKE(rtptools, 1.18)
 
+AC_CANONICAL_HOST
+
+ts_cv_darwin="no"
+case "${host}" in
+*-*-darwin*)
+  AC_DEFINE(unix)
+  AC_DEFINE(__darwin__)
+  ts_cv_darwin="yes";;
+esac
+
+AM_CONDITIONAL(DARWIN, test "$ts_cv_darwin" = yes)
+
 dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_CPP
@@ -10,7 +22,6 @@ AC_PROG_INSTALL
 if test "x$GCC" = "xyes"; then
   CFLAGS="$CFLAGS -Wall"
 fi
-
 
 dnl Checks for libraries.
 
