@@ -19,6 +19,9 @@
 <dt>1.18 (September 2002)
 <dd>
 <ul>
+<li>Large ts and ssrc values would overflow; replaced strtol() with
+strtoul().
+
 <li>Fixed out of range timeval, which led a spike on jitter in rare case.
 (Akira Tsukamoto)
 
