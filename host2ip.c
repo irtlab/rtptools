@@ -4,6 +4,7 @@
 #include <netinet/in.h>      /* sockaddr_in */
 #include <arpa/inet.h>       /* inet_addr() */
 #include <rpcsvc/ypclnt.h>   /* YP */
+#include <string.h>          /* strlen() added by Akira 12/27/01 */ 
 #include "sysdep.h"
 
 static char rcsid[] = "$Id$";

@@ -1,9 +1,10 @@
 /*
  * rtp.h  --  RTP header file (RFC 1890)
  */
-#include <sys/types.h>
+#include "types.h"   /* changed from <sys/types.h> by Akira 12/27/01 */
 #include "sysdep.h"
 
+#if 0 /* types.h has a better definition for this. by Akira 12/27/01 */
 /*
  * The type definitions below are valid for 32-bit architectures and
  * may have to be adjusted for 16- or 64-bit architectures.
@@ -12,6 +13,7 @@ typedef unsigned char  u_int8;
 typedef unsigned short u_int16;
 typedef unsigned int   u_int32;
 typedef          short int16;
+#endif
 
 /*
  * System endianness -- determined by autoconf.

@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sol_search.h>
+#include "sysdep.h"
+#include "hsearch.h"
 
 typedef struct entryb {
 	ENTRY *entry;
@@ -108,7 +109,8 @@ ENTRY *hsearch(ENTRY item, ACTION action) {
 			result->next->entry = NULL;
 			result->next->next = NULL;
 			result->entry->key = strdup(item.key);
-			result->entry->data = strdup(item.data);
+//			result->entry->data = strdup(item.data);
+			result->entry->data = item.data;      /* fixed by Akira 12/27/01 */
 			return result->entry;
 		}
 	} else {
@@ -126,7 +128,7 @@ void hdestroy(void) {
 			p = e;
 			e = e->next;
 			free(p->entry->key);
-			free(p->entry->data);
+//			free(p->entry->data);               /* fixed by Akira 12/27/01 */
 			free(p->entry);
 			free(p);
 		}

@@ -63,6 +63,7 @@
 /* Don't include stdlib.h for non-GNU C libraries because some of them
    contain conflicting prototypes for getopt.  */
 #include <stdlib.h>
+#define	__alloca	alloca
 #else	/* Not GNU C library.  */
 #define	__alloca	alloca
 #endif	/* GNU C library.  */
