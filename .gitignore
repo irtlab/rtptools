@@ -1,0 +1,9 @@
+/.deps
+Makefile
+config.log
+config.status
+*.o
+/rtpdump
+/rtpplay
+/rtpsend
+/rtptrans
