@@ -15,9 +15,13 @@
 */
 
 typedef struct {
-  struct timeval start;  /* start of recording (GMT) */
+  struct timeval32 {
+      u_int32 tv_sec;    /* start of recording (GMT) (seconds) */
+      u_int32 tv_usec;   /* start of recording (GMT) (microseconds)*/
+  } start;
   u_int32 source;        /* network source (multicast address) */
   u_int16 port;          /* UDP port */
+  u_int16 padding;       /* padding */
 } RD_hdr_t;
 
 typedef struct {

@@ -38,10 +38,11 @@
 #include "ansi.h"
 #include "sysdep.h"
 
-static char rcsid[] = "$Id$";
+static char rcsid[] = "$Id: rtpsend.c,v 1.5 2002/09/10 10:24:10 at541 Exp $";
 static int verbose = 0;
 static FILE *in;
 static int sock[2];  /* output sockets */
+static int loop = 0; /* play file indefinitely if set */
 
 
 /*
@@ -737,7 +738,7 @@ static int generate(char *text, char *data, double *time, int *type)
 
   if (verbose) printf("%s", text);
   if (sscanf(text, "%lf %s", time, type_name) < 2) {
-    fprintf(stderr, "Line %s is invalid.\n", text);
+    fprintf(stderr, "Line {%s} is invalid.\n", text);
     exit(2);
   }
   if (strcmp(type_name, "RTP") == 0) {
@@ -777,6 +778,7 @@ static struct timeval d2tv(double t)
   return tv;
 } /* d2tv */
 
+#define MAX_TEXT_LINE 4096
 
 /*
 * Timer handler; sends any pending packets and parses next one.
@@ -791,8 +793,8 @@ static Notify_value send_handler(Notify_client client)
     char data[1500]; 
   } packet = { 0, -1, 0};
   FILE *in = (FILE *)client;
-  static char line[2048];       /* last line read (may be next packet) */
-  char text[2048];              /* current line from the file, including cont. lines */
+  static char line[MAX_TEXT_LINE];       /* last line read (may be next packet) */
+  char text[MAX_TEXT_LINE];              /* current line from the file, including cont. lines */
   static int isfirstpacket = 1; /* is this the first packet? */
   double this;                  /* time this packet is being sent */
   static double basetime;       /* base time (first packet) */ 
@@ -806,9 +808,15 @@ static Notify_value send_handler(Notify_client client)
 
   /* read line; continuation lines start with white space */
   if (feof(in)) {
-    notify_stop();
-    exit(0);
-    return NOTIFY_DONE;
+    if (loop) {
+      fseek(in, 0, SEEK_SET);
+      printf("Rewound input file\n");
+    }
+    else {
+      notify_stop();
+      exit(0);
+      return NOTIFY_DONE;
+   }
   }
   s = text;
   if (line[0]) {
@@ -851,7 +859,6 @@ int main(int argc, char *argv[])
   static struct sockaddr_in from;
   int i;
   int c;
-  int loop = 0;        /* play file indefinitely */
   int alert = 0;       /* insert IP router alert option if possible */
   int sourceport = 0;  /* source port */
   int on = 1;          /* flag */

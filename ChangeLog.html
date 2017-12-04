@@ -16,9 +16,71 @@
 <h1><a href="rtptools.html">RTP tools</a> change history</h1>
 
 <dl>
-<dt>1.18 (September 2002)
+<dt>1.21 (July 2016)</dt>
+<dd>Yann E. MORIN (yann.morin.1998@free.fr): Buildroot [1] is a
+build-system targetting embedded devices. It is able
+to build toolchains for various architectures, based on the traditional
+GNU compiler collection gcc, the GNU binutils and various C libraries,
+such as GNU libc (glibc), uClibc [2] [3] or musl [4].
+
+<p>glibc is a feature-full C library, which has had support for Yellow
+Pages (and the rest of the SUN RPC stuff) for a long time. However,
+circa the 2.14 release, glibc stopped installing the RPC headers [5], on
+the principle that providing the RPC implementation would be better
+served by a third-party package, namely ti-rpc [6]. That did not happen
+in time, so installing the RPC headers from glibc was re-instated circa
+2.16.</p>
+
+<p>uClibc (no longer maintained, replaced by a fork, uClibc-ng) is a fully
+configurable C library for embedded systems. It entirely lacks a SUN RPC
+implementation altogether.</p>
+
+<p>musl is standards-conforming, lightweight C library. It also entirely
+lacks a SUN RPC implementation.</p>
+
+<p>TI-RPC is a stand-alone package. It may or may not be available (because
+the user may not need SUN RPC stuff on an embedded device, for example).
+Besides, it is not yet as feature-full as the implementation in glibc,
+though for all practical means, it is totally useable.</p>
+
+<p>So, there are cases where a SUN RPC implementation is not available.</p>
+
+<p>This patch makes it so that the use of Yellow Pages is conditional on
+the presence of a SUN RPC implementation, by checking at ./configure
+whether the required header is present, and disabling the corresponding
+code if the header is missing.</p>
+
+<p>At the same time, the legacy, long unsupported AM_C_PROTOTYPES directive
+is also removed, as it makes recent-ish autoconf fail.</dd>
+
+<dt>1.20 (October 2013)</dt>
+<dd><p>Nick Birch (Nick.Birch@s-and-t.com):  rtpsend -l (loop) flag does
+not work.  Modified to rewind input file on feof if loop was set.  Fails
+if length of line is greater than 2048 characters.  Increased to 4096
+(sufficient for typical MTU-sized message such as 7 MPEG TS packets)</p>
+<p>rtpdump:  Put space after ext_data=&lt;hex extension data&gt; so that
+it can be parsed by rtpsend.  parse_header doesn't comprehend the
+possible extension header.  As a consequence any extension header data
+is also dumped twice.  Once in the ext_data report and then a second
+time in the data report.  Modify parse_header to return hlen that
+comprehends the extension header if present.<p>
+
+<p>The format for reporting contributing sources does not match the format
+accepted by rtpsend (i.e., reports "csrc[n] = xxxx" rather than
+"csrc[n]=0xxxxx"). Fixed. Note: the documentation is less than clear on
+the csrc syntax accepted by rtpsend.</p></dd>
+
+<dt>1.19 (August 2010)</dt>
+<dd><a href="http://www.burghardt.pl/">Krzysztof Burghardt</a>
+(krzysztof@burghardt.pl):  "Wireshark implemented "rtpdump" file format
+in a bit different way, so cooperation beetwen those program is a bit
+problematic.  Moreover rtptools compiled on i386 and amd64 have
+different size of file header (size of long in timeval is different)."
+
+<dt>1.18 (September 2002)</dt>
 <dd>Changes made by Akira Tsukamoto unless otherwise noted.
 <ul>
+<li>Port to MacOSX (10.2).
 
 <li>Check for errors when resolving host name.
 
@@ -53,13 +115,13 @@ source port of packets. (Ping Pan and Akira Tsukamoto)
 (David Allouche)
 </ul>
 
-<dt>1.17 (April 2001)
+<dt>1.17 (April 2001)</dt>
 <dd>Added <samp>-o</samp> option to <tt>rtpdump</tt>, so that output can
 be directed to a file.  This is necessary so that the file can be opened
 in binary mode.  Also configured stdout on Win32 for binary mode,
 disabling the typical \n to \n\r translation.  (hgs)
 
-<dt>1.16 (July 2000)
+<dt>1.16 (July 2000)</dt>
 <dd>
 <ul>
 <li>For <tt>rtpsend</tt>, add <samp>-s</samp> flag to allow setting
@@ -71,7 +133,7 @@ Pan)
 <li>Compile fixes for Linux. (Jori)
 </ul>
 
-<dt>1.15 (March 2000)
+<dt>1.15 (March 2000)</dt>
 <dd>
 <ul>
 <li>For <tt>rtpsend</tt>, in function <tt>rtpsend()</tt>, added support
@@ -104,14 +166,14 @@ invalid input is found rather than trying to soldier on.
 
 </ul>
 
-<dt>1.14 (October 1999)
+<dt>1.14 (October 1999)</dt>
 <dd>
 <ul>
 <li>Various portability fixes; now tested to compile on Solaris 2.6,
 Linux 2.2.10, FreeBSD 2.2.7, and FreeBSD 3.3. (Jonathan Lennox)
 </ul>
 
-<dt>1.13 (August 1999)
+<dt>1.13 (August 1999)</dt>
 <dd>
 <ul>
 <li>Change to autoconf format [<a href="mailto:pere@hungry.com">Petter
@@ -136,7 +198,7 @@ packet.p.hdr.plen   = ctrl ? 0 : len;
 href="mailto:jori@lumumba.luc.ac.be">Jori</a>]
 </ul>
 
-<dt>1.11 (January 1999)
+<dt>1.11 (January 1999)</dt>
 <dd>
 <ul>
 <li>Marc Eaddy found that MSVC++ 5.0 only works if seq is declared
@@ -149,7 +211,7 @@ Reinholdtsen</a>
 
 </ul>
 
-<dt>1.10 (March 1998)
+<dt>1.10 (March 1998)</dt>
 <dd>
 <ul>
 <li>Bill Fenner:  "I've been experimenting with real short clips, and
@@ -172,7 +234,7 @@ a selected portion of the file.
 the preceding RTCP packet.
 </ul>
 
-<dt>1.9 (August 1997)
+<dt>1.9 (August 1997)</dt>
 <dd>
 <ul>
 <li><tt>rtptrans</tt> also has non-sendmsg ifdef for Linux and similarly
@@ -195,13 +257,13 @@ be identical).
 numbers.
 </ul>
 
-<dt>1.8 (July 1997)
+<dt>1.8 (July 1997)</dt>
 <dd>
 <ul>
 <li>Bug in parsing of RR fixed.
 </ul>
 
-<dt>1.6 (October 1996)
+<dt>1.6 (October 1996)</dt>
 <dd>
 
 <ul>
@@ -219,7 +281,7 @@ RTP/RTCP and media headers are logged.
 <li>Fixed: random address information in header.
 </ul>
 
-<dt>1.0 (December 1995)
+<dt>1.0 (December 1995)</dt>
 
 <dd>
 <ul>

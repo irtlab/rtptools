@@ -44,7 +44,7 @@
 
 #define READAHEAD 16 /* must be power of 2 */
 
-static char rcsid[] = "$Id$";
+static char rcsid[] = "$Id: rtpplay.c,v 1.6 2002/09/10 10:24:10 at541 Exp $";
 static int verbose = 0;        /* be chatty about packets sent */
 static int wallclock = 0;      /* use wallclock time rather than timestamps */
 static u_int32 begin = 0;      /* time of first packet to send */

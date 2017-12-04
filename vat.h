@@ -15,7 +15,7 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header$ (LBL)
+ * @(#) $Header: /u/kon/hgs/src/cvsroot//rtptools/vat.h,v 1.1.1.1 1997/08/07 17:13:53 hgs Exp $ (LBL)
  * modified for NEVOT by H. Schulzrinne
  */
 
