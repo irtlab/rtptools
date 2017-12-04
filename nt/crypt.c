@@ -6,12 +6,12 @@
  * this stuff is worth it, you can buy me a beer in return.   Poul-Henning Kamp
  * ----------------------------------------------------------------------------
  *
- * $Id$
+ * $Id: crypt.c,v 1.1.1.1 1999/02/14 16:17:00 hgs Exp $
  *
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char rcsid[] = "$Header$";
+static char rcsid[] = "$Header: /u/kon/hgs/src/cvsroot//rtptools/nt/crypt.c,v 1.1.1.1 1999/02/14 16:17:00 hgs Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include <unistd.h>

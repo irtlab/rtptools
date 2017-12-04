@@ -29,7 +29,8 @@ int RD_header(FILE *in, struct sockaddr_in *sin, int verbose)
     struct in_addr in;
 
     in.s_addr = hdr.source;
-    tm = localtime(&hdr.start.tv_sec);
+    time_t tt = (time_t)(hdr.start.tv_sec);
+    tm = localtime(&tt);
     strftime(line, sizeof(line), "%C", tm);
     printf("Start:  %s\n", line);
     printf("Source: %s (%d)\n", inet_ntoa(in), hdr.port);

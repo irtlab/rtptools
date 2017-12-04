@@ -1,4 +1,0 @@
-#
-while (1)
-  rtpplay -T -b 32.3 -e 73 -f sample.rtp 224.2.0.25/1234/16
-end

@@ -17,14 +17,14 @@
 int gettimeofday(struct timeval *tv, void *t)
 {
   static struct timeval stv;    /* initial timeval */
-  static LONGLONG sct, tick;
+  static INT64 sct, tick;
   static int initialized = -1;
   LARGE_INTEGER startCount;  
   LARGE_INTEGER tickPerSec;
   struct timeb tb;
 
   LARGE_INTEGER count;
-  LONGLONG c;
+  INT64 c;
 
   if (initialized == -1) {
     ftime(&tb);

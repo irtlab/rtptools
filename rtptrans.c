@@ -326,7 +326,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
         if (side[i][proto].sock != sock) {
           msg.msg_name = (caddr_t ) &side[i][proto].sin;
           msg.msg_namelen = sizeof(side[i][proto].sin);
-#if defined(__FreeBSD__) || defined(__linux__) || defined(__darwin__) /* Or presumably other BSD 4.4 systems */
+#if defined(__unix__) || defined(__FreeBSD__) || defined(__linux__) || defined(__darwin__) /* Or presumably other BSD 4.4 systems */
           msg.msg_control = 0;
           msg.msg_controllen = 0;
 #else
