@@ -1,33 +1,3 @@
-/*
-* RTP/RTCP packet dumper (RFC 1889)
-* Usage:
-*   rtpdump [address/port] > dump file
-*
-* Listens on port pair specified by argument for RTP and RTCP
-* packets, or reads from dump file.
-*
-*  -F format (names can be abbreviated):
-*     dump     dump in binary format (suitable for rtpplay)
-*     header   like 'dump', but don't save audio/video payload
-*     ascii    parsed packets (default)
-*     hex      like 'ascii', but with hex dump
-*     rtcp     like 'ascii', RTCP packets only
-*     short    RTP or vat data: [-]time ts [seq]
-*     payload  only audio/video payload
-*     
-*  -t d:    recording duration in minutes
-*  -x n:    number of payload bytes to dump per packet (hex, dump)
-*  -f name: name of input file, using "dump" format
-*  -o name: name of output file
-*
-* To record in chunks, simply build a shell script that loops,
-*  with suitably chosen file names. Each such file will be
-*  individually playable. (Gaps?)
-*
-* Copyright (c) 1995-2001 by H. Schulzrinne and Ping Pan (Columbia University)
-*   All Rights Reserved
-*/
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>  /* struct sockaddr_in */
@@ -51,7 +21,6 @@
 typedef u_int32 member_t;
 
 static int verbose = 0; /* decode */
-static char rcsid[] = "$Id$";
 
 typedef enum {F_invalid, F_dump, F_header, F_hex, F_rtcp, F_short,
    F_payload, F_ascii} t_format;
@@ -67,10 +36,10 @@ static struct {
 
 static void usage(char *argv0)
 {
-  fprintf(stderr, 
-"Usage: %s [-F [hex|ascii|rtcp|short|payload|dump|header] [-t minutes]\
- [-o outputfile] [-f inputfile] [-x bytes] [multicast]/port > file\n", 
-  argv0);
+  fprintf(stderr, "usage: %s "
+	"[-F hex|ascii|rtcp|short|payload|dump|header] "
+	"[-f infile] [-o outfile] [-t minutes] [-x bytes] "
+	"[address]/port > file\n", argv0);
 }
 
 

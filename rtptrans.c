@@ -1,49 +1,3 @@
-/*
-* RTP translator.
-*
-* Usage:
-*   rtptrans [host]/port[/ttl] [host]/port[/ttl] [...]
-*
-* Forwards RTP/RTCP packets from one of the named sockets to all
-* others.  Addresses can be a multicast or unicast.  TTL values for
-* unicast addresses are ignored. (Actually, doesn't check whether
-* packets are RTP or not.)
-*
-* It would be easy to add transcoding on a packet-by-packet basis (as
-*   long as the sampling rate doesn't change).
-*
-* Author: Henning Schulzrinne
-* Columbia University
-*
-*
-* Additionally, the translator can translate VAT packets into RTP packets. 
-* Thereby, the VAT control packets are translated into RTCP SDES packets with
-* a CNAME and a NAME entry. However, this is only entended to be used in the 
-* following configuration:
-* VAT packets arriving on a multicast connection are translated into RTP and
-* sent over a unicast link. RTP packets are not translated -not yet at least-
-* into VAT packets and and all packets arriving on unicast links are not
-* changed at all. Therefore, currently mainly the following topology is 
-* supported:
-*
-*    multicast VAT -> translator -> unicast RTP
-*
-*    and on the way back it should lokk like this
-*
-*    multicast VAT <- translator <- unicast VAT
-*
-*
-* This means that the audio agent on the unicast link should be able to use
-* both VAT and RTP.
-*
-* Author: Dorgham Sisalem
-* GMD Fokus, Berlin
-*
-* Bug fixes and supstantial improvements by 
-* Stephen Casner <casner@precept.com>
-* 
-*/
-
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <sys/socket.h>
@@ -405,11 +359,8 @@ static Notify_value socket_handler(Notify_client client, int sock)
 
 void usage(char *argv0)
 {
-  fprintf(stderr, 
-"Usage: %s\
- host/port[/ttl]\
- host/port[/ttl] [...]\n",
- argv0);
+  fprintf(stderr, "usage: %s address/port[/ttl] address/port[/ttl] [...]\n",
+	argv0);
 }
 
 int main(int argc, char *argv[])
@@ -445,7 +396,6 @@ int main(int argc, char *argv[])
   }
 
   if (argc - optind < 2) {
-    fprintf(stderr, "%s: Requires two host/port[/tll].\n", argv[0]);
     usage(argv[0]);
     exit(1);
   }
