@@ -365,7 +365,7 @@ int main(int argc, char *argv[])
   }
 
   /* read header of input file */
-  if (RD_header(in, &sin, 0) < 0) {
+  if (RD_header(in, &sin, verbose) < 0) {
     fprintf(stderr, "Invalid header\n");
     exit(1);
   }
