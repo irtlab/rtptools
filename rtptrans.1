@@ -1,0 +1,63 @@
+.\" (c) 1998-2017 by Columbia University; all rights reserved
+.\" (c) 2017 Jan Stary <hans@stare.cz>
+.\"
+.\" Permission to use, copy, modify, and distribute this software and its
+.\" documentation for research and educational purpose and without fee is
+.\" hereby granted, provided that the above copyright notice appear in all
+.\" copies and that both the copyright notice and warranty disclaimer appear
+.\" in supporting documentation, and that the names of the copyright holders
+.\" or any of their entities not be used in advertising or publicity
+.\" pertaining to distribution of the software without specific, written
+.\" prior permission.  Use of this software in whole or in parts for direct
+.\" commercial advantage requires explicit prior permission.
+.\"
+.\" The copyright holders disclaim all warranties with regard to this
+.\" software, including all implied warranties of merchantability and
+.\" fitness.  In no event shall the copyright holders be liable for any
+.\" special, indirect or consequential damages or any damages whatsoever
+.\" resulting from loss of use, data or profits, whether in an action of
+.\" contract, negligence or other tortuous action, arising out of or in
+.\" connection with the use or performance of this software.
+.Dd November 23, 2017
+.Dt RTPTRANS 1
+.Os
+.Sh NAME
+.Nm rtptrans
+.Nd translate RTP between unicast and multicast networks
+.Sh SYNOPSIS
+.Nm
+.Op Fl h
+.Ar address Ns / Ns Ar port Ns Op / Ns Ar ttl
+.Ar address Ns / Ns Ar port Ns Op / Ns Ar ttl
+.Op Ar ...
+.Sh DESCRIPTION
+.Nm
+translates RTP/RTCP packets arriving from one of the specified addresses
+to all the other addresses.
+Addresses can be multicast or unicast.
+The optional TTL values are ignored for unicast addresses.
+.Pp
+Additionally, the translator can translate VAT packets into RTP packets.
+VAT control packets are translated into RTCP SDES packets
+with a CNAME and a NAME entry.
+However, this is only intended to be used in the following configuration:
+VAT packets arriving on a multicast connection are translated into RTP
+and sent over a unicast link.
+RTP packets are not yet translated into VAT packets
+and packets arriving on unicast links are not changed at all.
+Therefore, only the following topology is supported:
+.Dq multicast VAT -> translator -> unicast RTP
+on the way in and
+.Dq multicast VAT <- translator <- unicast VAT
+on the way back.
+This means that the audio agent on the unicast link
+should be able to use both VAT and RTP.
+.Sh AUTHORS
+.An -nosplit
+.Nm
+was written by
+.An Henning Schulzrinne Aq Mt hgs@cs.columbia.edu ,
+with enhancements by
+.An Dorgham Sisalem
+and
+.An Steve Casner .
