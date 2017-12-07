@@ -16,6 +16,7 @@
 int RD_header(FILE *in, struct sockaddr_in *sin, int verbose)
 {
   RD_hdr_t hdr;
+  time_t tt;
   char line[80], magic[80];
 
   if (fgets(line, sizeof(line), in) == NULL) return -1;
@@ -29,7 +30,7 @@ int RD_header(FILE *in, struct sockaddr_in *sin, int verbose)
     struct in_addr in;
 
     in.s_addr = hdr.source;
-    time_t tt = (time_t)(hdr.start.tv_sec);
+    tt = (time_t)(hdr.start.tv_sec);
     tm = localtime(&tt);
     strftime(line, sizeof(line), "%C", tm);
     printf("Start:  %s\n", line);
