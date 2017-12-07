@@ -9,7 +9,7 @@
 #include <string.h>          /* strlen() added by Akira 12/27/01 */ 
 #include "sysdep.h"
 
-static char rcsid[] = "$Id: host2ip.c,v 1.2 2002/09/01 13:31:34 hgs Exp $";
+static char rcsid[] = "$Id$";
 
 /*
 * Return IP address given host name 'host'.

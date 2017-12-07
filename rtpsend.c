@@ -38,7 +38,7 @@
 #include "ansi.h"
 #include "sysdep.h"
 
-static char rcsid[] = "$Id: rtpsend.c,v 1.5 2002/09/10 10:24:10 at541 Exp $";
+static char rcsid[] = "$Id$";
 static int verbose = 0;
 static FILE *in;
 static int sock[2];  /* output sockets */
