@@ -48,7 +48,7 @@
 #include <assert.h>
 #include "sysdep.h"      /* system-dependent */
 
-static char rcsid[] = "$Id: multimer.c,v 1.2 2002/09/01 13:16:12 hgs Exp $";
+static char rcsid[] = "$Id$";
 
 typedef struct TQE {
     struct TQE *link;           /* link to next timer */

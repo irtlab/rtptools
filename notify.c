@@ -17,7 +17,7 @@ Copyright 1993 by AT&T Bell Laboratories; all rights reserved
 #include "multimer.h"
 #include "ansi.h"
 
-static char rcsid[] = "$Id: notify.c,v 1.2 2002/09/01 13:16:12 hgs Exp $";
+static char rcsid[] = "$Id$";
 
 #ifdef hp
 #define CAST int *

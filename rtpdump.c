@@ -51,7 +51,7 @@
 typedef u_int32 member_t;
 
 static int verbose = 0; /* decode */
-static char rcsid[] = "$Id: rtpdump.c,v 1.6 2002/09/10 10:30:54 at541 Exp $";
+static char rcsid[] = "$Id$";
 
 typedef enum {F_invalid, F_dump, F_header, F_hex, F_rtcp, F_short,
    F_payload, F_ascii} t_format;
