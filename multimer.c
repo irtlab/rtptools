@@ -48,8 +48,6 @@
 #include <assert.h>
 #include "sysdep.h"      /* system-dependent */
 
-static char rcsid[] = "$Id$";
-
 typedef struct TQE {
     struct TQE *link;           /* link to next timer */
     struct timeval time;        /* expiration time */

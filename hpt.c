@@ -29,9 +29,6 @@ int hpt(char *h, struct sockaddr *sa, unsigned char *ttl)
     *s = '\0';
     port = atoi(s+1);
     sin->sin_port = htons(port);
-    if (port & 1) {
-      return -2;
-    }
     s = strchr(s+1, '/');
     if (s && ttl) {
       *ttl = atoi(s+1);

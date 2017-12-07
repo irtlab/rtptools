@@ -9,8 +9,6 @@
 #include <string.h>          /* strlen() added by Akira 12/27/01 */ 
 #include "sysdep.h"
 
-static char rcsid[] = "$Id$";
-
 /*
 * Return IP address given host name 'host'.
 * If 'host' is "", set to INADDR_ANY.
