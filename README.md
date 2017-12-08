@@ -1,4 +1,4 @@
-### RTP Tools
+# RTP Tools
 
 RTP Tools is a set of small applications
 that can be used for processing RTP data.
@@ -24,11 +24,11 @@ Refer to the individual manpages for details.
 The RTP tools should compile on any Posix-compliant platform
 supporting sockets, as well as on Windows.
 
-# UNIX
+### UNIX
 
 On Unix systems, the usual `./configure; make` will compile rtptools.
 
-# Windows
+### Windows
 
 The `*.dsp` files are project files. `*.dsw` file and workspace file.
 User can open the workspace file and use 'batch compile'
