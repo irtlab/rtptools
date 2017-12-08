@@ -1,0 +1,205 @@
+.\" (c) 1998-2017 by Columbia University; all rights reserved
+.\" (c) 2017 Jan Stary <hans@stare.cz>
+.\"
+.\" Permission to use, copy, modify, and distribute this software and its
+.\" documentation for research and educational purpose and without fee is
+.\" hereby granted, provided that the above copyright notice appear in all
+.\" copies and that both the copyright notice and warranty disclaimer appear
+.\" in supporting documentation, and that the names of the copyright holders
+.\" or any of their entities not be used in advertising or publicity
+.\" pertaining to distribution of the software without specific, written
+.\" prior permission.  Use of this software in whole or in parts for direct
+.\" commercial advantage requires explicit prior permission.
+.\"
+.\" The copyright holders disclaim all warranties with regard to this
+.\" software, including all implied warranties of merchantability and
+.\" fitness.  In no event shall the copyright holders be liable for any
+.\" special, indirect or consequential damages or any damages whatsoever
+.\" resulting from loss of use, data or profits, whether in an action of
+.\" contract, negligence or other tortuous action, arising out of or in
+.\" connection with the use or performance of this software.
+.Dd November 23, 2017
+.Dt RTPDUMP 1
+.Os
+.Sh NAME
+.Nm rtpdump
+.Nd parse and print RTP packets
+.Sh SYNOPSIS
+.Nm
+.Op Fl h
+.Op Fl F Ar format
+.Op Fl f Ar infile
+.Op Fl o Ar outfile
+.Op Fl t Ar minutes
+.Op Fl x Ar bytes
+.Oo Ar address Oc Ns / Ns Ar port
+.Sh DESCRIPTION
+.Nm
+reads RTP and RTCP packets on the given
+.Ar address Ns / Ns Ar port ,
+or from standard input by default,
+and dumps a processed version to standard output.
+The output is suitable as input for
+.Xr rtpplay 1
+and
+.Xr rtpsend 1 .
+The IPv4
+.Ar address
+can be specified in dotted decimal notation or as a hostname
+and defaults to 127.0.0.1.
+The
+.Ar port
+number must be given as a decimal numbers between 1 and 65535.
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl F Ar format
+Write the output in the given
+.Ar format ,
+which is one of the following:
+.Cm dump ,
+.Cm header ,
+.Cm payload ,
+.Cm ascii ,
+.Cm hex ,
+.Cm rtcp ,
+.Cm short .
+.Pp
+The
+.Cm dump
+format is a binary format suitable as input for
+.Xr rtpplay 1 .
+The generated output file should have a
+.Pa .rtp
+filename extension.
+The file starts with
+.Pp
+.Dl #!rtpplay1.0 address/port\en
+.Pp
+The version number indicates the file format version,
+not the version of RTP tools used to generate the file.
+The current file format version is 1.0.
+This is followed by one
+.Vt RD_hdr_t
+header and one
+.Vt RD_packet_t
+structure for each received packet.
+All fields are in network byte order.
+The RTP and RTCP packets are recorded as-is.
+The structures are as follows:
+.Bd -literal
+typedef struct {
+  struct timeval start; /* start of recording (GMT) */
+  uint32_t source;        /* network source (multicast) */
+  uint16_t port;          /* UDP port */
+} RD_hdr_t;
+
+typedef struct {
+  uint16_t length; /* length of original packet, including header */
+  uint16_t plen;   /* actual header+payload length for RTP, 0 for RTCP */
+  uint32_t offset; /* ms since the start of recording */
+} RD_packet_t;
+.Ed
+.Pp
+The
+.Cm header
+format is like
+.Cm dump ,
+but does not save the audio/video payload.
+The
+.Cm payload
+format only saves the audio/video payload.
+.Pp
+The
+.Cm ascii
+format, which is the default, saves text parsed packets,
+suitable for
+.Xr rtpsend 1 .
+See below for an example.
+The
+.Cm hex
+format is like
+.Cm ascii ,
+but with a hex dump of the payload.
+The
+.Cm rtcp
+format is like
+.Cm ascii ,
+but only saves RTCP packets.
+.Pp
+The
+.Cm short
+format dumps RTP or VAT data in lines such as
+.Pp
+.D1 Oo Cm - Oc Ns Ar time timestamp Op Ar seq
+.Pp
+where
+.Sq Cm -
+indicates a set marker bit,
+.Ar time
+is the arrival time,
+.Ar timestamp
+is the RTP timestamp, and
+.Ar seq
+is the RTP sequence number (only used for RTP packets).
+.It Fl f Ar infile
+Read packets from
+.Ar infile
+instead of from the network or from standard input.
+The file must have been recorded using the
+.Cm dump
+format.
+.It Fl h
+Print a short usage summary and exit.
+.It Fl o Ar outfile
+Dump to
+.Ar outfile
+instead of to standard output.
+.It Fl t Ar minutes
+Only listen for the first
+.Ar minutes .
+.It Fl x Ar bytes
+Process only the first number of
+.Ar bytes
+of the payload.
+This is only applicable for the
+.Cm dump
+and
+.Cm hex
+formats.
+.El
+.Sh EXAMPLES
+.Bd -literal
+$ rtpdump -F ascii /1234
+844525628.240592 RTP len=176 from=131.136.234.103:46196 v=2 p=0 x=0 cc=0 m=0 pt=5 (IDVI,1,8000) seq=28178 ts=954052737 ssrc=0x124e2b58
+
+$ rtpdump -F rtcp /1234
+844525628.243123 RTCP len=128 from=139.88.27.43:53154
+ (RR ssrc=0x125bd36f p=0 count=1 len=7
+(ssrc=bc64b658 fraction=0.503906 lost=4291428375 last_seq=308007791
+  jit=17987961 lsr=2003335488 dlsr=825440558)
+ )
+ (SDES p=0 count=1 len=23
+  (src=0x125bd36f CNAME="yywhy@139.88.27.43" NAME="Michael Baldizzi
+  (NASA LeRC)" TOOL="vat-4.0a8" EMAIL="mbaldizzi@lerc.nasa.gov" )
+ )
+
+$ rtpdump -F short /1234
+-1511433758.442892 3988999488 54553
+1511433758.480881 3988999648 54554
+1511433758.500863 3988999808 54555
+1511433758.520860 3988999968 54556
+1511433758.540872 3989000128 54557
+.Ed
+.Sh SEE ALSO
+.Xr rtpplay 1 ,
+.Xr rtpsend 1
+.Sh AUTHORS
+.An -nosplit
+.Nm
+was written by
+.An Henning Schulzrinne Aq Mt hgs@cs.columbia.edu ,
+with enhancements by
+.An Ping Pan
+and
+.An Akira Tsukamoto Aq Mt akira.tsukamoto@gmail.com .
