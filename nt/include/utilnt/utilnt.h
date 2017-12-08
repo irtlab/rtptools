@@ -89,7 +89,7 @@ struct passwd *getpwnam(const char *name);
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *  $Id: utilnt.h,v 1.3 2002/09/10 10:20:59 at541 Exp $
+ *  $Id$
  */
 
 /*

@@ -25,6 +25,7 @@
 
 #define READAHEAD 16 /* must be power of 2 */
 
+static char rcsid[] = "$Id$";
 static int verbose = 0;        /* be chatty about packets sent */
 static int wallclock = 0;      /* use wallclock time rather than timestamps */
 static u_int32 begin = 0;      /* time of first packet to send */
@@ -344,7 +345,7 @@ int main(int argc, char *argv[])
   }
 
   /* read header of input file */
-  if (RD_header(in, &sin, 0) < 0) {
+  if (RD_header(in, &sin, verbose) < 0) {
     fprintf(stderr, "Invalid header\n");
     exit(1);
   }
