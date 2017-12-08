@@ -4,7 +4,8 @@ AUTOMAKE_OPTIONS = foreign
 
 TAR = gtar
 
-bin_PROGRAMS = rtpdump rtpplay rtpsend rtptrans
+bin_PROGRAMS	= rtpdump rtpplay rtpsend rtptrans
+man1_MANS	= rtpdump.1 rtpplay.1 rtpsend.1 rtptrans.1
 
 COMMON = \
         ansi.h \

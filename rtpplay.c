@@ -1,22 +1,3 @@
-/*
-* Recreate packet stream recorded with rtpdump -f dump.
-* Usage:
-* -v         verbose
-* -T         use absolute time rather than RTP timestamps
-* -f         file to read
-* -b         begin time
-* -e         end time
-* -s         local binding port
-* -p [file]  profile of RTP PT to frequency mappings
-* destination/port[/ttl]
-*
-* Program reads ahead by READAHEAD packets to compensate for reordering.
-* Currently does not correct SR/RR absolute (NTP) timestamps,
-* but should. Receiver reports are fairly meaningless.
-*
-* (c) 1994-1998 Henning Schulzrinne (Columbia University); all rights reserved
-*/
-
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/time.h>    /* gettimeofday() */
@@ -44,7 +25,6 @@
 
 #define READAHEAD 16 /* must be power of 2 */
 
-static char rcsid[] = "$Id: rtpplay.c,v 1.6 2002/09/10 10:24:10 at541 Exp $";
 static int verbose = 0;        /* be chatty about packets sent */
 static int wallclock = 0;      /* use wallclock time rather than timestamps */
 static u_int32 begin = 0;      /* time of first packet to send */
@@ -95,10 +75,9 @@ static double period[128] = {  /* ms per timestamp difference */
 
 static void usage(char *argv0)
 {
-  fprintf(stderr,
-"Usage: %s [-v] [-T] [-p profile] [-f file] [-b begin time] [-e end time] \
-[-s localport] destination/port[/ttl]\n",
-  argv0);
+  fprintf(stderr, "usage: %s "
+	"[-hTv] [-b begin] [-e end] [-f file] [-p profile] [-s port] "
+	"address/port[/ttl]\n", argv0);
   exit(1);
 } /* usage */
 
