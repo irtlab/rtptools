@@ -17,8 +17,6 @@ Copyright 1993 by AT&T Bell Laboratories; all rights reserved
 #include "multimer.h"
 #include "ansi.h"
 
-static char rcsid[] = "$Id$";
-
 #ifdef hp
 #define CAST int *
 #else

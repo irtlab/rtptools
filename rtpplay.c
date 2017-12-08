@@ -25,7 +25,6 @@
 
 #define READAHEAD 16 /* must be power of 2 */
 
-static char rcsid[] = "$Id$";
 static int verbose = 0;        /* be chatty about packets sent */
 static int wallclock = 0;      /* use wallclock time rather than timestamps */
 static u_int32 begin = 0;      /* time of first packet to send */

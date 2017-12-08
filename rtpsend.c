@@ -17,7 +17,6 @@
 #include "ansi.h"
 #include "sysdep.h"
 
-static char rcsid[] = "$Id$";
 static int verbose = 0;
 static FILE *in;
 static int sock[2];  /* output sockets */
