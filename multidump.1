@@ -1,0 +1,52 @@
+.Dd December 8, 2017
+.Dt MULTIDUMP 1
+.Os
+.Sh NAME
+.Nm multidump
+.Nd run multiple rtpdumps simultaneously
+.Sh SYNOPSIS
+.Nm
+.Op Fl F Ar format
+.Op Fl t Ar minutes
+.Op Fl x Ar bytes
+.Ar basename
+.Oo Ar address Oc Ns / Ns Ar port
+.Op Ar ...
+.Sh DESCRIPTION
+.Nm
+runs multiple
+.Xr rtpdump 1
+sessions simultaneously.
+For every
+.Oo Ar address Oc Ns / Ns Ar port ,
+one
+.Xr rtpdump 1
+process is started accordingly.
+The dumps are stored in
+.Pa basename.* ,
+numbered from
+.Pa basename.1
+increasingly.
+The
+.Fl F ,
+.Fl t
+and
+.Fl x
+flags, if present, are passed to every
+.Xr rtpdump 1
+process.
+.Pp
+If the
+.Fl t
+flags is used,
+.Nm
+will wait for all the
+.Xr rtpdump 1
+processes to finish.
+Otherwise,
+.Nm
+will need to be killed with a signal,
+in which case it kills the running processes as well.
+.Sh SEE ALSO
+.Xr multiplay 1 ,
+.Xr rtpdump 1

@@ -1,7 +1,7 @@
 #!/bin/sh
 # Run multiple rtpplays simultaneously.
 
-USAGE="usage: multidump [-F format] [-t minutes] [-x bytes] filebase [[addr]/port[/ttl] ...]"
+USAGE="usage: multidump [-p profile] [-T] [-v] filebase addr/port[/ttl] [...]"
 
 args=""  # The flags to pass to each rtpplay
 pids=""  # The list process IDs of the rtpplay processes
@@ -18,7 +18,7 @@ while getopts 'p:Tv' c
 do
     case $c in
     p)          args="${args} -$c ${OPTARG}";;
-    t | v)      args="$args -$c";;
+    T | v)      args="$args -$c";;
     \?)     echo $USAGE
 	    exit 2;;
     esac
@@ -34,7 +34,7 @@ fi
 filebase=$1
 shift
 
-# Get each of the destination addresses, and start an rtpdump for it.
+# Get each of the destination addresses, and start an rtpplay for it.
 # Its output goes to filebase.count.
 while expr $# \> 0 > /dev/null
 do

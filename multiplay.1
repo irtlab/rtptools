@@ -1,0 +1,39 @@
+.Dd December 8, 2017
+.Dt MULTIPLAY 1
+.Os
+.Sh NAME
+.Nm multiplay
+.Nd run multiple rtpplays simultaneously
+.Sh SYNOPSIS
+.Nm
+.Op Fl p Ar profile
+.Op Fl T
+.Op Fl v
+.Ar basename
+.Ar address Ns / Ns Ar port Ns Op / Ns Ar ttl
+.Ar ...
+.Sh DESCRIPTION
+.Nm
+runs multiple
+.Xr rtpplay 1
+sessions simultaneously.
+For every
+.Ar address Ns / Ns Ar port Ns Op / Ns Ar ttl
+argument, one
+.Xr rtpplay 1
+process is started.
+The dumps to be played are read from
+.Pa basename.* ,
+starting with
+.Pa basename.1 .
+.Pp
+The
+.Fl p ,
+.Fl T
+and
+.Fl v
+flags, if present, are passed to every
+.Xr rtpplay 1 .
+.Sh SEE ALSO
+.Xr multidump 1 ,
+.Xr rtpplay 1
