@@ -1,7 +1,7 @@
 #!/bin/sh
 # Run multiple rtpdumps simultaneously.
 
-USAGE="usage: multidump [-F format] [-t minutes] [-x bytes] filebase [[addr]/port ...]"
+USAGE="usage: multidump [-F format] [-t minutes] [-x bytes] filebase [addr]/port [...]"
 
 args=""  # The flags to pass to each rtpdump
 pids=""  # The list process IDs of the rtpdump processes
