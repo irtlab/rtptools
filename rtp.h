@@ -1,18 +1,7 @@
 /*
  * rtp.h  --  RTP header file (RFC 1890)
  */
-#include "types.h"   /* changed from <sys/types.h> by Akira 12/27/01 */
 #include "sysdep.h"
-
-#if 0 /* types.h has a better definition for this. by Akira 12/27/01 */
-/*
- * The type definitions below are valid for 32-bit architectures and
- * may have to be adjusted for 16- or 64-bit architectures.
- */
-typedef unsigned short u_int16;
-typedef unsigned int   u_int32;
-typedef          short int16;
-#endif
 
 /*
  * System endianness -- determined by autoconf.
@@ -73,16 +62,16 @@ typedef struct {
 #error Define one of RTP_LITTLE_ENDIAN or RTP_BIG_ENDIAN
 #endif
     unsigned int seq:16;      /* sequence number */
-    u_int32 ts;               /* timestamp */
-    u_int32 ssrc;             /* synchronization source */
-    u_int32 csrc[1];          /* optional CSRC list */
+    uint32_t ts;               /* timestamp */
+    uint32_t ssrc;             /* synchronization source */
+    uint32_t csrc[1];          /* optional CSRC list */
 } rtp_hdr_t;
 
-/* RTP Header Extension 
+/* RTP Header Extension
  */
 typedef struct {
-    u_int16 ext_type;         /* defined by profile */
-    u_int16 len;              /* extension length in 32-bit word */
+    uint16_t ext_type;         /* defined by profile */
+    uint16_t len;              /* extension length in 32-bit word */
 } rtp_hdr_ext_t;
 
 /*
@@ -115,13 +104,13 @@ typedef struct {
  * Reception report block
  */
 typedef struct {
-    u_int32 ssrc;             /* data source being reported */
+    uint32_t ssrc;             /* data source being reported */
     unsigned int fraction:8;  /* fraction lost since last SR/RR */
     int lost:24;              /* cumul. no. pkts lost (signed!) */
-    u_int32 last_seq;         /* extended last seq. no. received */
-    u_int32 jitter;           /* interarrival jitter */
-    u_int32 lsr;              /* last SR packet from this source */
-    u_int32 dlsr;             /* delay since last SR packet */
+    uint32_t last_seq;         /* extended last seq. no. received */
+    uint32_t jitter;           /* interarrival jitter */
+    uint32_t lsr;              /* last SR packet from this source */
+    uint32_t dlsr;             /* delay since last SR packet */
 } rtcp_rr_t;
 
 /*
@@ -141,30 +130,30 @@ typedef struct {
     union {
         /* sender report (SR) */
         struct {
-            u_int32 ssrc;     /* sender generating this report */
-            u_int32 ntp_sec;  /* NTP timestamp */
-            u_int32 ntp_frac;
-            u_int32 rtp_ts;   /* RTP timestamp */
-            u_int32 psent;    /* packets sent */
-            u_int32 osent;    /* octets sent */ 
+            uint32_t ssrc;     /* sender generating this report */
+            uint32_t ntp_sec;  /* NTP timestamp */
+            uint32_t ntp_frac;
+            uint32_t rtp_ts;   /* RTP timestamp */
+            uint32_t psent;    /* packets sent */
+            uint32_t osent;    /* octets sent */
             rtcp_rr_t rr[1];  /* variable-length list */
         } sr;
 
         /* reception report (RR) */
         struct {
-            u_int32 ssrc;     /* receiver generating this report */
+            uint32_t ssrc;     /* receiver generating this report */
             rtcp_rr_t rr[1];  /* variable-length list */
         } rr;
 
         /* source description (SDES) */
         struct rtcp_sdes {
-            u_int32 src;      /* first SSRC/CSRC */
+            uint32_t src;      /* first SSRC/CSRC */
             rtcp_sdes_item_t item[1]; /* list of SDES items */
         } sdes;
 
         /* BYE */
         struct {
-            u_int32 src[1];   /* list of sources */
+            uint32_t src[1];   /* list of sources */
             /* can't express trailing text for reason */
         } bye;
     } r;

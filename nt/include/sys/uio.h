@@ -83,7 +83,6 @@ int	uiomove __P((caddr_t, int, struct uio *));
 #else /* !KERNEL */
 
 /* #include <sys/cdefs.h> */
-#include "types.h"
 
 ssize_t	readv (int, const struct iovec *, int);
 ssize_t	writev (int, const struct iovec *, int);

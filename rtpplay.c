@@ -18,7 +18,6 @@
 #endif
 #include "notify.h"      /* notify_start(), ... */
 #include "rtp.h"         /* RTP headers */
-#include "types.h"
 #include "rtpdump.h"     /* RD_packet_t */
 #include "multimer.h"    /* timer_set() */
 #include "ansi.h"
@@ -27,8 +26,8 @@
 
 static int verbose = 0;        /* be chatty about packets sent */
 static int wallclock = 0;      /* use wallclock time rather than timestamps */
-static u_int32 begin = 0;      /* time of first packet to send */
-static u_int32 end = UINT_MAX; /* when to stop sending */ 
+static uint32_t begin = 0;      /* time of first packet to send */
+static uint32_t end = UINT32_MAX; /* when to stop sending */ 
 static FILE *in;               /* input file */
 static int sock[2];            /* output sockets */
 static int first = -1;         /* time offset of first packet */
@@ -120,9 +119,9 @@ static Notify_value play_handler(Notify_client client)
   };
   struct rt_ts *t = 0;
   char ssrc[12];
-  u_int32 ts  = 0;
+  uint32_t ts  = 0;
   uint8_t  pt  = 0;
-  u_int16 seq = 0;
+  uint16_t seq = 0;
   uint8_t  m   = 0;
   rtp_hdr_t *r;
   int b = (int)client;  /* buffer to be played now */
