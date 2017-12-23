@@ -121,9 +121,9 @@ static Notify_value play_handler(Notify_client client)
   struct rt_ts *t = 0;
   char ssrc[12];
   u_int32 ts  = 0;
-  u_int8  pt  = 0;
+  uint8_t  pt  = 0;
   u_int16 seq = 0;
-  u_int8  m   = 0;
+  uint8_t  m   = 0;
   rtp_hdr_t *r;
   int b = (int)client;  /* buffer to be played now */
   int rp;        /* read pointer */

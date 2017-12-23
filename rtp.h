@@ -9,7 +9,6 @@
  * The type definitions below are valid for 32-bit architectures and
  * may have to be adjusted for 16- or 64-bit architectures.
  */
-typedef unsigned char  u_int8;
 typedef unsigned short u_int16;
 typedef unsigned int   u_int32;
 typedef          short int16;
@@ -129,8 +128,8 @@ typedef struct {
  * SDES item
  */
 typedef struct {
-    u_int8 type;              /* type of item (rtcp_sdes_type_t) */
-    u_int8 length;            /* length of item (in octets) */
+    uint8_t type;             /* type of item (rtcp_sdes_type_t) */
+    uint8_t length;           /* length of item (in octets) */
     char data[1];             /* text, not null-terminated */
 } rtcp_sdes_item_t;
 

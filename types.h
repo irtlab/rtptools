@@ -38,8 +38,6 @@ typedef int   int32;
 typedef unsigned int   u_int32;
 typedef unsigned short u_int16;
 #endif
-typedef char int8;
-typedef unsigned char u_int8;
 
 #endif /* RTP_VERSION */
 
