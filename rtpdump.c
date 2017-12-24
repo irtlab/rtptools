@@ -18,7 +18,7 @@
 #include "sysdep.h"
 #define RTPFILE_VERSION "1.0"
 
-typedef u_int32 member_t;
+typedef uint32_t member_t;
 
 static int verbose = 0; /* decode */
 
@@ -344,7 +344,7 @@ void member_sdes(FILE *out, member_t m, rtcp_sdes_type_t t, char *b, int len)
 static char *rtp_read_sdes(FILE *out, char *b, int len)
 {
   rtcp_sdes_item_t *rsp;
-  u_int32 src = *(u_int32 *)b;
+  uint32_t src = *(uint32_t *)b;
   int total_len = 0;
 
   len -= 4;  /* subtract SSRC from available bytes */
@@ -482,7 +482,7 @@ static int parse_control(FILE *out, char *buf, int len)
           (unsigned long)ntohl(r->r.sdes.src));
       break;
       }
-      r = (rtcp_t *)((u_int32 *)r + ntohs(r->common.length) + 1);
+      r = (rtcp_t *)((uint32_t *)r + ntohs(r->common.length) + 1);
     }
   }
   else {

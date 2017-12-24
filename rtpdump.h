@@ -16,19 +16,19 @@
 
 typedef struct {
   struct timeval32 {
-      u_int32 tv_sec;    /* start of recording (GMT) (seconds) */
-      u_int32 tv_usec;   /* start of recording (GMT) (microseconds)*/
+      uint32_t tv_sec;    /* start of recording (GMT) (seconds) */
+      uint32_t tv_usec;   /* start of recording (GMT) (microseconds)*/
   } start;
-  u_int32 source;        /* network source (multicast address) */
-  u_int16 port;          /* UDP port */
-  u_int16 padding;       /* padding */
+  uint32_t source;        /* network source (multicast address) */
+  uint16_t port;          /* UDP port */
+  uint16_t padding;       /* padding */
 } RD_hdr_t;
 
 typedef struct {
-  u_int16 length;    /* length of packet, including this header (may 
+  uint16_t length;   /* length of packet, including this header (may
                         be smaller than plen if not whole packet recorded) */
-  u_int16 plen;      /* actual header+payload length for RTP, 0 for RTCP */
-  u_int32 offset;    /* milliseconds since the start of recording */
+  uint16_t plen;     /* actual header+payload length for RTP, 0 for RTCP */
+  uint32_t offset;   /* milliseconds since the start of recording */
 } RD_packet_t;
 
 typedef union {

@@ -161,10 +161,10 @@ static node_t *parse(char *text)
 * Parse parameter=value. Return value, word becomes parameter.
 * Value must be unsigned integer.
 */
-static u_int32 parse_uint(char *word)
+static uint32_t parse_uint(char *word)
 {
   char *s;
-  u_int32 value = 0;
+  uint32_t value = 0;
 
   if ((s = strchr(word, '='))) {
     value = strtoul(s+1, (char **)NULL, 0);    
@@ -388,7 +388,7 @@ static int rtcp_write_sr(node_t *list, char *packet)
   r->common.version = RTP_VERSION;
   r->common.pt      = RTCP_SR;
   r->common.p       = 0;
-  r->r.sr.ntp_sec   = htonl((u_int32)now.tv_sec + GETTIMEOFDAY_TO_NTP_OFFSET);
+  r->r.sr.ntp_sec   = htonl((uint32_t)now.tv_sec + GETTIMEOFDAY_TO_NTP_OFFSET);
   r->r.sr.ntp_frac  = htonl(usec2ntp((u_int)now.tv_usec)); 
 
   packet += RTCP_SR_HDR_LEN; /* skip common header and ssrc */
@@ -491,7 +491,7 @@ static int rtcp_write_rr(node_t *list, char *packet)
 static int rtcp_bye(node_t *list, char *packet)
 {
   node_t *n;
-  u_int32 *bye = (u_int32 *)packet;
+  uint32_t *bye = (uint32_t *)packet;
 
   for (n = list; n; n = n->next) {
     if (n->type) {
@@ -499,7 +499,7 @@ static int rtcp_bye(node_t *list, char *packet)
         *bye = htonl(n->num);
     }
   }
-  return sizeof(u_int32);
+  return sizeof(uint32_t);
 } /* rtcp_bye */
 
 
@@ -629,7 +629,7 @@ static int rtp(char *text, char *packet)
   rtp_hdr_t *h = (rtp_hdr_t *)packet;
   rtp_hdr_ext_t *ext;
   int length = 0;
-  u_int32 value;
+  uint32_t value;
 
   /* defaults */
   memset(packet, 0, sizeof(rtp_hdr_t));
