@@ -17,7 +17,6 @@ COMMON = \
         notify.h \
         rtp.h \
         sysdep.h \
-        types.h \
         vat.h
 
 rtpdump_SOURCES = $(COMMON) rd.c rtpdump.h rtpdump.c
