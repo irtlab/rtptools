@@ -28,7 +28,7 @@ dnl Checks for libraries.
 dnl Substitute for AC_CHECK_FUNC; check for function normally, then in
 dnl library
 
-AC_DEFUN(CU_CHECK_LIB,
+AC_DEFUN([CU_CHECK_LIB],
 [AC_CHECK_FUNCS($2, , AC_CHECK_LIB($1, $2))])
 
 
@@ -38,7 +38,7 @@ CU_CHECK_LIB(socket, socket)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(search.h sys/time.h unistd.h)
+AC_CHECK_HEADERS(search.h sys/time.h unistd.h stdint.h)
 AC_CHECK_HEADER([rpcsvc/ypclnt.h],
                 [AC_DEFINE([HAVE_YP],[1],[Define to 1 if you have rpcsvc/ypclnt.h])])
 
@@ -49,6 +49,7 @@ AC_TYPE_UID_T
 AC_TYPE_OFF_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
+AC_TYPE_UINT16_T
 AC_HEADER_TIME
 AC_STRUCT_TM
 
