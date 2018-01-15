@@ -46,5 +46,6 @@ EXTRA_DIST = ChangeLog.html COPYRIGHT rtptools.html bark.rtp \
         nt/include/rpcsvc/*.h nt/include/sys/*.h \
         nt/include/utilnt/*.h \
         hsearch.h hsearch.c multidump multiplay \
+        $(man_MANS) \
         rtptools.dsw rtpdump.dsp rtpplay.dsp rtpsend.dsp rtptrans.dsp \
         bcb/*.bp? bcb/obj/* rtptools.spec
