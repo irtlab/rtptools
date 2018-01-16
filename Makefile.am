@@ -5,6 +5,7 @@ AUTOMAKE_OPTIONS = foreign
 TAR = gtar
 
 bin_PROGRAMS = rtpdump rtpplay rtpsend rtptrans
+dist_bin_SCRIPTS = multidump multiplay
 man_MANS     = rtpdump.1 rtpplay.1 rtpsend.1 rtptrans.1 multidump.1 multiplay.1
 
 COMMON = \
