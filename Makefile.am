@@ -7,6 +7,8 @@ TAR = gtar
 bin_PROGRAMS = rtpdump rtpplay rtpsend rtptrans
 dist_bin_SCRIPTS = multidump multiplay
 man_MANS     = rtpdump.1 rtpplay.1 rtpsend.1 rtptrans.1 multidump.1 multiplay.1
+html_DATA  = rtpdump.html rtpplay.html rtpsend.html rtptrans.html \
+             multidump.html multiplay.html
 
 COMMON = \
         ansi.h \
@@ -29,6 +31,9 @@ endif
 rtpsend_SOURCES = $(COMMON) rtpsend.c
 rtptrans_SOURCES= $(COMMON) rtptrans.c
 
+$(html_DATA): $(man_MANS)
+	groff -Thtml -mdoc $< > $@
+
 # make rpm_spec
 # This will automatically generate rtptools-VERSION.spec file 
 # which is required for making Linux's RPM/SRPM package.
@@ -39,7 +44,10 @@ rpm_spec: rtptools.spec
 	@sed s/VERSION/$(VERSION)/g  rtptools.spec >> rtptools-$(VERSION).spec
 
 #rpm: rtptools-$(VERSION).spec $(bin_PROGRAMS)
-#	rpm -ba 
+#	rpm -ba
+
+clean-local:
+	rm $(html_DATA)
 
 EXTRA_DIST = ChangeLog.html COPYRIGHT rtptools.html bark.rtp \
         nt/*.c nt/include/*.h \
