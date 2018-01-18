@@ -7,8 +7,10 @@ TAR = gtar
 bin_PROGRAMS = rtpdump rtpplay rtpsend rtptrans
 dist_bin_SCRIPTS = multidump multiplay
 man_MANS     = rtpdump.1 rtpplay.1 rtpsend.1 rtptrans.1 multidump.1 multiplay.1
-html_DATA  = rtpdump.html rtpplay.html rtpsend.html rtptrans.html \
-             multidump.html multiplay.html
+man_HTML     = rtpdump.html rtpplay.html rtpsend.html rtptrans.html \
+               multidump.html multiplay.html
+
+MAN2HTML = groff -Thtml -mdoc
 
 COMMON = \
         ansi.h \
@@ -31,7 +33,7 @@ endif
 rtpsend_SOURCES = $(COMMON) rtpsend.c
 rtptrans_SOURCES= $(COMMON) rtptrans.c
 
-$(html_DATA): $(man_MANS)
+.1.html: $(man_MANS)
 	groff -Thtml -mdoc $< > $@
 
 # make rpm_spec
@@ -46,8 +48,10 @@ rpm_spec: rtptools.spec
 #rpm: rtptools-$(VERSION).spec $(bin_PROGRAMS)
 #	rpm -ba
 
+all-local: $(man_HTML)
+
 clean-local:
-	rm $(html_DATA)
+	rm -f $(man_HTML)
 
 EXTRA_DIST = ChangeLog.html COPYRIGHT rtptools.html bark.rtp \
         nt/*.c nt/include/*.h \
