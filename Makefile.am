@@ -31,7 +31,7 @@ endif
 rtpsend_SOURCES = $(COMMON) rtpsend.c
 rtptrans_SOURCES= $(COMMON) rtptrans.c
 
-$(html_DATA): $(man_MANS)
+.1.html: $(man_MANS)
 	groff -Thtml -mdoc $< > $@
 
 # make rpm_spec
