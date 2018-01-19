@@ -192,19 +192,12 @@ Notify_error notify_start(void)
     found = select(max_fd+1, (CAST)&readfds, (CAST)&writefds, (CAST)&exceptfds, 
                     timer_get_pending(&timeout, max_fd));
 
-#if defined(WIN32)
-    if (found < 0 && WSAGetLastError() != WSAEINVAL) {
-      fprintf(stderr, "select(): WSAErrono: %d\n", WSAGetLastError());
-      return -1;
-    }
-#else
     /* For not to catch signal as an error
      * EINTR added by Akira T. 12/11/01 */
     if (found < 0 && errno != EINTR) {
       fprintf(stderr, "Timeout: %lu.%06lu\n", timeout.tv_sec, timeout.tv_usec);
       return -1;
     }
-#endif
 
     /* found = 0: just a timer -> do nothing, 
                   timer_get() will execute the handler */

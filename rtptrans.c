@@ -247,29 +247,6 @@ static Notify_value socket_handler(Notify_client client, int sock)
       rtp_hdr_send.cc      = 0;
       rtp_hdr_send.ts      = vat_hdr->ts;
 
-#if defined(Linux) || defined(WIN32)
-      /* 
-       * Stupid little Linux and stupid big Win32 does not support
-       * sendmsg(), thus, use copying instead; contributed by Lutz
-       * Grueneberg <gruen@rvs.uni-hannover.de>.
-       */
-      {
-        unsigned char mbuf[10000];
-        int mlength = 0;
-        memcpy (&mbuf[mlength], (char *)&(rtp_hdr_send), sizeof(rtp_hdr_t)-4);
-        mlength += sizeof(rtp_hdr_t)-4;
-        memcpy (&mbuf[mlength], packet+VAT_LEN, len-VAT_LEN);
-        mlength += len-VAT_LEN;
-        for (i = 0; i < hostc; i++) {
-          if (side[i][proto].sock != sock) {
-            if (sendto(side[i][2].sock, mbuf, mlength, 0,
-                        &(side[i][proto].sin), sizeof(side[i][proto].sin))!=
-                mlength)
-              perror("sendmsg RTCP");
-          }
-        }
-      }
-#else 
       iov[0].iov_base = (char *)&(rtp_hdr_send);
       iov[0].iov_len = sizeof(rtp_hdr_t)-4;
       iov[1].iov_base = packet+VAT_LEN;
@@ -280,19 +257,14 @@ static Notify_value socket_handler(Notify_client client, int sock)
         if (side[i][proto].sock != sock) {
           msg.msg_name = (caddr_t ) &side[i][proto].sin;
           msg.msg_namelen = sizeof(side[i][proto].sin);
-#if defined(__unix__) || defined(__FreeBSD__) || defined(__linux__) || defined(__darwin__) /* Or presumably other BSD 4.4 systems */
           msg.msg_control = 0;
           msg.msg_controllen = 0;
-#else
-          msg.msg_accrights = 0;
-          msg.msg_accrightslen = 0;
-#endif
           if ((sendmsg(side[i][2].sock, &msg,0))!= 
             iov[0].iov_len +iov[1].iov_len)
             perror("sendmsg RTCP");
           }
        }
-#endif /* Linux || WIN32 */
+
     }
     else if (((struct CtrlMsgHdr *)packet)->type == 1) /* vat ID messages */{
       rtcp_t *rtcp_msg;
