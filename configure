@@ -625,6 +625,17 @@ LTLIBOBJS
 LIBOBJS
 EGREP
 GREP
+FOUND_GEN_HTML_FALSE
+FOUND_GEN_HTML_TRUE
+HAVE_MANDOC_FALSE
+HAVE_MANDOC_TRUE
+FOUND_MANDOC
+HAVE_MAN2HTML_FALSE
+HAVE_MAN2HTML_TRUE
+FOUND_MAN2HTML
+HAVE_GROFF_FALSE
+HAVE_GROFF_TRUE
+FOUND_GROFF
 CPP
 am__fastdepCC_FALSE
 am__fastdepCC_TRUE
@@ -4104,6 +4115,158 @@ if test "x$GCC" = "xyes"; then
   CFLAGS="$CFLAGS -Wall"
 fi
 
+# Extract the first word of "groff", so it can be a program name with args.
+set dummy groff; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_FOUND_GROFF+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$FOUND_GROFF"; then
+  ac_cv_prog_FOUND_GROFF="$FOUND_GROFF" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_FOUND_GROFF="yes"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+FOUND_GROFF=$ac_cv_prog_FOUND_GROFF
+if test -n "$FOUND_GROFF"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $FOUND_GROFF" >&5
+$as_echo "$FOUND_GROFF" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+ if test "x$FOUND_GROFF" = xyes; then
+  HAVE_GROFF_TRUE=
+  HAVE_GROFF_FALSE='#'
+else
+  HAVE_GROFF_TRUE='#'
+  HAVE_GROFF_FALSE=
+fi
+
+# Extract the first word of "man2html", so it can be a program name with args.
+set dummy man2html; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_FOUND_MAN2HTML+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$FOUND_MAN2HTML"; then
+  ac_cv_prog_FOUND_MAN2HTML="$FOUND_MAN2HTML" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_FOUND_MAN2HTML="yes"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+FOUND_MAN2HTML=$ac_cv_prog_FOUND_MAN2HTML
+if test -n "$FOUND_MAN2HTML"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $FOUND_MAN2HTML" >&5
+$as_echo "$FOUND_MAN2HTML" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+ if test "x$FOUND_MAN2HTML" = xyes; then
+  HAVE_MAN2HTML_TRUE=
+  HAVE_MAN2HTML_FALSE='#'
+else
+  HAVE_MAN2HTML_TRUE='#'
+  HAVE_MAN2HTML_FALSE=
+fi
+
+# Extract the first word of "mandoc", so it can be a program name with args.
+set dummy mandoc; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_FOUND_MANDOC+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$FOUND_MANDOC"; then
+  ac_cv_prog_FOUND_MANDOC="$FOUND_MANDOC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_FOUND_MANDOC="yes"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+FOUND_MANDOC=$ac_cv_prog_FOUND_MANDOC
+if test -n "$FOUND_MANDOC"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $FOUND_MANDOC" >&5
+$as_echo "$FOUND_MANDOC" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+ if test "x$FOUND_MANDOC" = xyes; then
+  HAVE_MANDOC_TRUE=
+  HAVE_MANDOC_FALSE='#'
+else
+  HAVE_MANDOC_TRUE='#'
+  HAVE_MANDOC_FALSE=
+fi
+
+ if test "x$FOUND_GROFF" = xyes || test "x$FOUND_MAN2HTML" = xyes; then
+  FOUND_GEN_HTML_TRUE=
+  FOUND_GEN_HTML_FALSE='#'
+else
+  FOUND_GEN_HTML_TRUE='#'
+  FOUND_GEN_HTML_FALSE=
+fi
+
+ if test "x$FOUND_MANDOC" = xyes; then
+  FOUND_GEN_HTML_TRUE=
+  FOUND_GEN_HTML_FALSE='#'
+else
+  FOUND_GEN_HTML_TRUE='#'
+  FOUND_GEN_HTML_FALSE=
+fi
+
+
 
 
 
@@ -5397,6 +5560,26 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_GROFF_TRUE}" && test -z "${HAVE_GROFF_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_GROFF\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_MAN2HTML_TRUE}" && test -z "${HAVE_MAN2HTML_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_MAN2HTML\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_MANDOC_TRUE}" && test -z "${HAVE_MANDOC_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_MANDOC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${FOUND_GEN_HTML_TRUE}" && test -z "${FOUND_GEN_HTML_FALSE}"; then
+  as_fn_error $? "conditional \"FOUND_GEN_HTML\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${FOUND_GEN_HTML_TRUE}" && test -z "${FOUND_GEN_HTML_FALSE}"; then
+  as_fn_error $? "conditional \"FOUND_GEN_HTML\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

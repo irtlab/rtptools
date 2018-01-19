@@ -254,6 +254,9 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+FOUND_GROFF = @FOUND_GROFF@
+FOUND_MAN2HTML = @FOUND_MAN2HTML@
+FOUND_MANDOC = @FOUND_MANDOC@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -337,7 +340,10 @@ man_MANS = rtpdump.1 rtpplay.1 rtpsend.1 rtptrans.1 multidump.1 multiplay.1
 man_HTML = rtpdump.html rtpplay.html rtpsend.html rtptrans.html \
                multidump.html multiplay.html
 
-MAN2HTML = groff -Thtml -mdoc
+@FOUND_GEN_HTML_FALSE@GEN_HTML = $(error Please install mandoc, man2html or groff.)
+@HAVE_GROFF_TRUE@GEN_HTML = groff -Thtml -mdoc
+@HAVE_MAN2HTML_TRUE@GEN_HTML = man2html
+@HAVE_MANDOC_TRUE@GEN_HTML = mandoc -Thtml
 COMMON = \
         ansi.h \
         host2ip.c \
@@ -929,7 +935,7 @@ uninstall-man: uninstall-man1
 
 
 .1.html: $(man_MANS)
-	groff -Thtml -mdoc $< > $@
+	$(GEN_HTML) $< > $@
 
 # make rpm_spec
 # This will automatically generate rtptools-VERSION.spec file 
