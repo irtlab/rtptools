@@ -10,7 +10,18 @@ man_MANS     = rtpdump.1 rtpplay.1 rtpsend.1 rtptrans.1 multidump.1 multiplay.1
 man_HTML     = rtpdump.html rtpplay.html rtpsend.html rtptrans.html \
                multidump.html multiplay.html
 
-MAN2HTML = groff -Thtml -mdoc
+if HAVE_GROFF
+GEN_HTML = groff -Thtml -mdoc
+endif
+if HAVE_MAN2HTML
+GEN_HTML = man2html
+endif
+if HAVE_MANDOC
+GEN_HTML = mandoc -Thtml
+endif
+if !FOUND_GEN_HTML
+GEN_HTML = $(error Please install mandoc, man2html or groff.)
+endif
 
 COMMON = \
         ansi.h \
@@ -34,7 +45,7 @@ rtpsend_SOURCES = $(COMMON) rtpsend.c
 rtptrans_SOURCES= $(COMMON) rtptrans.c
 
 .1.html: $(man_MANS)
-	groff -Thtml -mdoc $< > $@
+	$(GEN_HTML) $< > $@
 
 # make rpm_spec
 # This will automatically generate rtptools-VERSION.spec file 

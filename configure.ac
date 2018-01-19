@@ -24,6 +24,15 @@ if test "x$GCC" = "xyes"; then
   CFLAGS="$CFLAGS -Wall"
 fi
 
+AC_CHECK_PROG([FOUND_GROFF], [groff], [yes])
+AM_CONDITIONAL([HAVE_GROFF], [test "x$FOUND_GROFF" = xyes])
+AC_CHECK_PROG([FOUND_MAN2HTML], [man2html], [yes])
+AM_CONDITIONAL([HAVE_MAN2HTML], [test "x$FOUND_MAN2HTML" = xyes])
+AC_CHECK_PROG([FOUND_MANDOC], [mandoc], [yes])
+AM_CONDITIONAL([HAVE_MANDOC], [test "x$FOUND_MANDOC" = xyes])
+AM_CONDITIONAL([FOUND_GEN_HTML], [test "x$FOUND_GROFF" = xyes] || [test "x$FOUND_MAN2HTML" = xyes])
+AM_CONDITIONAL([FOUND_GEN_HTML], [test "x$FOUND_MANDOC" = xyes])
+
 dnl Checks for libraries.
 
 dnl Substitute for AC_CHECK_FUNC; check for function normally, then in
