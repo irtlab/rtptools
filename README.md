@@ -21,19 +21,17 @@ Refer to the individual manpages for details.
 
 ## Installation
 
-The RTP tools should compile on any Posix-compliant platform
-supporting sockets, as well as on Windows.
+The RTP tools should compile on any
+POSIX platform supporting sockets.
 
-### UNIX
+When building from a release tarball,
+the usual `./configure; make` will compile rtptools.
 
-On Unix systems, the usual `./configure; make` will compile rtptools.
+When building from git, the following sequence
+might be needed to regenerate the build tools first:
 
-### Windows
-
-The `*.dsp` files are project files. `*.dsw` file and workspace file.
-User can open the workspace file and use 'batch compile'
-to compile all the projects.
-
-* In Visual C++ 6.0, open workspace file rtptools.dsw.
-* In VC menu Build, use Batch Build to build all the tools.
-* All the rtptools will be created under the "debug\" directory.
+```
+aclocal
+autoconf
+automake
+```
