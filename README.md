@@ -31,7 +31,7 @@ On Unix systems, the usual `./configure; make` will compile rtptools.
 `make install` for installing.
 `make uninstall` for uninstalling.
 
-`make distclean; make dist` generates a source tar file `rtptools-*tar.gz`.
+`make distclean; ./configure; make dist` generates a source tar file `rtptools-*tar.gz`.
   e.g. rtptools-1.22.tar.gz
 
 `make rpm-spec` will creat spec file for generating rpm package.
