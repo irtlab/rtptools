@@ -62,7 +62,7 @@ all-local: $(man_HTML)
 clean-local:
 	rm -f $(man_HTML)
 
-EXTRA_DIST = ChangeLog.html COPYRIGHT rtptools.html bark.rtp \
+EXTRA_DIST = ChangeLog.html rtptools.html bark.rtp \
         nt/*.c nt/include/*.h \
         nt/include/arpa/*.h nt/include/netinet/*.h \
         nt/include/rpcsvc/*.h nt/include/sys/*.h \
