@@ -988,27 +988,6 @@ int main(int argc, char *argv[])
     }
   }
 
-#if defined(WIN32)
-  /*
-   * We have to set the socket array when we use 'select' in NT,
-   * otherwise the 'select' function in NT will consider all the
-   * three fd_sets are NULL and return an error.  Error code
-   * WSAEINVAL means The timeout value is not valid, or all three
-   * descriptor parameters were NULL but the timeout value is valid.
-   * After setting Writefds, the program runs ok.
-   */
-//  notify_set_socket(sock[i], 1);
-  /*
-   * Modified by Wenyu and Akira 12/27/01
-   * setting Writefds was causing 
-   *   1)consuming CPU 100% (behave polling)
-   *   2)slow
-   *   3)large jitter
-   * therefore, we changed it to set dummy fd to Readfds.
-   */
-  notify_set_socket(winfd_dummy, 0);
-#endif
-
   send_handler((Notify_client)in);
   notify_start();
   return 0;
