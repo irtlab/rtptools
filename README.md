@@ -28,7 +28,17 @@ supporting sockets, as well as on Windows.
 
 On Unix systems, the usual `./configure; make` will compile rtptools.
 
-### Windows
+`make install` for installing.
+`make uninstall` for uninstalling.
+
+`make distclean; make dist` generates a source tar file `rtptools-*tar.gz`.
+  e.g. rtptools-1.22.tar.gz
+
+`make rpm-spec` will creat spec file for generating rpm package.
+  Then run `rpmbuild -ba rtptools-*.spec` or
+  `rpmbuild -bb rtptools-*.spec` on rpm based distribution.
+
+### Windows (broken at the moment)
 
 The `*.dsp` files are project files. `*.dsw` file and workspace file.
 User can open the workspace file and use 'batch compile'
@@ -37,3 +47,11 @@ to compile all the projects.
 * In Visual C++ 6.0, open workspace file rtptools.dsw.
 * In VC menu Build, use Batch Build to build all the tools.
 * All the rtptools will be created under the "debug\" directory.
+
+## TODO
+
+* Improve generating html for homepage.
+* Fixing type mismatch warnings.
+* Fixing building on windows.
+* Added file to generate debian package.
+* And any other issues come up.
