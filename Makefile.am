@@ -13,14 +13,11 @@ man_HTML     = rtpdump.html rtpplay.html rtpsend.html rtptrans.html \
 if HAVE_GROFF
 GEN_HTML = groff -Thtml -mdoc
 endif
-if HAVE_MAN2HTML
-GEN_HTML = man2html
-endif
 if HAVE_MANDOC
 GEN_HTML = mandoc -Thtml
 endif
 if !FOUND_GEN_HTML
-GEN_HTML = $(error Please install mandoc, man2html or groff.)
+GEN_HTML = echo "No mandoc or groff to generate html, skipping."
 endif
 
 COMMON = \
