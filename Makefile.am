@@ -43,6 +43,7 @@ rtptrans_SOURCES= $(COMMON) rtptrans.c
 
 .1.html: $(man_MANS)
 	$(GEN_HTML) $< > $@
+	sed s/VERSION/$(VERSION)/g rtptools.html.in > rtptools.html
 
 # make rpm_spec
 # This will automatically generate rtptools-VERSION.spec file 
