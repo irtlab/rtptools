@@ -70,4 +70,5 @@ EXTRA_DIST = ChangeLog.html rtptools.html bark.rtp \
         hsearch.h hsearch.c multidump multiplay \
         $(man_MANS) \
         rtptools.dsw rtpdump.dsp rtpplay.dsp rtpsend.dsp rtptrans.dsp \
-        bcb/*.bp? bcb/obj/* rtptools.spec
+        bcb/*.bp? bcb/obj/* rtptools.spec rtptools.html.in \
+        bootstrap

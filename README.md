@@ -26,7 +26,7 @@ supporting sockets, as well as on Windows.
 
 ### UNIX
 
-On Unix systems, the usual `./configure; make` will compile rtptools.
+`./bootstrap; ./configure; make` for compiling.
 
 `make install` for installing.
 `make uninstall` for uninstalling.
