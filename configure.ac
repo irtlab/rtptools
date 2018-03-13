@@ -31,19 +31,6 @@ AM_CONDITIONAL([HAVE_MANDOC], [mandoc -Thtml rtpplay.1 > rtpplay.html])
 AM_CONDITIONAL([FOUND_GEN_HTML], [test "x$HAVE_GROFF" = xyes])
 AM_CONDITIONAL([FOUND_GEN_HTML], [test "x$HAVE_MANDOC" = xyes])
 
-dnl Checks for libraries.
-
-dnl Substitute for AC_CHECK_FUNC; check for function normally, then in
-dnl library
-
-AC_DEFUN([CU_CHECK_LIB],
-[AC_CHECK_FUNCS($2, , AC_CHECK_LIB($1, $2))])
-
-
-CU_CHECK_LIB(nsl, gethostbyname)
-CU_CHECK_LIB(nsl, yp_match)
-CU_CHECK_LIB(socket, socket)
-
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(search.h sys/time.h unistd.h stdint.h)
@@ -66,7 +53,19 @@ AC_PROG_GCC_TRADITIONAL
 AC_TYPE_SIGNAL
 AC_FUNC_STRFTIME
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(gethostname gettimeofday mktime select \
+AC_CHECK_FUNCS(gethostbyname gettimeofday mktime select \
         strdup strerror strstr strtol uname)
+
+dnl Checks for libraries.
+
+dnl Substitute for AC_CHECK_FUNC; check for function normally, then in
+dnl library
+
+AC_DEFUN([CU_CHECK_LIB],
+[AC_CHECK_FUNCS($2, , AC_CHECK_LIB($1, $2))])
+
+CU_CHECK_LIB(nsl, gethostbyname)
+CU_CHECK_LIB(nsl, yp_match)
+CU_CHECK_LIB(socket, socket)
 
 AC_OUTPUT(Makefile)
