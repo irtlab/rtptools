@@ -53,5 +53,5 @@ to compile all the projects.
 * Improve generating html for homepage.
 * Fixing type mismatch warnings.
 * Fixing building on windows.
-* Added file to generate debian package.
+* Adding file to generate debian package.
 * And any other issues come up.
