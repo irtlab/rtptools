@@ -60,7 +60,7 @@ rpm_spec: rtptools.spec
 all-local: $(man_HTML)
 
 clean-local:
-	rm -f $(man_HTML)
+	rm -f $(man_HTML) configure aclocal.m4
 
 EXTRA_DIST = ChangeLog.html rtptools.html bark.rtp \
         nt/*.c nt/include/*.h \
