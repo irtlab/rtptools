@@ -71,4 +71,4 @@ EXTRA_DIST = ChangeLog.html rtptools.html bark.rtp \
         $(man_MANS) \
         rtptools.dsw rtpdump.dsp rtpplay.dsp rtpsend.dsp rtptrans.dsp \
         bcb/*.bp? bcb/obj/* rtptools.spec rtptools.html.in \
-        bootstrap
+        bootstrap LICENSE README.md
