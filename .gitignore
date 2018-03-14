@@ -1,9 +1,13 @@
 /.deps
 Makefile.in
 Makefile
-config.log
-config.status
+config.*
 autom4te.cache
+compile
+depcomp
+install-sh
+missing
+mkinstalldirs
 *.o
 /rtpdump
 /rtpplay
