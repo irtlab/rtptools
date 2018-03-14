@@ -71,4 +71,4 @@ clean-local:
 EXTRA_DIST = ChangeLog.html bark.rtp \
         hsearch.h hsearch.c multidump multiplay \
         $(man_MANS) rtptools.spec rtptools.html.in \
-        bootstrap LICENSE README.md
+        LICENSE README.md
