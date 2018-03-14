@@ -10,16 +10,6 @@ man_MANS     = rtpdump.1 rtpplay.1 rtpsend.1 rtptrans.1 multidump.1 multiplay.1
 man_HTML     = rtpdump.html rtpplay.html rtpsend.html rtptrans.html \
                multidump.html multiplay.html
 
-if HAVE_GROFF
-GEN_HTML = groff -Thtml -mdoc
-endif
-if HAVE_MANDOC
-GEN_HTML = mandoc -Thtml
-endif
-if !FOUND_GEN_HTML
-GEN_HTML = echo "No mandoc or groff to generate html, skipping."
-endif
-
 COMMON = \
         ansi.h \
         host2ip.c \
@@ -41,8 +31,26 @@ endif
 rtpsend_SOURCES = $(COMMON) rtpsend.c
 rtptrans_SOURCES= $(COMMON) rtptrans.c
 
-.1.html: $(man_MANS)
-	$(GEN_HTML) $< > $@
+if HAVE_GROFF
+GEN_HTML = groff -Thtml -mdoc
+endif
+if HAVE_MANDOC
+GEN_HTML = mandoc -Thtml
+endif
+if HAVE_MAN2HTML
+GEN_HTML = man2html
+endif
+
+html: $(man_MANS)
+if !FOUND_GEN_HTML
+	@echo "No mandoc, groff or man2html to generate html, skipping."
+	@echo "Please install mandoc, groff or man2html."
+	@exit 1
+endif
+	for MAN_FILE in $(man_MANS) ; do \
+	  FILE=$${MAN_FILE%%.*} ; \
+	  $(GEN_HTML) $${MAN_FILE} > $${FILE}.html ;\
+	done
 	sed s/VERSION/$(VERSION)/g rtptools.html.in > rtptools.html
 
 # make rpm_spec
@@ -57,12 +65,10 @@ rpm_spec: rtptools.spec
 #rpm: rtptools-$(VERSION).spec $(bin_PROGRAMS)
 #	rpm -ba
 
-all-local: $(man_HTML)
-
 clean-local:
-	rm -f $(man_HTML) configure aclocal.m4
+	rm -f $(man_HTML) rtptools.html
 
-EXTRA_DIST = ChangeLog.html rtptools.html bark.rtp \
+EXTRA_DIST = ChangeLog.html bark.rtp \
         nt/*.c nt/include/*.h \
         nt/include/arpa/*.h nt/include/netinet/*.h \
         nt/include/rpcsvc/*.h nt/include/sys/*.h \

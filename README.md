@@ -42,6 +42,9 @@ supporting sockets, as well as on Windows.
   Then run `rpmbuild -ba rtptools-*.spec` or
   `rpmbuild -bb rtptools-*.spec` on rpm based distribution.
 
+- `make html` generates html files from man pages.
+
+
 ### Windows (broken at the moment)
 
 The `*.dsp` files are project files. `*.dsw` file and workspace file.
