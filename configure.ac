@@ -41,16 +41,8 @@ if test x"$FOUND_MANDOC" == x"yes" ; then
 fi
 AM_CONDITIONAL([HAVE_MANDOC], [test x"$WORKS_MANDOC" == x"yes"])
 
-AC_CHECK_PROG([FOUND_MAN2HTML], [man2html], [yes])
-if test x"$FOUND_MAN2HTML" == x"yes" ; then
-  if $(man2html rtpplay.1 > /dev/null 2>&1) ; then
-    WORKS_MAN2HTML="yes"
-  fi
-fi
-AM_CONDITIONAL([HAVE_MAN2HTML], [test x"$WORKS_MAN2HTML" == x"yes"])
-
 AM_CONDITIONAL([FOUND_GEN_HTML], [test x"$WORKS_GROFF" == x"yes"] || 
-  [test x"$WORKS_MANDOC" == x"yes"] || [test x"$WORKS_MAN2HTML" == x"yes"])
+  [test x"$WORKS_MANDOC" == x"yes"])
 
 dnl Checks for header files.
 AC_HEADER_STDC
