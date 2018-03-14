@@ -26,15 +26,19 @@ supporting sockets, as well as on Windows.
 
 ### UNIX
 
-`./bootstrap; ./configure; make` for compiling.
+- Run `./bootstrap; ./configure; make` for compiling after cloning from git.
 
-`make install` for installing.
-`make uninstall` for uninstalling.
+- `make install` for installing.
 
-`make distclean; ./configure; make dist` generates a source tar file `rtptools-*tar.gz`.
-  e.g. rtptools-1.22.tar.gz
+- `make uninstall` for uninstalling.
 
-`make rpm-spec` will creat spec file for generating rpm package.
+- `make distclean; ./configure; make dist` generates a source tar file
+  `rtptools-*tar.gz`. e.g. rtptools-1.22.tar.gz
+    - It is using autotools and once the tar file have been made,
+      `./configure; make` should works after copying the `rtptools-*tar.gz`
+      to other system, such as, from Linux to OpenBSD and others.
+
+- `make rpm-spec` will create spec file for generating rpm package.
   Then run `rpmbuild -ba rtptools-*.spec` or
   `rpmbuild -bb rtptools-*.spec` on rpm based distribution.
 
