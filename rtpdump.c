@@ -690,22 +690,6 @@ int main(int argc, char *argv[])
     }
   }
 
-#if defined(WIN32)
-  /* 
-   * If using dump or binary format, make stdout and stdin use binary
-   * format on Win32, to assure that files generated can be read on both
-   * Unix and Windows systems. 
-   */
-  if (format == F_dump || format == F_header) {
-    if (out == stdout) {
-      setmode(fileno(stdout), O_BINARY);
-    }
-  } 
-  if (in == stdin) {
-    setmode(fileno(stdin), O_BINARY);
-  }
-#endif
-
   /*
    * Set up payload type map. We should be able to read this in
    * from a file.

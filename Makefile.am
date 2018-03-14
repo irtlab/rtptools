@@ -65,12 +65,6 @@ clean-local:
 	rm -f $(man_HTML) rtptools.html
 
 EXTRA_DIST = ChangeLog.html bark.rtp \
-        nt/*.c nt/include/*.h \
-        nt/include/arpa/*.h nt/include/netinet/*.h \
-        nt/include/rpcsvc/*.h nt/include/sys/*.h \
-        nt/include/utilnt/*.h \
         hsearch.h hsearch.c multidump multiplay \
-        $(man_MANS) \
-        rtptools.dsw rtpdump.dsp rtpplay.dsp rtpsend.dsp rtptrans.dsp \
-        bcb/*.bp? bcb/obj/* rtptools.spec rtptools.html.in \
+        $(man_MANS) rtptools.spec rtptools.html.in \
         LICENSE README.md
