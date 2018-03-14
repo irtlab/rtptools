@@ -1,12 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <html>
 <head>
-<title>RTP Tools 1.19</title>
+<title>RTP Tools VERSION</title>
 <meta name="author" content="Henning Schulzrinne">
 <meta name="keywords" content="RTP; rtptools; debugging">
 </head>
 <body bgcolor="#38B0DE">
-<h1>RTP Tools (Version 1.19)</h1>
+<h1>RTP Tools (Version VERSION)</h1>
 
 <font color=red><big>
 The authors <b>cannot</b> provide support for compiling or running the

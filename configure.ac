@@ -24,27 +24,33 @@ if test "x$GCC" = "xyes"; then
   CFLAGS="$CFLAGS -Wall"
 fi
 
+dnl Checks for html conversion tool from man page
 AC_CHECK_PROG([FOUND_GROFF], [groff], [yes])
-AM_CONDITIONAL([HAVE_GROFF], [test "x$FOUND_GROFF" = xyes])
-AC_CHECK_PROG([FOUND_MAN2HTML], [man2html], [yes])
-AM_CONDITIONAL([HAVE_MAN2HTML], [test "x$FOUND_MAN2HTML" = xyes])
+if test x"$FOUND_GROFF" == x"yes" ; then
+  if $(groff -Thtml -mdoc rtpplay.1 > /dev/null 2>&1) ; then
+    WORKS_GROFF="yes"
+  fi
+fi
+AM_CONDITIONAL([HAVE_GROFF], [test x"$WORKS_GROFF" == x"yes"])
+
 AC_CHECK_PROG([FOUND_MANDOC], [mandoc], [yes])
-AM_CONDITIONAL([HAVE_MANDOC], [test "x$FOUND_MANDOC" = xyes])
-AM_CONDITIONAL([FOUND_GEN_HTML], [test "x$FOUND_GROFF" = xyes] || [test "x$FOUND_MAN2HTML" = xyes])
-AM_CONDITIONAL([FOUND_GEN_HTML], [test "x$FOUND_MANDOC" = xyes])
+if test x"$FOUND_MANDOC" == x"yes" ; then
+  if $(mandoc -Thtml rtpplay.1 > /dev/null 2>&1)  ; then
+    WORKS_MANDOC="yes"
+  fi
+fi
+AM_CONDITIONAL([HAVE_MANDOC], [test x"$WORKS_MANDOC" == x"yes"])
 
-dnl Checks for libraries.
+AC_CHECK_PROG([FOUND_MAN2HTML], [man2html], [yes])
+if test x"$FOUND_MAN2HTML" == x"yes" ; then
+  if $(man2html rtpplay.1 > /dev/null 2>&1) ; then
+    WORKS_MAN2HTML="yes"
+  fi
+fi
+AM_CONDITIONAL([HAVE_MAN2HTML], [test x"$WORKS_MAN2HTML" == x"yes"])
 
-dnl Substitute for AC_CHECK_FUNC; check for function normally, then in
-dnl library
-
-AC_DEFUN([CU_CHECK_LIB],
-[AC_CHECK_FUNCS($2, , AC_CHECK_LIB($1, $2))])
-
-
-CU_CHECK_LIB(nsl, gethostbyname)
-CU_CHECK_LIB(nsl, yp_match)
-CU_CHECK_LIB(socket, socket)
+AM_CONDITIONAL([FOUND_GEN_HTML], [test x"$WORKS_GROFF" == x"yes"] || 
+  [test x"$WORKS_MANDOC" == x"yes"] || [test x"$WORKS_MAN2HTML" == x"yes"])
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -68,7 +74,19 @@ AC_PROG_GCC_TRADITIONAL
 AC_TYPE_SIGNAL
 AC_FUNC_STRFTIME
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(gethostname gettimeofday mktime select \
+AC_CHECK_FUNCS(gethostbyname gettimeofday mktime select \
         strdup strerror strstr strtol uname)
+
+dnl Checks for libraries.
+
+dnl Substitute for AC_CHECK_FUNC; check for function normally, then in
+dnl library
+
+AC_DEFUN([CU_CHECK_LIB],
+[AC_CHECK_FUNCS($2, , AC_CHECK_LIB($1, $2))])
+
+CU_CHECK_LIB(nsl, gethostbyname)
+CU_CHECK_LIB(nsl, yp_match)
+CU_CHECK_LIB(socket, socket)
 
 AC_OUTPUT(Makefile)
