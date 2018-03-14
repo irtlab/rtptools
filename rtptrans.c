@@ -310,12 +310,12 @@ static Notify_value socket_handler(Notify_client client, int sock)
         if (side[i][proto].sock != sock) {
           msg.msg_name = (caddr_t ) &side[i][proto].sin;
           msg.msg_namelen = sizeof(side[i][proto].sin);
-#if defined(__unix__) || defined(__FreeBSD__) || defined(__linux__) || defined(__darwin__) /* Or presumably other BSD 4.4 systems */
-          msg.msg_control = 0;
-          msg.msg_controllen = 0;
-#else
+#if defined(__sun)
           msg.msg_accrights = 0;
           msg.msg_accrightslen = 0;
+#else
+          msg.msg_control = 0;
+          msg.msg_controllen = 0;
 #endif
           if ((sendmsg(side[i][2].sock, &msg,0))!= 
             iov[0].iov_len +iov[1].iov_len)
