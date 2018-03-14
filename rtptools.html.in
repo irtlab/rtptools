@@ -6,7 +6,7 @@
 <meta name="keywords" content="RTP; rtptools; debugging">
 </head>
 <body bgcolor="#38B0DE">
-<h1>RTP Tools (Version 1.21)</h1>
+<h1>RTP Tools (Version VERSION)</h1>
 
 <font color=red><big>
 The authors <b>cannot</b> provide support for compiling or running the
