@@ -51,7 +51,6 @@ endif
 	  FILE=$${MAN_FILE%%.*} ; \
 	  $(GEN_HTML) $${MAN_FILE} > $${FILE}.html ;\
 	done
-	sed s/VERSION/$(VERSION)/g rtptools.html.in > rtptools.html
 
 # make rpm_spec
 # This will automatically generate rtptools-VERSION.spec file 
@@ -66,7 +65,7 @@ rpm_spec: rtptools.spec
 #	rpm -ba
 
 clean-local:
-	rm -f $(man_HTML) rtptools.html
+	rm -f $(man_HTML)
 
 EXTRA_DIST = ChangeLog.html bark.rtp \
         nt/*.c nt/include/*.h \
@@ -76,5 +75,5 @@ EXTRA_DIST = ChangeLog.html bark.rtp \
         hsearch.h hsearch.c multidump multiplay \
         $(man_MANS) \
         rtptools.dsw rtpdump.dsp rtpplay.dsp rtpsend.dsp rtptrans.dsp \
-        bcb/*.bp? bcb/obj/* rtptools.spec rtptools.html.in \
+        bcb/*.bp? bcb/obj/* rtptools.spec rtptools.html \
         bootstrap LICENSE README.md
