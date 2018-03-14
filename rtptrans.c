@@ -186,9 +186,10 @@ struct sdes_msg {
 */
 static Notify_value socket_handler(Notify_client client, int sock)
 {
-  int len, addr_len;
+  int len;
   int proto;
   struct sockaddr_in sin_from;
+  socklen_t addr_len;
   char packet[8192];
   int i;
   const int VAT_LEN=8;
