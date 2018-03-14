@@ -37,14 +37,10 @@ endif
 if HAVE_MANDOC
 GEN_HTML = mandoc -Thtml
 endif
-if HAVE_MAN2HTML
-GEN_HTML = man2html
-endif
 
 html: $(man_MANS)
 if !FOUND_GEN_HTML
-	@echo "No mandoc, groff or man2html to generate html, skipping."
-	@echo "Please install mandoc, groff or man2html."
+	@echo "No mandoc or groff to generate html, skipping."
 	@exit 1
 endif
 	for MAN_FILE in $(man_MANS) ; do \
