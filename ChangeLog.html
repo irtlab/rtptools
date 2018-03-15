@@ -16,6 +16,26 @@
 <h1><a href="rtptools.html">RTP tools</a> change history</h1>
 
 <dl>
+<dt>1.22 (July 2018)</dt>
+<dd>Moved hosting sources to github.
+<a href="https://github.com/columbia-irt/rtptools">https://github.com/columbia-irt/rtptools</a>
+<p>The License have changed to BSD 3-clouses.</p>
+<p>Listing only major changes, see details in git log.</p>
+
+<ul>
+<li>Added man pages. (Jan Stary)
+
+<li>Eliminated u_int16/32, int16/32 and others and replace with stdint.h. (Jan Stary)
+
+<li>Updated to support new autotools. (Akira Tsukamoto)
+
+<li>Added generating html files from man pages. (Akira Tsukamoto)
+
+<li>Updated the main rtptools.html page to reflect the changes. (Jan Stary)
+
+<li>Fixed build error on Solaris. (Jan Stary)
+</ul>
+
 <dt>1.21 (July 2016)</dt>
 <dd>Yann E. MORIN (yann.morin.1998@free.fr): Buildroot [1] is a
 build-system targetting embedded devices. It is able
