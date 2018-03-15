@@ -46,7 +46,6 @@ autoconf
 
 ## TODO
 
-* Improve generating html for homepage.
 * Fix type mismatch warnings.
 * Fix building on windows.
 * Generate a debian package.
