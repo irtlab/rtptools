@@ -17,23 +17,20 @@
 
 <dl>
 <dt>1.22 (July 2018)</dt>
-<dd>Moved hosting sources to github.
-<a href="https://github.com/columbia-irt/rtptools">https://github.com/columbia-irt/rtptools</a>
-<p>The License have changed to BSD 3-clouses.</p>
-<p>Listing only major changes, see details in git log.</p>
-
+<p>
+Moved source to <a
+href="https://github.com/columbia-irt/rtptools">https://github.com/columbia-irt/rtptools</a><br>
+Listing only major changes, see details in git log.
+</p>
 <ul>
-<li>Added man pages. (Jan Stary)
-
-<li>Eliminated u_int16/32, int16/32 and others and replace with stdint.h. (Jan Stary)
-
-<li>Updated to support new autotools. (Akira Tsukamoto)
-
-<li>Added generating html files from man pages. (Akira Tsukamoto)
-
-<li>Updated the main rtptools.html page to reflect the changes. (Jan Stary)
-
-<li>Fixed build error on Solaris. (Jan Stary)
+<li>Add man pages. (Jan Stary)
+<li>Change license to 3-clause BSD.
+<li>Replace <code>typedef unsigned char u_int8</code> etc
+	with <code>stdint.h</code> types. (Jan Stary)
+<li>Update to new autotools. (Akira Tsukamoto)
+<li>Generate html versions from man pages. (Akira Tsukamoto)
+<li>Reflect the manpages in the homepage. (Jan Stary)
+<li>Fix <code>recvmsg()</code> on Solaris. (Jan Stary)
 </ul>
 
 <dt>1.21 (July 2016)</dt>
