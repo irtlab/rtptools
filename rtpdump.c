@@ -833,7 +833,7 @@ int main(int argc, char *argv[])
       }
       for (i = 0; i < 2; i++) {
         if (sock[i] >= 0 && FD_ISSET(sock[i], &readfds)) {
-          int alen = sizeof(sin);
+          socklen_t alen = sizeof(sin);
 
           /* subtract elapsed time from remaining timeout */
           gettimeofday(&now, 0);
