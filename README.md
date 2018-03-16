@@ -24,8 +24,6 @@ Refer to the individual manpages for details.
 The RTP tools should compile on any POSIX-compliant
 platform supporting sockets.
 
-### UNIX
-
 - If building from git, run the following first to regenerate the build tools:
 
 ```
@@ -37,15 +35,12 @@ autoconf
 - Run `./configure` to configure rtptools for your system.
 - Run `make` to build rtptools.
 - Run `make install` to install.
-- Run `make uninstall` to unisntall.
-
-- Run `make rpm-spec` to create a spec file for a rpm package.
-  Then run `rpmbuild -ba rtptools-*.spec` or `rpmbuild -bb rtptools-*.spec`
-  on your rpm based distribution.
+- Run `make uninstall` to uninstall.
+- Run `make rpm` to create a rpm package.
 
 
 ## TODO
 
 * Fix type mismatch warnings.
 * Fix building on windows.
-* Generate a debian package.
+* Generate a Debian package.
