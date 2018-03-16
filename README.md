@@ -36,7 +36,7 @@ autoconf
 - Run `make` to build rtptools.
 - Run `make install` to install.
 - Run `make uninstall` to uninstall.
-- Run `make rpm` to create a rpm package.
+- Run `make rpm` to create a rpm package. The rpm files will be in ./rpmbuild/RPMS.
 
 
 ## TODO
