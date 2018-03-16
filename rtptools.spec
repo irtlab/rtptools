@@ -2,10 +2,9 @@ Summary: RTP Tools
 Name: rtptools
 Version: VERSION
 Release: 1
-Source: http://www.cs.columbia.edu/IRT/software/rtptools/src/rtptools-VERSION.tar.gz
-Copyright: Copyright (C) 2001 by Columbia University; all rights reserved
-Group: Networking
-BuildRoot: %{_tmppath}/%{name}-%{version}
+License: BSD
+URL: https://github.com/columbia-irt/rtptools
+Source0: rtptools-VERSION.tar.gz
 
 %description
 The rtptools distribution consists of a number of small applications that
@@ -50,4 +49,5 @@ make prefix=%{_prefix}
 make prefix=$RPM_BUILD_ROOT%{_prefix} install
 
 %files
+%{_mandir}
 %{_bindir}
