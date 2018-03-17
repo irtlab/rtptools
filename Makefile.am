@@ -47,12 +47,11 @@ endif
 	done
 	sed s/VERSION/$(VERSION)/g rtptools.html.in > rtptools.html
 
-rpm: $(bin_PROGRAMS) rtptools.spec rtptools-$(VERSION).tar.gz
+rpm: $(bin_PROGRAMS) rtptools.spec dist
 	mkdir -p ./rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 	cp rtptools-$(VERSION).tar.gz ./rpmbuild/SOURCES/.
 	sed s/VERSION/$(VERSION)/g  rtptools.spec > ./rpmbuild/SPECS/rtptools-$(VERSION).spec
-	cd ./rpmbuild; \
-	rpmbuild --define "_topdir `pwd`" -ba SPECS/rtptools-$(VERSION).spec
+	rpmbuild --define "_topdir `pwd`/rpmbuild" -ba rpmbuild/SPECS/rtptools-$(VERSION).spec
 
 clean-local:
 	rm -f $(man_HTML) rtptools.html
