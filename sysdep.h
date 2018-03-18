@@ -55,16 +55,11 @@
 #include <winsock2.h>  /* For NT socket */
 #include <ws2tcpip.h>  /* IP_ADD_MEMBERSHIP */
 #include <windows.h>
+#include <stdio.h>     /* stderr */
 #include <time.h>      /* time_t */
-#include <utilNT.h>    /* For function and struct in UNIX but not in NT */
 
-#ifndef EADDRNOTAVAIL
-#define EADDRNOTAVAIL WSAEADDRNOTAVAIL
-#endif
-
-#define NOLONGLONG
+#define HAVE_STDINT_H 1
 #define RTP_LITTLE_ENDIAN 1
-#define nextstep
 
 /* Determine if the C(++) compiler requires complete function prototype  */
 #ifndef __P
@@ -103,25 +98,29 @@
 #define SIGPIPE SIGINT
 #endif
 
-typedef int     ssize_t;
-
-#if 0
-typedef long pid_t;
-typedef long gid_t;
-typedef long uid_t;
-typedef unsigned long u_long;
-typedef unsigned int u_int;
-typedef unsigned short u_short;
-typedef unsigned char u_char;
+#ifndef EADDRNOTAVAIL
+#define EADDRNOTAVAIL WSAEADDRNOTAVAIL
 #endif
+
+typedef SSIZE_T ssize_t;
+
+typedef  INT32 pid_t;
+typedef UINT32 gid_t;
+typedef UINT32 uid_t;
 
 typedef char *   caddr_t;        /* core address */
 typedef long  fd_mask;
 #define NBBY  8   /* number of bits in a byte */
 #define NFDBITS (sizeof(fd_mask) * NBBY)  /* bits per mask */
+
 #ifndef howmany
 #define howmany(x, y) (((x) + ((y) - 1)) / (y))
 #endif
+
+struct iovec {
+    void  *iov_base;    /* Starting address */
+    size_t iov_len;     /* Number of bytes to transfer */
+};
 
 struct msghdr {
         caddr_t msg_name;               /* optional address */
@@ -144,13 +143,6 @@ struct passwd {
         char    *pw_shell;
 };
 
-#if 0
-struct ip_mreq {
-        struct in_addr  imr_multiaddr;  /* IP multicast address of group */
-        struct in_addr  imr_interface;  /* local IP address of interface */
-};
-#endif
-
 #define  ITIMER_REAL     0       /* Decrements in real time */
 
 #ifndef _TIMESPEC_T
@@ -165,6 +157,46 @@ struct  itimerval {
         struct  timeval it_interval;    /* timer interval */
         struct  timeval it_value;       /* current value */
 };
+
+#ifndef timerisset
+#define timerisset(tvp)        ((tvp)->tv_sec || (tvp)->tv_usec)
+#endif
+
+#ifndef timerclear
+#define timerclear(tvp)        ((tvp)->tv_sec = (tvp)->tv_usec = 0)
+#endif
+
+#ifndef timercmp
+#define timercmp(a, b, CMP)                                                  \
+  (((a)->tv_sec == (b)->tv_sec) ?                                             \
+   ((a)->tv_usec CMP (b)->tv_usec) :                                          \
+   ((a)->tv_sec CMP (b)->tv_sec))
+#endif
+
+#ifndef timeradd
+#define timeradd(a, b, result)                                               \
+  do {                                                                        \
+    (result)->tv_sec = (a)->tv_sec + (b)->tv_sec;                             \
+    (result)->tv_usec = (a)->tv_usec + (b)->tv_usec;                          \
+    if ((result)->tv_usec >= 1000000)                                         \
+      {                                                                       \
+        ++(result)->tv_sec;                                                   \
+        (result)->tv_usec -= 1000000;                                         \
+      }                                                                       \
+  } while (0)
+#endif
+
+#ifndef timersub
+#define timersub(a, b, result)                                               \
+  do {                                                                        \
+    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;                             \
+    (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;                          \
+    if ((result)->tv_usec < 0) {                                              \
+      --(result)->tv_sec;                                                     \
+      (result)->tv_usec += 1000000;                                           \
+    }                                                                         \
+  } while (0)
+#endif
 
 #ifndef ETIME
 #define ETIME 1
@@ -189,7 +221,7 @@ struct  itimerval {
 #define fclose_socket(f) closesocket(*f)
 #endif
 
-extern int winfd_dummy;  /* for WinNT see unitNT.c by Akira 12/27/01 */
+extern int winfd_dummy;
 extern char getc_socket(FILE_SOCKET *f);
 extern ssize_t write_socket(int fildes, const void *buf, size_t nbyte);
 extern int sendmsg(int s, const struct msghdr *msg, int flags);
@@ -197,6 +229,10 @@ extern int sendmsg(int s, const struct msghdr *msg, int flags);
 /* end of 'ifdef WIN32' */
 #else
 #error "Not Unix or WIN32 -- what system is this?"
+#endif
+
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
 #endif
 
 #if !defined(sun4) && !defined(hp) && !defined(nextstep) && !defined(linux)
