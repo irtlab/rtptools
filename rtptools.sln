@@ -1,0 +1,49 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtpdump", "rtpdump.vcxproj", "{333E7BC5-9CB7-EC33-1820-8D8074259229}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtpplay", "rtpplay.vcxproj", "{337C6CB6-E7A9-E9E0-DAD6-B443C8919DCB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{333E7BC5-9CB7-EC33-1820-8D8074259229} = {333E7BC5-9CB7-EC33-1820-8D8074259229}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtpsend", "rtpsend.vcxproj", "{0CAA9E82-F628-1D89-9D1F-59F724D1AF6C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{333E7BC5-9CB7-EC33-1820-8D8074259229} = {333E7BC5-9CB7-EC33-1820-8D8074259229}
+		{337C6CB6-E7A9-E9E0-DAD6-B443C8919DCB} = {337C6CB6-E7A9-E9E0-DAD6-B443C8919DCB}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtptrans", "rtptrans.vcxproj", "{27D4015E-064D-D720-D690-1D4AA824C3C1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0CAA9E82-F628-1D89-9D1F-59F724D1AF6C} = {0CAA9E82-F628-1D89-9D1F-59F724D1AF6C}
+		{333E7BC5-9CB7-EC33-1820-8D8074259229} = {333E7BC5-9CB7-EC33-1820-8D8074259229}
+		{337C6CB6-E7A9-E9E0-DAD6-B443C8919DCB} = {337C6CB6-E7A9-E9E0-DAD6-B443C8919DCB}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Template|Win32 = Template|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{333E7BC5-9CB7-EC33-1820-8D8074259229}.Debug|Win32.ActiveCfg = Debug|Win32
+		{333E7BC5-9CB7-EC33-1820-8D8074259229}.Debug|Win32.Build.0 = Debug|Win32
+		{333E7BC5-9CB7-EC33-1820-8D8074259229}.Template|Win32.ActiveCfg = Template|Win32
+		{333E7BC5-9CB7-EC33-1820-8D8074259229}.Template|Win32.Build.0 = Template|Win32
+		{337C6CB6-E7A9-E9E0-DAD6-B443C8919DCB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{337C6CB6-E7A9-E9E0-DAD6-B443C8919DCB}.Debug|Win32.Build.0 = Debug|Win32
+		{337C6CB6-E7A9-E9E0-DAD6-B443C8919DCB}.Template|Win32.ActiveCfg = Template|Win32
+		{337C6CB6-E7A9-E9E0-DAD6-B443C8919DCB}.Template|Win32.Build.0 = Template|Win32
+		{0CAA9E82-F628-1D89-9D1F-59F724D1AF6C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0CAA9E82-F628-1D89-9D1F-59F724D1AF6C}.Debug|Win32.Build.0 = Debug|Win32
+		{0CAA9E82-F628-1D89-9D1F-59F724D1AF6C}.Template|Win32.ActiveCfg = Template|Win32
+		{0CAA9E82-F628-1D89-9D1F-59F724D1AF6C}.Template|Win32.Build.0 = Template|Win32
+		{27D4015E-064D-D720-D690-1D4AA824C3C1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{27D4015E-064D-D720-D690-1D4AA824C3C1}.Debug|Win32.Build.0 = Debug|Win32
+		{27D4015E-064D-D720-D690-1D4AA824C3C1}.Template|Win32.ActiveCfg = Template|Win32
+		{27D4015E-064D-D720-D690-1D4AA824C3C1}.Template|Win32.Build.0 = Template|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
