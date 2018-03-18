@@ -43,6 +43,7 @@
 * problems and privacy/security concerns. The header is followed by
 * the RTP/RTCP header and (optionally) the actual payload.
 */
+#include "sysdep.h"
 
 typedef struct {
   struct timeval32 {
