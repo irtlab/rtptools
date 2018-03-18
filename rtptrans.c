@@ -106,11 +106,6 @@ int create_stream(int addr, int next)
     head=new_stream;
     middle=new_stream;
     list_len=1;
-#ifdef HAVE_SRAND48
-    srand48(rand());  /* initialize random number generator */
-#else
-    srand(rand());    /* (fred) This is surprising */
-#endif
     new_stream->seq=rand();
     last=new_stream;
     return new_stream->seq;
@@ -410,6 +405,8 @@ int main(int argc, char *argv[])
   int i, j;
 
   extern struct in_addr host2ip(char *);
+
+  srand(0); /* Only needed for random seq numbers */
 
   /* Set up socket. */
   startupSocket();
