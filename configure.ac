@@ -67,7 +67,7 @@ AC_TYPE_SIGNAL
 AC_FUNC_STRFTIME
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(gethostbyname gettimeofday mktime select \
-        strdup strerror strstr strtol uname)
+        strdup strerror strstr strtol uname srand48)
 
 dnl Checks for libraries.
 

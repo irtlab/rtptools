@@ -106,7 +106,7 @@ int create_stream(int addr, int next)
     head=new_stream;
     middle=new_stream;
     list_len=1;
-#if !defined(nextstep)
+#ifdef HAVE_SRAND48
     srand48(rand());  /* initialize random number generator */
 #else
     srand(rand());    /* (fred) This is surprising */
