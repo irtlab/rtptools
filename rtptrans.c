@@ -406,8 +406,6 @@ int main(int argc, char *argv[])
 
   extern struct in_addr host2ip(char *);
 
-  srand(0); /* Only needed for random seq numbers */
-
   /* Set up socket. */
   startupSocket();
   while ((c = getopt(argc, argv, "d?h")) != EOF) {
