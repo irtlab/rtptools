@@ -22,9 +22,11 @@ Refer to the individual manpages for details.
 ## Installation
 
 The RTP tools should compile on any POSIX-compliant
-platform supporting sockets.
+platform supporting sockets, as well as on Windows.
 
-- If building from git, run the following first to regenerate the build tools:
+### UNIX
+
+If building from git, run the following first to regenerate the build tools:
 
 ```
 aclocal
@@ -36,11 +38,13 @@ autoconf
 - Run `make` to build rtptools.
 - Run `make install` to install.
 - Run `make uninstall` to uninstall.
-- Run `make rpm` to create a rpm package. The rpm files will be in ./rpmbuild/RPMS.
+- Run `make rpm` to create a rpm package in `./rpmbuild`
 
+### Windows
+
+Open `rtptools.sln` on MS Visual Studio and press F7 to build.
 
 ## TODO
 
 * Fix type mismatch warnings.
-* Fix building on windows.
 * Generate a Debian package.
