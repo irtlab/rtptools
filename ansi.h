@@ -90,8 +90,6 @@ extern void perror(char *s);
 extern int qsort(void *base, long unsigned nel, long unsigned int
   width, int (*compar)(const void *, const void *));
 extern long strtol(char *str, char **ptr, int base);
-extern double drand48(void);
-extern void srand48(long seedval);
 extern int atoi(const char *str);
 extern int system(char *cmd);
 #endif
