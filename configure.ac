@@ -20,7 +20,12 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
 
-if test "x$GCC" = "xyes"; then
+AC_CHECK_PROG([FOUND_CLANG], [clang], [yes])
+if test "x$FOUND_CLANG" == "xyes" ; then
+  CC="clang"
+fi
+
+if test "x$GCC" == "xyes" -o "x$CC" == "xclang"; then
   CFLAGS="$CFLAGS -Wall"
 fi
 
