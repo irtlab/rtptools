@@ -66,6 +66,11 @@ AC_TYPE_UINT16_T
 AC_HEADER_TIME
 AC_STRUCT_TM
 
+AC_CHECK_MEMBER([struct msghdr.msg_control],
+    [AC_DEFINE([HAVE_MSGHDR_MSG_CONTROL], [1],
+    [Define to 1 if system have 'msghdr.msg_control' structure.])], [],
+    [[#include <sys/socket.h>]])
+
 dnl Checks for library functions.
 AC_PROG_GCC_TRADITIONAL
 AC_TYPE_SIGNAL
