@@ -1,24 +1,12 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtpdump", "rtpdump.vcxproj", "{FE50B62B-2F70-3A5A-797A-1AF5ABD2C230}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtpdump", "rtpdump.vcxproj", "{3728D7FF-88D6-A3AA-EC5F-4ABC87923B48}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtpplay", "rtpplay.vcxproj", "{9344F6E1-B795-F67B-6EE6-114445B320D0}"
-	ProjectSection(ProjectDependencies) = postProject
-		{FE50B62B-2F70-3A5A-797A-1AF5ABD2C230} = {FE50B62B-2F70-3A5A-797A-1AF5ABD2C230}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtpplay", "rtpplay.vcxproj", "{D9F3E0ED-4CC9-C64A-D53A-EF3BD693298C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtpsend", "rtpsend.vcxproj", "{46FEAD4E-EAD3-ED86-495D-B715989D79F2}"
-	ProjectSection(ProjectDependencies) = postProject
-		{FE50B62B-2F70-3A5A-797A-1AF5ABD2C230} = {FE50B62B-2F70-3A5A-797A-1AF5ABD2C230}
-		{9344F6E1-B795-F67B-6EE6-114445B320D0} = {9344F6E1-B795-F67B-6EE6-114445B320D0}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtpsend", "rtpsend.vcxproj", "{95E97737-15D4-D5F0-2CF5-193A9C3B1F36}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtptrans", "rtptrans.vcxproj", "{2132483A-1871-0E03-21D6-A951CE8D1D68}"
-	ProjectSection(ProjectDependencies) = postProject
-		{46FEAD4E-EAD3-ED86-495D-B715989D79F2} = {46FEAD4E-EAD3-ED86-495D-B715989D79F2}
-		{FE50B62B-2F70-3A5A-797A-1AF5ABD2C230} = {FE50B62B-2F70-3A5A-797A-1AF5ABD2C230}
-		{9344F6E1-B795-F67B-6EE6-114445B320D0} = {9344F6E1-B795-F67B-6EE6-114445B320D0}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtptrans", "rtptrans.vcxproj", "{D64D5AFF-2E38-C242-27E4-0F6D839223D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,22 +14,22 @@ Global
 		Template|Win32 = Template|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FE50B62B-2F70-3A5A-797A-1AF5ABD2C230}.Debug|Win32.ActiveCfg = Debug|Win32
-		{FE50B62B-2F70-3A5A-797A-1AF5ABD2C230}.Debug|Win32.Build.0 = Debug|Win32
-		{FE50B62B-2F70-3A5A-797A-1AF5ABD2C230}.Template|Win32.ActiveCfg = Template|Win32
-		{FE50B62B-2F70-3A5A-797A-1AF5ABD2C230}.Template|Win32.Build.0 = Template|Win32
-		{9344F6E1-B795-F67B-6EE6-114445B320D0}.Debug|Win32.ActiveCfg = Debug|Win32
-		{9344F6E1-B795-F67B-6EE6-114445B320D0}.Debug|Win32.Build.0 = Debug|Win32
-		{9344F6E1-B795-F67B-6EE6-114445B320D0}.Template|Win32.ActiveCfg = Template|Win32
-		{9344F6E1-B795-F67B-6EE6-114445B320D0}.Template|Win32.Build.0 = Template|Win32
-		{46FEAD4E-EAD3-ED86-495D-B715989D79F2}.Debug|Win32.ActiveCfg = Debug|Win32
-		{46FEAD4E-EAD3-ED86-495D-B715989D79F2}.Debug|Win32.Build.0 = Debug|Win32
-		{46FEAD4E-EAD3-ED86-495D-B715989D79F2}.Template|Win32.ActiveCfg = Template|Win32
-		{46FEAD4E-EAD3-ED86-495D-B715989D79F2}.Template|Win32.Build.0 = Template|Win32
-		{2132483A-1871-0E03-21D6-A951CE8D1D68}.Debug|Win32.ActiveCfg = Debug|Win32
-		{2132483A-1871-0E03-21D6-A951CE8D1D68}.Debug|Win32.Build.0 = Debug|Win32
-		{2132483A-1871-0E03-21D6-A951CE8D1D68}.Template|Win32.ActiveCfg = Template|Win32
-		{2132483A-1871-0E03-21D6-A951CE8D1D68}.Template|Win32.Build.0 = Template|Win32
+		{3728D7FF-88D6-A3AA-EC5F-4ABC87923B48}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3728D7FF-88D6-A3AA-EC5F-4ABC87923B48}.Debug|Win32.Build.0 = Debug|Win32
+		{3728D7FF-88D6-A3AA-EC5F-4ABC87923B48}.Template|Win32.ActiveCfg = Template|Win32
+		{3728D7FF-88D6-A3AA-EC5F-4ABC87923B48}.Template|Win32.Build.0 = Template|Win32
+		{D9F3E0ED-4CC9-C64A-D53A-EF3BD693298C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D9F3E0ED-4CC9-C64A-D53A-EF3BD693298C}.Debug|Win32.Build.0 = Debug|Win32
+		{D9F3E0ED-4CC9-C64A-D53A-EF3BD693298C}.Template|Win32.ActiveCfg = Template|Win32
+		{D9F3E0ED-4CC9-C64A-D53A-EF3BD693298C}.Template|Win32.Build.0 = Template|Win32
+		{95E97737-15D4-D5F0-2CF5-193A9C3B1F36}.Debug|Win32.ActiveCfg = Debug|Win32
+		{95E97737-15D4-D5F0-2CF5-193A9C3B1F36}.Debug|Win32.Build.0 = Debug|Win32
+		{95E97737-15D4-D5F0-2CF5-193A9C3B1F36}.Template|Win32.ActiveCfg = Template|Win32
+		{95E97737-15D4-D5F0-2CF5-193A9C3B1F36}.Template|Win32.Build.0 = Template|Win32
+		{D64D5AFF-2E38-C242-27E4-0F6D839223D2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D64D5AFF-2E38-C242-27E4-0F6D839223D2}.Debug|Win32.Build.0 = Debug|Win32
+		{D64D5AFF-2E38-C242-27E4-0F6D839223D2}.Template|Win32.ActiveCfg = Template|Win32
+		{D64D5AFF-2E38-C242-27E4-0F6D839223D2}.Template|Win32.Build.0 = Template|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
