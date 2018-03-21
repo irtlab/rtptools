@@ -37,6 +37,12 @@ href="rtpsend.html">rtpsend</a></samp>
 <dt><samp><a href="rtptrans.html">rtptrans</a></samp>
 <dd>RTP translator between unicast and multicast networks; also
 translates between VAT and RTP formats.
+
+<dt><samp><a href="multidump.html">multidump</a></samp>
+<dd>Starts multiple rtpdumps simultaneously.
+
+<dt><samp><a href="multiplay.html">multiplay</a></samp>
+<dd>Starts multiple rtpplays simultaneously.
 </dl>
 
 <h2><a name="download">Download</a></h2>
@@ -44,9 +50,9 @@ translates between VAT and RTP formats.
 <p>The code is maintained at <a
 href="https://github.com/columbia-irt/rtptools">
 https://github.com/columbia-irt/rtptools</a>
-and the release tarball are available at <a
-href="http://www.cs.columbia.edu/IRT/software/rtptools/download">
-http://www.cs.columbia.edu/IRT/rtptools/software/download</a>.
+and the release tarballs are available at <a
+href="http://www.cs.columbia.edu/irt/software/rtptools/download">
+http://www.cs.columbia.edu/irt/software/rtptools/download/</a>.
 
 <h2><a name="installation">Installation</a></h2>
 
