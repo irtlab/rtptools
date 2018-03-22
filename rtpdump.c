@@ -39,7 +39,6 @@
 #include <errno.h>
 #include <unistd.h>      /* select(), perror() */
 #include <stdlib.h>      /* getopt(), atoi() */
-#include <math.h>        /* fmod() */
 #include <fcntl.h>       /* O_BINARY on Win32 */
 #include "rtp.h"
 #include "vat.h"
