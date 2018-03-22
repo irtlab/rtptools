@@ -59,11 +59,8 @@ clean-local:
 EXTRA_DIST = ChangeLog.html bark.rtp \
         hsearch.h hsearch.c multidump multiplay \
         $(man_MANS) \
-        win/*.c win/*.h win/include/*.h \
-        win/include/arpa/*.h win/include/netinet/*.h \
-        win/include/sys/*.h \
+        win/*.c win/*.h \
         win/rtptools.sln win/rtptools.suo \
-        win/rtpdump.vcxproj* win/rtpplay.vcxproj* win/rtpsend.vcxproj* \
-        win/rtptrans.vcxproj* \
-        rtptools.spec rtptools.html.in \
-        LICENSE README.md
+        win/rtpdump.vcxproj win/rtpplay.vcxproj \
+	win/rtpsend.vcxproj win/rtptrans.vcxproj \
+        rtptools.spec LICENSE README.md
