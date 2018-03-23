@@ -45,7 +45,6 @@ HAVE_GETHOSTBYNAME=
 HAVE_MSGCONTROL=
 HAVE_NTOHL=
 HAVE_PATH_MAX=
-HAVE_PLEDGE=
 HAVE_PROGNAME=
 HAVE_REALLOCARRAY=
 HAVE_RECALLOCARRAY=
@@ -57,7 +56,6 @@ HAVE_STRLCPY=
 HAVE_STRNDUP=
 HAVE_STRTONUM=
 HAVE_SYS_ENDIAN=
-HAVE_VASPRINTF=
 
 INSTALL="install"
 PREFIX="/usr/local"
@@ -145,9 +143,7 @@ runtest err		ERR		|| true
 runtest gethostbyname   GETHOSTBYNAME -lnsl	|| true
 runtest msgcontrol	MSGCONTROL	|| true
 runtest ntohl		NTOHL		|| true
-runtest O_DIRECTORY	O_DIRECTORY	|| true
 runtest PATH_MAX	PATH_MAX	|| true
-runtest pledge		PLEDGE		|| true
 runtest progname	PROGNAME	|| true
 runtest reallocarray	REALLOCARRAY	|| true
 runtest recallocarray	RECALLOCARRAY	|| true
@@ -158,7 +154,6 @@ runtest strlcat		STRLCAT		|| true
 runtest strlcpy		STRLCPY		|| true
 runtest strndup		STRNDUP		|| true
 runtest strtonum	STRTONUM	|| true
-runtest vasprintf	VASPRINTF	|| true
 
 #if [ ${HAVE_ENDIAN} -eq 0 -a \
      #${HAVE_SYS_ENDIAN} -eq 0 -a \
@@ -191,7 +186,6 @@ __HEREDOC__
   ${HAVE_STRLCAT} -eq 0 -o ${HAVE_STRLCPY} -eq 0 -o \
   ${HAVE_STRNDUP} -eq 0 ] \
 	&& echo "#include <sys/types.h>"
-[ ${HAVE_VASPRINTF} -eq 0 ] && echo "#include <stdarg.h>"
 
 echo
 echo "#define MAN_CONF_FILE \"/etc/${MANM_MANCONF}\""
@@ -208,7 +202,6 @@ cat << __HEREDOC__
 #define HAVE_ERR ${HAVE_ERR}
 #define HAVE_MSGCONTROL ${HAVE_MSGCONTROL}
 #define HAVE_NTOHL ${HAVE_NTOHL}
-#define HAVE_PLEDGE ${HAVE_PLEDGE}
 #define HAVE_PROGNAME ${HAVE_PROGNAME}
 #define HAVE_REALLOCARRAY ${HAVE_REALLOCARRAY}
 #define HAVE_RECALLOCARRAY ${HAVE_RECALLOCARRAY}
@@ -219,7 +212,6 @@ cat << __HEREDOC__
 #define HAVE_STRNDUP ${HAVE_STRNDUP}
 #define HAVE_STRTONUM ${HAVE_STRTONUM}
 #define HAVE_SYS_ENDIAN ${HAVE_SYS_ENDIAN}
-#define HAVE_VASPRINTF ${HAVE_VASPRINTF}
 
 __HEREDOC__
 
@@ -258,9 +250,6 @@ fi
 
 [ ${HAVE_STRTONUM} -eq 0 ] && \
 	echo "extern	long long strtonum(const char *, long long, long long, const char **);"
-
-[ ${HAVE_VASPRINTF} -eq 0 ] && \
-	echo "extern	int	  vasprintf(char **, const char *, va_list);"
 
 echo "config.h: written" 1>&2
 echo "config.h: written" 1>&3
@@ -305,9 +294,4 @@ exit 0
 #AC_CHECK_FUNCS(gettimeofday mktime select \
         #strdup strerror strstr strtol uname srand)
 
-#dnl Substitute for AC_CHECK_FUNC; check for function normally, then in
-#dnl library
-#AC_DEFUN([CU_CHECK_LIB],
-#[AC_CHECK_FUNCS($2, , AC_CHECK_LIB($1, $2))])
 #CU_CHECK_LIB(nsl, yp_match)
-#CU_CHECK_LIB(socket, socket)
