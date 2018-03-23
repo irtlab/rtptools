@@ -44,6 +44,7 @@ rtptrans_OBJS	= hpt.o host2ip.o notify.o multimer.o      rtptrans.o
 
 HAVE_SRCS = \
 	have-err.c		\
+	have-gethostbyname.c	\
 	have-strtonum.c		\
 	have-msgcontrol.c
 
@@ -116,16 +117,16 @@ Makefile.local config.h: configure $(HAVESRCS)
 	@exit 1
 
 rtpdump: $(rtpdump_OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o rtpdump $(rtpdump_OBJS)
+	$(CC) $(CFLAGS) -o rtpdump $(rtpdump_OBJS) $(LDADD)
 
 rtpplay: $(rtpplay_OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o rtpplay $(rtpplay_OBJS)
+	$(CC) $(CFLAGS) -o rtpplay $(rtpplay_OBJS) $(LDADD)
 
 rtpsend: $(rtpsend_OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o rtpsend $(rtpsend_OBJS)
+	$(CC) $(CFLAGS) -o rtpsend $(rtpsend_OBJS) $(LDADD)
 
 rtptrans: $(rtptrans_OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o rtptrans $(rtptrans_OBJS)
+	$(CC) $(CFLAGS) -o rtptrans $(rtptrans_OBJS) $(LDADD)
 
 # --- maintainer targets ---
 

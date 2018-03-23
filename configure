@@ -36,7 +36,8 @@ SOURCEDIR=`dirname "$0"`
 CC=`printf "all:\\n\\t@echo \\\$(CC)\\n" | env -i make -sf -`
 CFLAGS="-g -W -Wall -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings"
 CFLAGS="${CFLAGS} -Wno-unused-parameter"
-LDFLAGS="-lnsl -lsocket" # FIXME Solaris needs this
+LDFLAGS=
+LDADD=
 
 HAVE_CMSG=
 HAVE_CMSG_XPG42=0
@@ -44,6 +45,8 @@ HAVE_DIRENT_NAMLEN=
 HAVE_EFTYPE=
 HAVE_ENDIAN=
 HAVE_ERR=
+HAVE_GETHOSTBYNAME=
+HAVE_GETHOSTBYNAME_NSL=
 HAVE_GETLINE=
 HAVE_GETSUBOPT=
 HAVE_ISBLANK=
@@ -73,6 +76,7 @@ HAVE_SYS_ENDIAN=
 HAVE_VASPRINTF=
 HAVE_WCHAR=
 
+INSTALL="install"
 PREFIX="/usr/local"
 BINDIR=
 MANDIR=
@@ -157,6 +161,8 @@ runtest be32toh		ENDIAN		|| true
 runtest be32toh		SYS_ENDIAN	-DSYS_ENDIAN || true
 runtest EFTYPE		EFTYPE		|| true
 runtest err		ERR		|| true
+runtest gethostbyname   GETHOSTBYNAME		|| true
+runtest gethostbyname   GETHOSTBYNAME_NSL -lnsl || true
 runtest getline		GETLINE		|| true
 runtest getsubopt	GETSUBOPT	|| true
 runtest isblank		ISBLANK		|| true
@@ -320,13 +326,17 @@ exec > Makefile.local
 [ -z "${BINDIR}"          ] && BINDIR="${PREFIX}/bin"
 [ -z "${MANDIR}"          ] && MANDIR="${PREFIX}/man"
 
+[ ${HAVE_GETHOSTBYNAME_NSL} -eq 1 ] && LDADD="${LDADD} -lnsl"
+
 cat << __HEREDOC__
 CC		= ${CC}
 CFLAGS		= ${CFLAGS}
 LDFLAGS		= ${LDFLAGS}
+LDADD		= ${LDADD}
 PREFIX		= ${PREFIX}
 BINDIR		= ${BINDIR}
 MANDIR		= ${MANDIR}
+INSTALL		= ${INSTALL}
 __HEREDOC__
 
 echo "Makefile.local: written" 1>&2

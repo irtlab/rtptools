@@ -37,6 +37,12 @@ PREFIX="/usr/local"
 BINDIR="${PREFIX}/bin"
 MANDIR="${PREFIX}/man"
 
+# Some platforms might need additional linker flags. For example,
+# Solaris only has gethostbynme in -lnsl and bind() in -lsocket.
+# However, ./configure seems to cope just fine.
+
+LDADD="-lnsl -lsocket"
+
 # It is possible to change the utility program used for installation
 # and the modes files are installed with.
 
@@ -65,6 +71,8 @@ HAVE_DIRENT_NAMLEN=0
 HAVE_ENDIAN=0
 HAVE_EFTYPE=0
 HAVE_ERR=0
+HAVE_GETHOSTBYNAME=0
+HAVE_GETHOSTBYNAME_NSL=0
 HAVE_GETLINE=0
 HAVE_GETSUBOPT=0
 HAVE_ISBLANK=0
