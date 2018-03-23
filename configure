@@ -188,9 +188,6 @@ __HEREDOC__
 	&& echo "#include <sys/types.h>"
 
 echo
-echo "#define MAN_CONF_FILE \"/etc/${MANM_MANCONF}\""
-echo "#define MANPATH_BASE \"${MANPATH_BASE}\""
-echo "#define MANPATH_DEFAULT \"${MANPATH_DEFAULT}\""
 [ ${HAVE_PATH_MAX} -eq 0 ] && echo "#define PATH_MAX 4096"
 if [ ${HAVE_ENDIAN} -eq 0 -a ${HAVE_SYS_ENDIAN} -eq 0 ]; then
 	echo "#define be32toh ntohl"
