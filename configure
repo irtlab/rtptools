@@ -36,7 +36,7 @@ SOURCEDIR=`dirname "$0"`
 CC=`printf "all:\\n\\t@echo \\\$(CC)\\n" | env -i make -sf -`
 CFLAGS="-g -W -Wall -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings"
 CFLAGS="${CFLAGS} -Wno-unused-parameter"
-LDFLAGS=
+LDFLAGS="-lnsl -lsocket" # FIXME Solaris needs this
 
 HAVE_CMSG=
 HAVE_CMSG_XPG42=0

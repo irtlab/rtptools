@@ -116,16 +116,16 @@ Makefile.local config.h: configure $(HAVESRCS)
 	@exit 1
 
 rtpdump: $(rtpdump_OBJS)
-	$(CC) $(CFLAGS) -o rtpdump $(rtpdump_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o rtpdump $(rtpdump_OBJS)
 
 rtpplay: $(rtpplay_OBJS)
-	$(CC) $(CFLAGS) -o rtpplay $(rtpplay_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o rtpplay $(rtpplay_OBJS)
 
 rtpsend: $(rtpsend_OBJS)
-	$(CC) $(CFLAGS) -o rtpsend $(rtpsend_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o rtpsend $(rtpsend_OBJS)
 
 rtptrans: $(rtptrans_OBJS)
-	$(CC) $(CFLAGS) -o rtptrans $(rtptrans_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o rtptrans $(rtptrans_OBJS)
 
 # --- maintainer targets ---
 
