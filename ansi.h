@@ -128,21 +128,6 @@ extern int stty(int fd, struct sgttyb *buf);
 extern int gtty(int fd, struct sgttyb *buf);
 #endif
 
-/* sys/time.h */
-#ifdef _sys_time_h
-/*
-extern int gettimeofday(struct timeval *tp, struct timezone *tzp);
-*/
-extern unsigned mktime(struct tm *tm);
-#endif
-
-/* <sys/time.h> (Solaris) */
-#ifdef _SYS_TIME_H
-/*
-extern int gettimeofday(struct timeval *tp, struct timezone *tzp);
-*/
-#endif
-
 /* <unistd.h> */
 #ifdef  __sys_unistd_h
 extern int ioctl(int fd, int request, ...);

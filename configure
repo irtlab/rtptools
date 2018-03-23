@@ -282,5 +282,5 @@ exit 0
 
 #AC_FUNC_STRFTIME
 #AC_FUNC_VPRINTF
-#AC_CHECK_FUNCS(gettimeofday mktime select \
+#AC_CHECK_FUNCS(gettimeofday select \
         #strdup strerror strstr strtol uname srand)
