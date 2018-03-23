@@ -38,8 +38,9 @@ BINDIR="${PREFIX}/bin"
 MANDIR="${PREFIX}/man"
 
 # Some platforms might need additional linker flags. For example,
-# Solaris only has gethostbynme in -lnsl and bind() in -lsocket.
-# However, ./configure seems to cope just fine.
+# Solaris needs -lnsl for gethostbyname(), inet_addr(), inet_ntoa()
+# and -lsocket bind(), socket(), setsockopt(), recvfrom().
+# Put them in LDADD if ./configure fails to detect that.
 
 LDADD="-lnsl -lsocket"
 
