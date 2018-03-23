@@ -46,7 +46,6 @@ HAVE_EFTYPE=
 HAVE_ENDIAN=
 HAVE_ERR=
 HAVE_GETHOSTBYNAME=
-HAVE_GETHOSTBYNAME_NSL=
 HAVE_GETLINE=
 HAVE_GETSUBOPT=
 HAVE_ISBLANK=
@@ -64,6 +63,7 @@ HAVE_RECVMSG=
 HAVE_REWB_BSD=
 HAVE_REWB_SYSV=
 HAVE_SANDBOX_INIT=
+HAVE_SOCKET=
 HAVE_STRCASESTR=
 HAVE_STRINGLIST=
 HAVE_STRLCAT=
@@ -161,8 +161,7 @@ runtest be32toh		ENDIAN		|| true
 runtest be32toh		SYS_ENDIAN	-DSYS_ENDIAN || true
 runtest EFTYPE		EFTYPE		|| true
 runtest err		ERR		|| true
-runtest gethostbyname   GETHOSTBYNAME		|| true
-runtest gethostbyname   GETHOSTBYNAME_NSL -lnsl || true
+runtest gethostbyname   GETHOSTBYNAME -lnsl	|| true
 runtest getline		GETLINE		|| true
 runtest getsubopt	GETSUBOPT	|| true
 runtest isblank		ISBLANK		|| true
@@ -178,6 +177,7 @@ runtest reallocarray	REALLOCARRAY	|| true
 runtest recallocarray	RECALLOCARRAY	|| true
 runtest rewb-bsd	REWB_BSD	|| true
 runtest rewb-sysv	REWB_SYSV	|| true
+runtest socket		SOCKET        -lsocket	|| true
 runtest strcasestr	STRCASESTR	|| true
 runtest stringlist	STRINGLIST	|| true
 runtest strlcat		STRLCAT		|| true
@@ -326,7 +326,8 @@ exec > Makefile.local
 [ -z "${BINDIR}"          ] && BINDIR="${PREFIX}/bin"
 [ -z "${MANDIR}"          ] && MANDIR="${PREFIX}/man"
 
-[ ${HAVE_GETHOSTBYNAME_NSL} -eq 1 ] && LDADD="${LDADD} -lnsl"
+[ ${HAVE_GETHOSTBYNAME} -eq 1 ] && LDADD="${LDADD} -lnsl"
+[ ${HAVE_SOCKET}        -eq 1 ] && LDADD="${LDADD} -lsocket"
 
 cat << __HEREDOC__
 CC		= ${CC}
@@ -355,13 +356,12 @@ exit 0
 
 #AC_FUNC_STRFTIME
 #AC_FUNC_VPRINTF
-#AC_CHECK_FUNCS(gethostbyname gettimeofday mktime select \
+#AC_CHECK_FUNCS(gettimeofday mktime select \
         #strdup strerror strstr strtol uname srand)
 
 #dnl Substitute for AC_CHECK_FUNC; check for function normally, then in
 #dnl library
 #AC_DEFUN([CU_CHECK_LIB],
 #[AC_CHECK_FUNCS($2, , AC_CHECK_LIB($1, $2))])
-#CU_CHECK_LIB(nsl, gethostbyname)
 #CU_CHECK_LIB(nsl, yp_match)
 #CU_CHECK_LIB(socket, socket)
