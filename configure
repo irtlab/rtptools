@@ -278,7 +278,7 @@ exit 0
 
 #AC_HEADER_STDC
 #AC_C_BIGENDIAN
-#AC_CHECK_HEADERS(search.h sys/time.h unistd.h stdint.h)
+#AC_CHECK_HEADERS(search.h sys/time.h )
 
 #AC_FUNC_STRFTIME
 #AC_FUNC_VPRINTF
