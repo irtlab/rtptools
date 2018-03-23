@@ -37,7 +37,6 @@ CC=`printf "all:\\n\\t@echo \\\$(CC)\\n" | env -i make -sf -`
 CFLAGS="-g -W -Wall -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings"
 CFLAGS="${CFLAGS} -Wno-unused-parameter"
 LDFLAGS=
-LD_RECVMSG=
 
 HAVE_CMSG=
 HAVE_CMSG_XPG42=0
@@ -191,36 +190,6 @@ runtest vasprintf	VASPRINTF	|| true
 	#exit 1
 #fi
 
-if [ 0 -gt 0 ]; then
-	# --- recvmsg ---
-	if [ -n "${LD_RECVMSG}" ]; then
-		runtest recvmsg RECVMSG "${LD_RECVMSG}" || true
-	elif singletest recvmsg RECVMSG; then
-		:
-	elif runtest recvmsg RECVMSG "-lsocket"; then
-		LD_RECVMSG="-lsocket"
-	fi
-	if [ "${HAVE_RECVMSG}" -eq 0 ]; then
-		echo "FATAL: recvmsg: no" 1>&2
-		echo "FATAL: recvmsg: no" 1>&3
-		echo "Without recvmsg(2), you cannot BUILD_CATMAN." 1>&2
-		exit 1
-	fi
-
-	# --- cmsg ---
-	if singletest cmsg CMSG; then
-		:
-	elif runtest cmsg CMSG "-D_XPG4_2"; then
-		HAVE_CMSG_XPG42=1
-	fi
-	if [ "${HAVE_CMSG}" -eq 0 ]; then
-		echo "FATAL: cmsg: no" 1>&2
-		echo "FATAL: cmsg: no" 1>&3
-		echo "Without CMSG_FIRSTHDR(3), you cannot BUILD_CATMAN." 1>&2
-		exit 1
-	fi
-fi
-
 # --- write config.h ---
 
 exec > config.h
@@ -259,7 +228,6 @@ if [ ${HAVE_ENDIAN} -eq 0 -a ${HAVE_SYS_ENDIAN} -eq 0 ]; then
 fi
 
 cat << __HEREDOC__
-#define HAVE_CMSG_XPG42 ${HAVE_CMSG_XPG42}
 #define HAVE_DIRENT_NAMLEN ${HAVE_DIRENT_NAMLEN}
 #define HAVE_ENDIAN ${HAVE_ENDIAN}
 #define HAVE_ERR ${HAVE_ERR}
