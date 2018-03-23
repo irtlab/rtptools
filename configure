@@ -39,42 +39,25 @@ CFLAGS="${CFLAGS} -Wno-unused-parameter"
 LDFLAGS=
 LDADD=
 
-HAVE_CMSG=
-HAVE_CMSG_XPG42=0
-HAVE_DIRENT_NAMLEN=
-HAVE_EFTYPE=
 HAVE_ENDIAN=
 HAVE_ERR=
 HAVE_GETHOSTBYNAME=
-HAVE_GETLINE=
-HAVE_GETSUBOPT=
-HAVE_ISBLANK=
 HAVE_MSGCONTROL=
-HAVE_MKDTEMP=
-HAVE_NANOSLEEP=
 HAVE_NTOHL=
-HAVE_OHASH=
 HAVE_PATH_MAX=
 HAVE_PLEDGE=
 HAVE_PROGNAME=
 HAVE_REALLOCARRAY=
 HAVE_RECALLOCARRAY=
-HAVE_RECVMSG=
-HAVE_REWB_BSD=
-HAVE_REWB_SYSV=
-HAVE_SANDBOX_INIT=
 HAVE_SOCKET=
 HAVE_STRCASESTR=
 HAVE_STRINGLIST=
 HAVE_STRLCAT=
 HAVE_STRLCPY=
 HAVE_STRNDUP=
-HAVE_STRPTIME=
-HAVE_STRSEP=
 HAVE_STRTONUM=
 HAVE_SYS_ENDIAN=
 HAVE_VASPRINTF=
-HAVE_WCHAR=
 
 INSTALL="install"
 PREFIX="/usr/local"
@@ -156,35 +139,24 @@ runtest() {
 }
 
 # --- library functions ---
-runtest dirent-namlen	DIRENT_NAMLEN	|| true
 runtest be32toh		ENDIAN		|| true
 runtest be32toh		SYS_ENDIAN	-DSYS_ENDIAN || true
-runtest EFTYPE		EFTYPE		|| true
 runtest err		ERR		|| true
 runtest gethostbyname   GETHOSTBYNAME -lnsl	|| true
-runtest getline		GETLINE		|| true
-runtest getsubopt	GETSUBOPT	|| true
-runtest isblank		ISBLANK		|| true
-runtest mkdtemp		MKDTEMP		|| true
 runtest msgcontrol	MSGCONTROL	|| true
 runtest ntohl		NTOHL		|| true
 runtest O_DIRECTORY	O_DIRECTORY	|| true
 runtest PATH_MAX	PATH_MAX	|| true
 runtest pledge		PLEDGE		|| true
-runtest sandbox_init	SANDBOX_INIT	|| true
 runtest progname	PROGNAME	|| true
 runtest reallocarray	REALLOCARRAY	|| true
 runtest recallocarray	RECALLOCARRAY	|| true
-runtest rewb-bsd	REWB_BSD	|| true
-runtest rewb-sysv	REWB_SYSV	|| true
 runtest socket		SOCKET        -lsocket	|| true
 runtest strcasestr	STRCASESTR	|| true
 runtest stringlist	STRINGLIST	|| true
 runtest strlcat		STRLCAT		|| true
 runtest strlcpy		STRLCPY		|| true
 runtest strndup		STRNDUP		|| true
-runtest strptime	STRPTIME	|| true
-runtest strsep		STRSEP		|| true
 runtest strtonum	STRTONUM	|| true
 runtest vasprintf	VASPRINTF	|| true
 
@@ -215,13 +187,11 @@ cat << __HEREDOC__
 
 __HEREDOC__
 
-[ ${HAVE_GETLINE} -eq 0 -o \
-  ${HAVE_REALLOCARRAY} -eq 0 -o ${HAVE_RECALLOCARRAY} -eq 0 -o \
+[ ${HAVE_REALLOCARRAY} -eq 0 -o ${HAVE_RECALLOCARRAY} -eq 0 -o \
   ${HAVE_STRLCAT} -eq 0 -o ${HAVE_STRLCPY} -eq 0 -o \
   ${HAVE_STRNDUP} -eq 0 ] \
 	&& echo "#include <sys/types.h>"
 [ ${HAVE_VASPRINTF} -eq 0 ] && echo "#include <stdarg.h>"
-[ ${HAVE_GETLINE} -eq 0 ] && echo "#include <stdio.h>"
 
 echo
 echo "#define MAN_CONF_FILE \"/etc/${MANM_MANCONF}\""
@@ -234,34 +204,22 @@ if [ ${HAVE_ENDIAN} -eq 0 -a ${HAVE_SYS_ENDIAN} -eq 0 ]; then
 fi
 
 cat << __HEREDOC__
-#define HAVE_DIRENT_NAMLEN ${HAVE_DIRENT_NAMLEN}
 #define HAVE_ENDIAN ${HAVE_ENDIAN}
 #define HAVE_ERR ${HAVE_ERR}
-#define HAVE_GETLINE ${HAVE_GETLINE}
-#define HAVE_GETSUBOPT ${HAVE_GETSUBOPT}
-#define HAVE_ISBLANK ${HAVE_ISBLANK}
-#define HAVE_MKDTEMP ${HAVE_MKDTEMP}
 #define HAVE_MSGCONTROL ${HAVE_MSGCONTROL}
 #define HAVE_NTOHL ${HAVE_NTOHL}
 #define HAVE_PLEDGE ${HAVE_PLEDGE}
 #define HAVE_PROGNAME ${HAVE_PROGNAME}
 #define HAVE_REALLOCARRAY ${HAVE_REALLOCARRAY}
 #define HAVE_RECALLOCARRAY ${HAVE_RECALLOCARRAY}
-#define HAVE_REWB_BSD ${HAVE_REWB_BSD}
-#define HAVE_REWB_SYSV ${HAVE_REWB_SYSV}
-#define HAVE_SANDBOX_INIT ${HAVE_SANDBOX_INIT}
 #define HAVE_STRCASESTR ${HAVE_STRCASESTR}
 #define HAVE_STRINGLIST ${HAVE_STRINGLIST}
 #define HAVE_STRLCAT ${HAVE_STRLCAT}
 #define HAVE_STRLCPY ${HAVE_STRLCPY}
 #define HAVE_STRNDUP ${HAVE_STRNDUP}
-#define HAVE_STRPTIME ${HAVE_STRPTIME}
-#define HAVE_STRSEP ${HAVE_STRSEP}
 #define HAVE_STRTONUM ${HAVE_STRTONUM}
 #define HAVE_SYS_ENDIAN ${HAVE_SYS_ENDIAN}
 #define HAVE_VASPRINTF ${HAVE_VASPRINTF}
-#define HAVE_WCHAR ${HAVE_WCHAR}
-#define HAVE_OHASH ${HAVE_OHASH}
 
 __HEREDOC__
 
@@ -272,17 +230,8 @@ if [ ${HAVE_ERR} -eq 0 ]; then
 	echo "extern	void	  warnx(const char *, ...);"
 fi
 
-[ ${HAVE_GETLINE} -eq 0 ] && \
-	echo "extern	ssize_t	  getline(char **, size_t *, FILE *);"
-
 [ ${HAVE_GETSUBOPT} -eq 0 ] && \
 	echo "extern	int	  getsubopt(char **, char * const *, char **);"
-
-[ ${HAVE_ISBLANK} -eq 0 ] && \
-	echo "extern	int	  isblank(int);"
-
-[ ${HAVE_MKDTEMP} -eq 0 ] && \
-	echo "extern	char	 *mkdtemp(char *);"
 
 if [ ${HAVE_PROGNAME} -eq 0 ]; then
 	echo "extern 	const char *getprogname(void);"
@@ -306,9 +255,6 @@ fi
 
 [ ${HAVE_STRNDUP} -eq 0 ] && \
 	echo "extern	char	 *strndup(const char *, size_t);"
-
-[ ${HAVE_STRSEP} -eq 0 ] && \
-	echo "extern	char	 *strsep(char **, const char *);"
 
 [ ${HAVE_STRTONUM} -eq 0 ] && \
 	echo "extern	long long strtonum(const char *, long long, long long, const char **);"
