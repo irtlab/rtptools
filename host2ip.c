@@ -33,9 +33,6 @@
 #include <netdb.h>           /* gethostbyname() */
 #include <netinet/in.h>      /* sockaddr_in */
 #include <arpa/inet.h>       /* inet_addr() */
-#ifdef HAVE_YP
-#include <rpcsvc/ypclnt.h>   /* YP */
-#endif
 #include <string.h>          /* strlen() added by Akira 12/27/01 */ 
 #include "sysdep.h"
 
@@ -58,18 +55,5 @@ struct in_addr host2ip(char *host)
   else if ((hep = gethostbyname(host))) {
     in = *(struct in_addr *)(hep->h_addr_list[0]);
   }
-#ifdef HAVE_YP
-  /* As a last resort, try YP. */
-  else {
-    static char *domain = 0;  /* YP domain */
-    char *value;              /* key value */
-    int value_len;            /* length of returned value */
-
-    if (!domain) yp_get_default_domain(&domain);
-    if (yp_match(domain, "hosts.byname", host, strlen(host), &value, &value_len) == 0) {
-      in.s_addr = inet_addr(value);
-    }
-  }
-#endif
   return in;
-} /* host2ip */
+}

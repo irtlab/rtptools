@@ -181,9 +181,6 @@ extern double infinity(void);
 extern double infinity(void);
 #endif
 
-#ifdef __RPCSVC_YPCLNT_H__
-extern int yp_get_default_domain(char **outdomain);
-#endif
 #endif /* sgi */
 
 /*** HP ***/

@@ -222,9 +222,6 @@ if [ ${HAVE_ERR} -eq 0 ]; then
 	echo "extern	void	  warnx(const char *, ...);"
 fi
 
-[ ${HAVE_GETSUBOPT} -eq 0 ] && \
-	echo "extern	int	  getsubopt(char **, char * const *, char **);"
-
 if [ ${HAVE_PROGNAME} -eq 0 ]; then
 	echo "extern 	const char *getprogname(void);"
 	echo "extern	void	  setprogname(const char *);"
@@ -283,15 +280,10 @@ exit 0
 # FIXME go throught the old confogure.ac to make sure nothing is left behind
 
 #AC_HEADER_STDC
-#AC_CHECK_HEADERS(search.h sys/time.h unistd.h stdint.h)
-#AC_CHECK_HEADER([rpcsvc/ypclnt.h],
-  #[AC_DEFINE([HAVE_YP],[1],[Define to 1 if you have rpcsvc/ypclnt.h])])
-
 #AC_C_BIGENDIAN
+#AC_CHECK_HEADERS(search.h sys/time.h unistd.h stdint.h)
 
 #AC_FUNC_STRFTIME
 #AC_FUNC_VPRINTF
 #AC_CHECK_FUNCS(gettimeofday mktime select \
         #strdup strerror strstr strtol uname srand)
-
-#CU_CHECK_LIB(nsl, yp_match)
