@@ -49,8 +49,8 @@ typedef enum {
         FIND, ENTER
 } ACTION;
 
-int      hcreate __P((size_t));
-void     hdestroy __P((void));
-ENTRY   *hsearch __P((ENTRY, ACTION));
+int      hcreate(size_t);
+void     hdestroy(void);
+ENTRY   *hsearch(ENTRY, ACTION);
 
 #endif  /* _SEARCH_H */
