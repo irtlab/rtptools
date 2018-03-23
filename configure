@@ -274,13 +274,12 @@ echo "Makefile.local: written" 1>&3
 
 exit 0
 
-# FIXME go throught the old confogure.ac to make sure nothing is left behind
+# FIXME These are the leftovers of the old configure.ac: anything left behind?
 
-#AC_HEADER_STDC
 #AC_C_BIGENDIAN
 #AC_CHECK_HEADERS(search.h)
 
 #AC_FUNC_STRFTIME
 #AC_FUNC_VPRINTF
 #AC_CHECK_FUNCS(gettimeofday select \
-        #strdup strerror strstr strtol uname srand)
+        #strdup strerror strstr strtol srand)
