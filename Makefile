@@ -1,9 +1,3 @@
-# $Id: Makefile,v 1.518 2018/02/27 11:16:23 schwarze Exp $
-#
-# Copyright (c) 2010, 2011, 2012 Kristaps Dzonsons <kristaps@bsd.lv>
-# Copyright (c) 2011, 2013-2017 Ingo Schwarze <schwarze@openbsd.org>
-# Copyright (c) 2018 Jan Stary <hans@stare.cz>
-#
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
 # copyright notice and this permission notice appear in all copies.
@@ -38,29 +32,15 @@ SRCS = \
 	sysdep.h	\
 	vat.h
 
-BINS =	rtpdump rtpplay rtpsend rtptrans
-PROG =	multidump multiplay $(BINS)
 MAN1 =	multidump.1 multiplay.1 rtpdump.1 rtpplay.1 rtpsend.1 rtptrans.1
+BINS =	rtpdump rtpplay rtpsend rtptrans
+MULT =	multidump multiplay
+PROG =	$(BINS) $(MULT)
 
 rtpdump_OBJS	= hpt.o host2ip.o                     rd.o rtpdump.o
 rtpplay_OBJS	= hpt.o host2ip.o notify.o multimer.o rd.o rtpplay.o
 rtpsend_OBJS	= hpt.o host2ip.o notify.o multimer.o      rtpsend.o
 rtptrans_OBJS	= hpt.o host2ip.o notify.o multimer.o      rtptrans.o
-
-DISTFILES = \
-	INSTALL			\
-	LICENSE			\
-	Makefile		\
-	Makefile.depend		\
-	bark.rtp		\
-	configure		\
-	configure.local.example	\
-	ChangeLog.html		\
-	rtptools.html.in	\
-	rtptools.spec		\
-	$(MAN1)			\
-	$(SRCS)			\
-	$(TESTSRCS)
 
 HAVE_SRCS = \
 	have-err.c		\
@@ -77,6 +57,34 @@ COMPAT_OBJS = \
 
 OBJS =	$(rtpdump_OBJS) $(rtpplay_OBJS) $(rtpsend_OBJS) $(rtptrans_OBJS)
 OBJS +=	$(COMPAT_OBJS)
+
+DISTFILES = \
+	LICENSE			\
+	Makefile		\
+	Makefile.depend		\
+	bark.rtp		\
+	configure		\
+	configure.local.example	\
+	ChangeLog.html		\
+	$(MAN1)			\
+	$(MULT)			\
+	$(SRCS)			\
+	$(HAVE_SRCS)
+
+# FIXME INSTALL
+# FIXME rtptools.spec
+# FIXME rtptools.html(.in)
+# FIXME hsearch.h hsearch.c - create have-hsearch.c
+
+# FIXME Windows allegedly needs these _empty_ includes(!)
+#win/*.c win/*.h win/include/*.h \
+#win/include/arpa/*.h win/include/netinet/*.h \
+#win/include/sys/*.h \
+
+# FIXME other windows cruft
+#win/rtptools.sln win/rtptools.suo \
+#win/rtpdump.vcxproj* win/rtpplay.vcxproj* win/rtpsend.vcxproj* \
+#win/rtptrans.vcxproj* \
 
 include Makefile.local
 
@@ -150,65 +158,22 @@ rtptools.tar.gz: $(DISTFILES)
 	highlight -I $< > $@
 
 .1.1.html:
-	mandoc -Thtml $< > $@
-	#mandoc -Thtml -Wall,stop \
-		#-Ostyle=mandoc.css,man=%N.%S.html,includes=%I.html $< > $@
+	which groff  > /dev/null && groff  -Thtml -mdoc   $< > $@
+	which mandoc > /dev/null && mandoc -Thtml -Wstyle $< > $@
 
 
 # The rest of this file is the relevant portions of old Makefile.am
 # that we need go through to make sure nothing is left behind
-#
-#bin_PROGRAMS = rtpdump rtpplay rtpsend rtptrans
-#dist_bin_SCRIPTS = multidump multiplay
-#man_MANS     = rtpdump.1 rtpplay.1 rtpsend.1 rtptrans.1 multidump.1 multiplay.1
-#man_HTML     = rtpdump.html rtpplay.html rtpsend.html rtptrans.html \
-#               multidump.html multiplay.html
 
-#COMMON = \ ansi.h \ host2ip.c \ hpt.c \ multimer.c \ multimer.h \ notify.c \ notify.h \ rtp.h \ sysdep.h \ vat.h
-#rtpdump_SOURCES = $(COMMON) rd.c rtpdump.h rtpdump.c
-#if DARWIN
-#rtpplay_SOURCES = $(COMMON) rd.c hsearch.c rtpplay.c
-#else
-#rtpplay_SOURCES = $(COMMON) rd.c rtpplay.c
-#endif
-#rtpsend_SOURCES = $(COMMON) rtpsend.c
-#rtptrans_SOURCES= $(COMMON) rtptrans.c
+#if DARWIN #rtpplay_SOURCES = $(COMMON) rd.c hsearch.c rtpplay.c
 
-#if HAVE_GROFF
-#GEN_HTML = groff -Thtml -mdoc
-#endif
-#if HAVE_MANDOC
-#GEN_HTML = mandoc -Thtml
-#endif
 
-#html: $(man_MANS)
-#if !FOUND_GEN_HTML
-#@echo "No mandoc or groff to generate html, skipping."
-#@exit 1
-#endif
-#for MAN_FILE in $(man_MANS) ; do \
-#FILE=$${MAN_FILE%%.*} ; \
-#$(GEN_HTML) $${MAN_FILE} > $${FILE}.html ;\
-#done
-#sed s/VERSION/$(VERSION)/g rtptools.html.in > rtptools.html
-#
 #rpm: $(bin_PROGRAMS) rtptools.spec dist
 #mkdir -p ./rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 #cp rtptools-$(VERSION).tar.gz ./rpmbuild/SOURCES/.
 #sed s/VERSION/$(VERSION)/g  rtptools.spec > ./rpmbuild/SPECS/rtptools-$(VERSION).spec
 #rpmbuild --define "_topdir `pwd`/rpmbuild" -ba rpmbuild/SPECS/rtptools-$(VERSION).spec
-#
+
+#sed s/VERSION/$(VERSION)/g rtptools.html.in > rtptools.html
 #clean-local:
 #rm -f $(man_HTML) rtptools.html
-
-#EXTRA_DIST = ChangeLog.html bark.rtp \
-#hsearch.h hsearch.c multidump multiplay \
-#$(man_MANS) \
-#win/*.c win/*.h win/include/*.h \
-#win/include/arpa/*.h win/include/netinet/*.h \
-#win/include/sys/*.h \
-#win/rtptools.sln win/rtptools.suo \
-#win/rtpdump.vcxproj* win/rtpplay.vcxproj* win/rtpsend.vcxproj* \
-#win/rtptrans.vcxproj* \
-#rtptools.spec rtptools.html.in \
-#LICENSE README.md
