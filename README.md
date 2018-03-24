@@ -39,7 +39,7 @@ If these look different from what you expected,
 read `configure.local.example`, create `configure.local`,
 and run `./configure` again.
 
-The build system not use GNU autoconf. All modern operating systems
+The build system does not use GNU autoconf. All modern operating systems
 are now reasonably close to POSIX and do not need arcane shell magic
 any longer. If your system does need such magic, consider upgrading
 to reasonably modern POSIX-compliant tools rather than asking for
@@ -51,7 +51,7 @@ autodetecting the availability of system functions
 involved (e.g. `-lnsl` for [`have-gethostbyname.c`](have-gethostbyname.c)).
 
 For C functions that might not be present in the system,
-we provide autoconfiguration tests and `compat_*.c` implementations.
+we provide autoconfiguration tests and `compat-*.c` implementations.
 (e.g. [`compat-strtonum.c`](compat-strtonum.c)).
 Please report any that turn out to be missing.
 

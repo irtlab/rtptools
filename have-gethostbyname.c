@@ -21,7 +21,6 @@ main(void)
 {
 	struct hostent* host;
 	host = gethostbyname("columbia.edu");
-	/* We only care whether the functions exists,
-	 * not whether Columbia's DNS servers are up. */
+	/* We only care whether the function exists. */
 	return 0;
 }
