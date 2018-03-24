@@ -17,3 +17,4 @@ mkinstalldirs
 /rtpsend
 /rtptrans
 /win/*.sdf
+/win/*.vcxproj.user
