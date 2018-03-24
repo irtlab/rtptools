@@ -55,6 +55,7 @@ rpm: $(bin_PROGRAMS) rtptools.spec dist
 
 clean-local:
 	rm -f $(man_HTML) rtptools.html
+	rm -fr ./autom4te.cache
 
 EXTRA_DIST = ChangeLog.html bark.rtp \
         hsearch.h hsearch.c multidump multiplay \
