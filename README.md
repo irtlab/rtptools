@@ -21,24 +21,63 @@ Refer to the individual manpages for details.
 
 ## Installation
 
-The RTP tools should compile on any POSIX-compliant
-platform supporting sockets, as well as on Windows.
+RTP tools should compile and run on any POSIX compatible system,
+as well as on Windows. It is also possible that your OS already
+provides a prebuilt package of RTP tools.
 
-### UNIX
+### configure
 
-If building from git, run the following first to regenerate the build tools:
+Run `./configure` to configure the build for your system.
+This will produce three files:
 
-```
-aclocal
-automake --add-missing --force-missing
-autoconf
-```
+* `config.h` containing the `#include` and `HAVE_` lines
+* `config.log` containing the details of autodetection
+* `Makefile.local` which defines `CC`, `PREFIX` and the like
 
-- Run `./configure` to configure rtptools for your system.
-- Run `make` to build rtptools.
-- Run `make install` to install.
-- Run `make uninstall` to uninstall.
-- Run `make rpm` to create a rpm package in `./rpmbuild`
+Read the standard output and `Makefile.local`.
+If these look different from what you expected,
+read `configure.local.example`, create `configure.local`,
+and run `./configure` again.
+
+The build system not use GNU autoconf. All modern operating systems
+are now reasonably close to POSIX and do not need arcane shell magic
+any longer. If your system does need such magic, consider upgrading
+to reasonably modern POSIX-compliant tools rather than asking for
+autoconf-style workarounds.
+
+The `./configure` script is accompanied by a set of simple programs
+autodetecting the availability of system functions
+(e.g. [`have-err.c`](have-err.c)), and whether extra libraries need to be
+involved (e.g. `-lnsl` for [`have-gethostbyname.c`](have-gethostbyname.c)).
+
+For C functions that might not be present in the system,
+we provide autoconfiguration tests and `compat_*.c` implementations.
+(e.g. [`compat-strtonum.c`](compat-strtonum.c)).
+Please report any that turn out to be missing.
+
+Read `config.log`, which shows shows the compiler commands used
+to test the libraries installed on your system, and the standard
+output and standard error output these commands produce.
+Failures are most likely to happen if headers or libraries
+are installed in unusual places or interfaces defined
+in unusual headers. You can also look at `config.h` and
+check that the `#define HAVE_*` lines match your expectations.
+
+### build
+
+Once the source is configured as above, run `make` to build SoX.
+Any POSIX-compatible make, in particular both BSD make and GNU make,
+should work. If the build fails, read `configure.local.example` again.
+
+### install
+
+Run `make -n install` and check where everything will go.
+If that differs from your expectations, set the `*DIR` variables
+in `configure.local` and go back to running `./configure`.
+
+Install the binaries and the manpages with `make install`.
+Depending on the `PREFIX` (which is `/usr/local` by default),
+you might need to `sudo make install` or `doas make install`.
 
 ### Windows
 
