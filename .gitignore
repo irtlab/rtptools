@@ -17,3 +17,4 @@ mkinstalldirs
 /rtptrans
 /win/*.sdf
 /win/*.vcxproj.user
+/win/*.suo
