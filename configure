@@ -41,14 +41,14 @@ LDADD=
 
 #HAVE_ENDIAN=
 #HAVE_ERR=
-HAVE_GETHOSTBYNAME=
+HAVE_LNSL=
 HAVE_MSGCONTROL=
 #HAVE_NTOHL=
 #HAVE_PATH_MAX=
 #HAVE_PROGNAME=
 #HAVE_REALLOCARRAY=
 #HAVE_RECALLOCARRAY=
-HAVE_SOCKET=
+HAVE_LSOCKET=
 #HAVE_STRCASESTR=
 #HAVE_STRINGLIST=
 #HAVE_STRLCAT=
@@ -140,14 +140,14 @@ runtest() {
 #runtest be32toh		ENDIAN		|| true
 #runtest be32toh		SYS_ENDIAN	-DSYS_ENDIAN || true
 #runtest err		ERR		|| true
-runtest gethostbyname   GETHOSTBYNAME -lnsl	|| true
+runtest gethostbyname   LNSL		-lnsl	|| true
 runtest msgcontrol	MSGCONTROL	|| true
 #runtest ntohl		NTOHL		|| true
 #runtest PATH_MAX	PATH_MAX	|| true
 #runtest progname	PROGNAME	|| true
 #runtest reallocarray	REALLOCARRAY	|| true
 #runtest recallocarray	RECALLOCARRAY	|| true
-runtest socket		SOCKET        -lsocket	|| true
+runtest socket		LSOCKET        -lsocket	|| true
 #runtest strcasestr	STRCASESTR	|| true
 #runtest stringlist	STRINGLIST	|| true
 #runtest strlcat		STRLCAT		|| true
@@ -259,8 +259,8 @@ exec > Makefile.local
 [ -z "${BINDIR}"          ] && BINDIR="${PREFIX}/bin"
 [ -z "${MANDIR}"          ] && MANDIR="${PREFIX}/man"
 
-[ ${HAVE_GETHOSTBYNAME} -eq 1 ] && LDADD="${LDADD} -lnsl"
-[ ${HAVE_SOCKET}        -eq 1 ] && LDADD="${LDADD} -lsocket"
+[ ${HAVE_LNSL}    -eq 1 ] && LDADD="${LDADD} -lnsl"
+[ ${HAVE_LSOCKET} -eq 1 ] && LDADD="${LDADD} -lsocket"
 
 cat << __HEREDOC__
 CC		= ${CC}
