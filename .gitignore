@@ -4,3 +4,6 @@
 /rtpplay
 /rtpsend
 /rtptrans
+/win/*.sdf
+/win/*.vcxproj.user
+/win/*.suo
