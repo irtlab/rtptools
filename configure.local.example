@@ -71,6 +71,7 @@ CFLAGS="-g -W -Wall -Wstrict-prototypes -Wno-unused-parameter -Wwrite-strings"
 HAVE_ENDIAN=0
 HAVE_ERR=0
 HAVE_GETHOSTBYNAME=0
+HAVE_MSGCONTROL=0
 HAVE_NTOHL=0
 HAVE_PATH_MAX=0
 HAVE_PROGNAME=0
