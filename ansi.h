@@ -128,7 +128,6 @@ extern int stty(int fd, struct sgttyb *buf);
 extern int gtty(int fd, struct sgttyb *buf);
 #endif
 
-
 #endif /* sun */
 
 /*** SGI ***/
