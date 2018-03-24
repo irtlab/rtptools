@@ -63,7 +63,7 @@ EXTRA_DIST = ChangeLog.html bark.rtp \
         win/*.c win/*.h win/include/*.h \
         win/include/arpa/*.h win/include/netinet/*.h \
         win/include/sys/*.h \
-        win/rtptools.sln win/rtptools.suo \
+        win/rtptools.sln \
         win/rtpdump.vcxproj* win/rtpplay.vcxproj* win/rtpsend.vcxproj* \
         win/rtptrans.vcxproj* \
         rtptools.spec rtptools.html.in \
