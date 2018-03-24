@@ -39,23 +39,23 @@ CFLAGS="${CFLAGS} -Wno-unused-parameter"
 LDFLAGS=
 LDADD=
 
-HAVE_ENDIAN=
-HAVE_ERR=
+#HAVE_ENDIAN=
+#HAVE_ERR=
 HAVE_GETHOSTBYNAME=
 HAVE_MSGCONTROL=
-HAVE_NTOHL=
-HAVE_PATH_MAX=
-HAVE_PROGNAME=
-HAVE_REALLOCARRAY=
-HAVE_RECALLOCARRAY=
+#HAVE_NTOHL=
+#HAVE_PATH_MAX=
+#HAVE_PROGNAME=
+#HAVE_REALLOCARRAY=
+#HAVE_RECALLOCARRAY=
 HAVE_SOCKET=
-HAVE_STRCASESTR=
-HAVE_STRINGLIST=
-HAVE_STRLCAT=
-HAVE_STRLCPY=
-HAVE_STRNDUP=
-HAVE_STRTONUM=
-HAVE_SYS_ENDIAN=
+#HAVE_STRCASESTR=
+#HAVE_STRINGLIST=
+#HAVE_STRLCAT=
+#HAVE_STRLCPY=
+#HAVE_STRNDUP=
+#HAVE_STRTONUM=
+#HAVE_SYS_ENDIAN=
 
 INSTALL="install"
 PREFIX="/usr/local"
@@ -137,23 +137,23 @@ runtest() {
 }
 
 # --- library functions ---
-runtest be32toh		ENDIAN		|| true
-runtest be32toh		SYS_ENDIAN	-DSYS_ENDIAN || true
-runtest err		ERR		|| true
+#runtest be32toh		ENDIAN		|| true
+#runtest be32toh		SYS_ENDIAN	-DSYS_ENDIAN || true
+#runtest err		ERR		|| true
 runtest gethostbyname   GETHOSTBYNAME -lnsl	|| true
 runtest msgcontrol	MSGCONTROL	|| true
-runtest ntohl		NTOHL		|| true
-runtest PATH_MAX	PATH_MAX	|| true
-runtest progname	PROGNAME	|| true
-runtest reallocarray	REALLOCARRAY	|| true
-runtest recallocarray	RECALLOCARRAY	|| true
+#runtest ntohl		NTOHL		|| true
+#runtest PATH_MAX	PATH_MAX	|| true
+#runtest progname	PROGNAME	|| true
+#runtest reallocarray	REALLOCARRAY	|| true
+#runtest recallocarray	RECALLOCARRAY	|| true
 runtest socket		SOCKET        -lsocket	|| true
-runtest strcasestr	STRCASESTR	|| true
-runtest stringlist	STRINGLIST	|| true
-runtest strlcat		STRLCAT		|| true
-runtest strlcpy		STRLCPY		|| true
-runtest strndup		STRNDUP		|| true
-runtest strtonum	STRTONUM	|| true
+#runtest strcasestr	STRCASESTR	|| true
+#runtest stringlist	STRINGLIST	|| true
+#runtest strlcat		STRLCAT		|| true
+#runtest strlcpy		STRLCPY		|| true
+#runtest strndup		STRNDUP		|| true
+#runtest strtonum	STRTONUM	|| true
 
 #if [ ${HAVE_ENDIAN} -eq 0 -a \
      #${HAVE_SYS_ENDIAN} -eq 0 -a \
@@ -182,22 +182,25 @@ cat << __HEREDOC__
 
 __HEREDOC__
 
-[ ${HAVE_REALLOCARRAY} -eq 0 -o ${HAVE_RECALLOCARRAY} -eq 0 -o \
-  ${HAVE_STRLCAT} -eq 0 -o ${HAVE_STRLCPY} -eq 0 -o \
-  ${HAVE_STRNDUP} -eq 0 ] \
-	&& echo "#include <sys/types.h>"
+#[ ${HAVE_REALLOCARRAY} -eq 0 -o ${HAVE_RECALLOCARRAY} -eq 0 -o \
+  #${HAVE_STRLCAT} -eq 0 -o ${HAVE_STRLCPY} -eq 0 -o \
+  #${HAVE_STRNDUP} -eq 0 ] \
+	#&& echo "#include <sys/types.h>"
 
-echo
-[ ${HAVE_PATH_MAX} -eq 0 ] && echo "#define PATH_MAX 4096"
-if [ ${HAVE_ENDIAN} -eq 0 -a ${HAVE_SYS_ENDIAN} -eq 0 ]; then
-	echo "#define be32toh ntohl"
-	echo "#define htobe32 htonl"
-fi
+#echo
+#[ ${HAVE_PATH_MAX} -eq 0 ] && echo "#define PATH_MAX 4096"
+#if [ ${HAVE_ENDIAN} -eq 0 -a ${HAVE_SYS_ENDIAN} -eq 0 ]; then
+	#echo "#define be32toh ntohl"
+	#echo "#define htobe32 htonl"
+#fi
 
 cat << __HEREDOC__
+/*
 #define HAVE_ENDIAN ${HAVE_ENDIAN}
 #define HAVE_ERR ${HAVE_ERR}
+*/
 #define HAVE_MSGCONTROL ${HAVE_MSGCONTROL}
+/*
 #define HAVE_NTOHL ${HAVE_NTOHL}
 #define HAVE_PROGNAME ${HAVE_PROGNAME}
 #define HAVE_REALLOCARRAY ${HAVE_REALLOCARRAY}
@@ -209,41 +212,42 @@ cat << __HEREDOC__
 #define HAVE_STRNDUP ${HAVE_STRNDUP}
 #define HAVE_STRTONUM ${HAVE_STRTONUM}
 #define HAVE_SYS_ENDIAN ${HAVE_SYS_ENDIAN}
+*/
 
 __HEREDOC__
 
-if [ ${HAVE_ERR} -eq 0 ]; then
-	echo "extern	void	  err(int, const char *, ...);"
-	echo "extern	void	  errx(int, const char *, ...);"
-	echo "extern	void	  warn(const char *, ...);"
-	echo "extern	void	  warnx(const char *, ...);"
-fi
+#if [ ${HAVE_ERR} -eq 0 ]; then
+	#echo "extern	void	  err(int, const char *, ...);"
+	#echo "extern	void	  errx(int, const char *, ...);"
+	#echo "extern	void	  warn(const char *, ...);"
+	#echo "extern	void	  warnx(const char *, ...);"
+#fi
 
-if [ ${HAVE_PROGNAME} -eq 0 ]; then
-	echo "extern 	const char *getprogname(void);"
-	echo "extern	void	  setprogname(const char *);"
-fi
-
-[ ${HAVE_REALLOCARRAY} -eq 0 ] && \
-	echo "extern	void	 *reallocarray(void *, size_t, size_t);"
-
-[ ${HAVE_RECALLOCARRAY} -eq 0 ] && \
-	echo "extern	void	 *recallocarray(void *, size_t, size_t, size_t);"
-
-[ ${HAVE_STRCASESTR} -eq 0 ] && \
-	echo "extern	char	 *strcasestr(const char *, const char *);"
-
-[ ${HAVE_STRLCAT} -eq 0 ] && \
-	echo "extern	size_t	  strlcat(char *, const char *, size_t);"
-
-[ ${HAVE_STRLCPY} -eq 0 ] && \
-	echo "extern	size_t	  strlcpy(char *, const char *, size_t);"
-
-[ ${HAVE_STRNDUP} -eq 0 ] && \
-	echo "extern	char	 *strndup(const char *, size_t);"
-
-[ ${HAVE_STRTONUM} -eq 0 ] && \
-	echo "extern	long long strtonum(const char *, long long, long long, const char **);"
+#if [ ${HAVE_PROGNAME} -eq 0 ]; then
+	#echo "extern 	const char *getprogname(void);"
+	#echo "extern	void	  setprogname(const char *);"
+#fi
+#
+#[ ${HAVE_REALLOCARRAY} -eq 0 ] && \
+	#echo "extern	void	 *reallocarray(void *, size_t, size_t);"
+#
+#[ ${HAVE_RECALLOCARRAY} -eq 0 ] && \
+	#echo "extern	void	 *recallocarray(void *, size_t, size_t, size_t);"
+#
+#[ ${HAVE_STRCASESTR} -eq 0 ] && \
+	#echo "extern	char	 *strcasestr(const char *, const char *);"
+#
+#[ ${HAVE_STRLCAT} -eq 0 ] && \
+	#echo "extern	size_t	  strlcat(char *, const char *, size_t);"
+#
+#[ ${HAVE_STRLCPY} -eq 0 ] && \
+	#echo "extern	size_t	  strlcpy(char *, const char *, size_t);"
+#
+#[ ${HAVE_STRNDUP} -eq 0 ] && \
+	#echo "extern	char	 *strndup(const char *, size_t);"
+#
+#[ ${HAVE_STRTONUM} -eq 0 ] && \
+	#echo "extern	long long strtonum(const char *, long long, long long, const char **);"
 
 echo "config.h: written" 1>&2
 echo "config.h: written" 1>&3
