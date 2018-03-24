@@ -5,7 +5,6 @@ Makefile
 config.*
 autom4te.cache
 compile
-configure
 depcomp
 install-sh
 missing
