@@ -166,20 +166,10 @@ extern int select(int, fd_set *, fd_set *, fd_set *, struct timeval *);
 extern int getdomainname(char *name, int namelen);
 #endif
 
-/* <math.h> */
-#ifdef _MATH_H
-extern double infinity(void);
-#endif
-
-#endif /* sun4 */
+#endif /* sun */
 
 /*** SGI ***/
 #ifdef sgi
-
-/* <math.h> */
-#ifdef __MATH_H__
-extern double infinity(void);
-#endif
 
 #ifdef __RPCSVC_YPCLNT_H__
 extern int yp_get_default_domain(char **outdomain);
@@ -188,11 +178,6 @@ extern int yp_get_default_domain(char **outdomain);
 
 /*** HP ***/
 #ifdef hp
-
-/* <math.h> */
-#ifdef _MATH_INCLUDED
-extern double infinity(void);
-#endif
 
 /* <unistd.h> */
 #ifdef _UNISTD_INCLUDED
