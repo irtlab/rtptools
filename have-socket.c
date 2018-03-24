@@ -20,7 +20,7 @@ int
 main(void)
 {
 	int sock;
-	sock = socket(AF_INET, SOCK_DGRAM, 0);                               
-	/* We only care whether the functions exists. */
+	if (-1 == (sock = socket(AF_INET, SOCK_DGRAM, 0)))
+		return 1;
 	return 0;
 }
