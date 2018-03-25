@@ -59,7 +59,7 @@ check that the `#define HAVE_*` lines match your expectations.
 
 ### build
 
-Once the source is configured as above, run `make` to build SoX.
+Once the source is configured as above, run `make` to build RTP tools.
 Any POSIX-compatible make, in particular both BSD make and GNU make,
 should work. If the build fails, read `configure.local.example` again.
 
