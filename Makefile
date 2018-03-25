@@ -11,6 +11,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 VERSION = 1.23
+TARBALL = rtptools-$(VERSION).tar.gz
 
 SRCS = \
 	ansi.h		\
@@ -75,7 +76,7 @@ DISTFILES = \
 # FIXME INSTALL
 # FIXME rtptools.spec
 # FIXME rtptools.html(.in)
-# FIXME hsearch.h hsearch.c - create have-hsearch.c
+# FIXME hsearch.h hsearch.c: have-hsearch.c, compat-hsearch.c
 
 # FIXME Windows allegedly needs these _empty_ includes(!)
 #win/*.c win/*.h win/include/*.h \
@@ -137,16 +138,14 @@ depend: config.h
 		depend > _depend
 	mv _depend depend
 
-dist: rtptools.sha256
+dist: $(TARBALL)
 
-rtptools.sha256: rtptools.tar.gz
-	sha256 rtptools.tar.gz > $@
-
-rtptools.tar.gz: $(DISTFILES)
+$(TARBALL): $(DISTFILES)
+	rm -rf .dist
 	mkdir -p .dist/rtptools-$(VERSION)/
-	$(INSTALL) -m 0644 $(DISTFILES) .dist/mandoc-$(VERSION)
-	chmod 755 .dist/mandoc-$(VERSION)/configure
-	( cd .dist/ && tar czf ../$@ mandoc-$(VERSION) )
+	$(INSTALL) -m 0644 $(DISTFILES) .dist/rtptools-$(VERSION)/
+	( cd .dist/rtptools-$(VERSION) && chmod 755 configure $(MULT) )
+	( cd .dist && tar czf ../$@ rtptools-$(VERSION) )
 	rm -rf .dist/
 
 .SUFFIXES: .c .o
@@ -168,7 +167,6 @@ rtptools.tar.gz: $(DISTFILES)
 
 #if DARWIN #rtpplay_SOURCES = $(COMMON) rd.c hsearch.c rtpplay.c
 
-
 #rpm: $(bin_PROGRAMS) rtptools.spec dist
 #mkdir -p ./rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 #cp rtptools-$(VERSION).tar.gz ./rpmbuild/SOURCES/.
@@ -176,5 +174,3 @@ rtptools.tar.gz: $(DISTFILES)
 #rpmbuild --define "_topdir `pwd`/rpmbuild" -ba rpmbuild/SPECS/rtptools-$(VERSION).spec
 
 #sed s/VERSION/$(VERSION)/g rtptools.html.in > rtptools.html
-#clean-local:
-#rm -f $(man_HTML) rtptools.html
