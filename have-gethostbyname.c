@@ -20,7 +20,7 @@ int
 main(void)
 {
 	struct hostent* host;
-	host = gethostbyname("columbia.edu");
+	host = gethostbyname("localhost");
 	/* We only care whether the function exists. */
 	return 0;
 }
