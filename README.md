@@ -39,12 +39,6 @@ If these look different from what you expected,
 read `configure.local.example`, create `configure.local`,
 and run `./configure` again.
 
-The build system does not use GNU autoconf. All modern operating systems
-are now reasonably close to POSIX and do not need arcane shell magic
-any longer. If your system does need such magic, consider upgrading
-to reasonably modern POSIX-compliant tools rather than asking for
-autoconf-style workarounds.
-
 The `./configure` script is accompanied by a set of simple programs
 autodetecting the availability of system functions
 (e.g. [`have-err.c`](have-err.c)), and whether extra libraries need to be
