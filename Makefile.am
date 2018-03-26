@@ -7,6 +7,14 @@ dist_bin_SCRIPTS = multidump multiplay
 man_MANS     = rtpdump.1 rtpplay.1 rtpsend.1 rtptrans.1 multidump.1 multiplay.1
 man_HTML     = rtpdump.html rtpplay.html rtpsend.html rtptrans.html \
                multidump.html multiplay.html
+win_FILES    = win/getopt.c win/getopt.h win/gettimeofday.c win/gettimeofday.h \
+               win/winsocklib.c win/winsocklib.h \
+               win/rtpdump.vcxproj win/rtpplay.vcxproj win/rtpsend.vcxproj \
+               win/rtptrans.vcxproj win/rtptools.sln \
+               win/include/unistd.h win/include/netdb.h \
+               win/include/arpa/inet.h win/include/netinet/in.h \
+               win/include/sys/select.h win/include/sys/socket.h \
+               win/include/sys/time.h win/include/sys/uio.h
 
 COMMON = \
         ansi.h \
@@ -60,11 +68,6 @@ clean-local:
 EXTRA_DIST = ChangeLog.html bark.rtp \
         hsearch.h hsearch.c multidump multiplay \
         $(man_MANS) \
-        win/*.c win/*.h win/include/*.h \
-        win/include/arpa/*.h win/include/netinet/*.h \
-        win/include/sys/*.h \
-        win/rtptools.sln \
-        win/rtpdump.vcxproj* win/rtpplay.vcxproj* win/rtpsend.vcxproj* \
-        win/rtptrans.vcxproj* \
+        $(win_FILES) \
         rtptools.spec rtptools.html.in \
         LICENSE README.md
