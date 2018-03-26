@@ -22,8 +22,11 @@ Refer to the individual manpages for details.
 ## Installation
 
 RTP tools should compile and run on any POSIX compatible system,
-as well as on Windows. It is also possible that your OS already
-provides a prebuilt package of RTP tools.
+as well as on Windows. Some operating systems also provide
+a prebuilt package of RTP tools.
+
+On UNIX, the usual `./configure && make` should work.
+Read on for the details.
 
 ### configure
 
