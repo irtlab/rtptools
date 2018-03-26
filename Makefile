@@ -127,9 +127,8 @@ distclean: clean
 	rm -f Makefile.local config.h config.h.old config.log config.log.old
 
 clean:
-	rm -f $(TARBALL)
-	rm -f $(BINS) $(OBJS)
-	rm -rf win/include
+	rm -f $(TARBALL) $(BINS) $(OBJS)
+	rm -rf rtptools-$(VERSION) win/include
 	rm -rf *.dSYM *.core *~ .*~
 
 install: $(PROG) $(MAN1)
@@ -180,6 +179,10 @@ $(TARBALL): $(DISTFILES) $(WINDOWS)
 	( cd .dist && tar czf ../$@ rtptools-$(VERSION) )
 	rm -rf .dist/
 
+distcheck: dist
+	rm -rf rtptools-$(VERSION) && tar xzf $(TARBALL)
+	( cd rtptools-$(VERSION) && ./configure && make all )
+
 .SUFFIXES: .c .o
 .SUFFIXES: .1 .1.html
 
@@ -189,8 +192,6 @@ $(TARBALL): $(DISTFILES) $(WINDOWS)
 .1.1.html:
 	which groff  > /dev/null && groff  -Thtml -mdoc   $< > $@
 	which mandoc > /dev/null && mandoc -Thtml -Wstyle $< > $@
-
-#sed s/VERSION/$(VERSION)/g rtptools.html.in > rtptools.html
 
 # The rest of this file is the relevant portions of old Makefile.am
 # that we need go through to make sure nothing is left behind
