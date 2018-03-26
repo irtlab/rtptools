@@ -33,10 +33,24 @@ SRCS = \
 	sysdep.h	\
 	vat.h
 
-MAN1 =	multidump.1 multiplay.1 rtpdump.1 rtpplay.1 rtpsend.1 rtptrans.1
 BINS =	rtpdump rtpplay rtpsend rtptrans
 MULT =	multidump multiplay
 PROG =	$(BINS) $(MULT)
+
+MAN1 =	multidump.1		\
+	multiplay.1		\
+	rtpdump.1		\
+	rtpplay.1		\
+	rtpsend.1		\
+	rtptrans.1
+
+HTML =	multidump.1.html	\
+	multiplay.1.html	\
+	rtpdump.1.html		\
+	rtpplay.1.html		\
+	rtpsend.1.html		\
+	rtptrans.1.html		\
+	rtptools.html
 
 rtpdump_OBJS	= hpt.o host2ip.o                     rd.o rtpdump.o
 rtpplay_OBJS	= hpt.o host2ip.o notify.o multimer.o rd.o rtpplay.o
@@ -102,7 +116,7 @@ DISTFILES = \
 include Makefile.local
 
 all: $(PROG) Makefile.local
-
+html: $(HTML)
 install: all
 
 .PHONY: install clean distclean depend
@@ -176,6 +190,7 @@ $(TARBALL): $(DISTFILES) $(WINDOWS)
 	which groff  > /dev/null && groff  -Thtml -mdoc   $< > $@
 	which mandoc > /dev/null && mandoc -Thtml -Wstyle $< > $@
 
+#sed s/VERSION/$(VERSION)/g rtptools.html.in > rtptools.html
 
 # The rest of this file is the relevant portions of old Makefile.am
 # that we need go through to make sure nothing is left behind
@@ -187,5 +202,3 @@ $(TARBALL): $(DISTFILES) $(WINDOWS)
 #cp rtptools-$(VERSION).tar.gz ./rpmbuild/SOURCES/.
 #sed s/VERSION/$(VERSION)/g  rtptools.spec > ./rpmbuild/SPECS/rtptools-$(VERSION).spec
 #rpmbuild --define "_topdir `pwd`/rpmbuild" -ba rpmbuild/SPECS/rtptools-$(VERSION).spec
-
-#sed s/VERSION/$(VERSION)/g rtptools.html.in > rtptools.html
