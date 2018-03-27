@@ -877,7 +877,6 @@ int main(int argc, char *argv[])
   extern int hpt(char *h, struct sockaddr *sa, unsigned char *ttl);
 
   /* parse command line arguments */
-  startupSocket();
   while ((c = getopt(argc, argv, "f:als:v?h")) != EOF) {
     switch(c) {
     case 'f':

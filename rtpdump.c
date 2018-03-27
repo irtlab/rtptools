@@ -637,7 +637,6 @@ int main(int argc, char *argv[])
   int nfds = 0;
   extern double tdbl(struct timeval *);
 
-  startupSocket();
   while ((c = getopt(argc, argv, "F:f:o:t:x:h")) != EOF) {
     switch(c) {
     /* output format */
