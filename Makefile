@@ -49,8 +49,7 @@ HTML =	multidump.1.html	\
 	rtpdump.1.html		\
 	rtpplay.1.html		\
 	rtpsend.1.html		\
-	rtptrans.1.html		\
-	rtptools.html
+	rtptrans.1.html
 
 rtpdump_OBJS	= hpt.o host2ip.o                     rd.o rtpdump.o
 rtpplay_OBJS	= hpt.o host2ip.o notify.o multimer.o rd.o rtpplay.o
@@ -110,7 +109,6 @@ DISTFILES = \
 
 # FIXME INSTALL
 # FIXME rtptools.spec
-# FIXME rtptools.html(.in)
 # FIXME hsearch.h hsearch.c: have-hsearch.c, compat-hsearch.c
 
 include Makefile.local
@@ -127,7 +125,7 @@ distclean: clean
 	rm -f Makefile.local config.h config.h.old config.log config.log.old
 
 clean:
-	rm -f $(TARBALL) $(BINS) $(OBJS)
+	rm -f $(TARBALL) $(BINS) $(OBJS) $(HTML)
 	rm -rf rtptools-$(VERSION) win/include
 	rm -rf *.dSYM *.core *~ .*~
 
@@ -190,8 +188,8 @@ distcheck: dist
 	$(CC) $(CFLAGS) -c $<
 
 .1.1.html:
-	which groff  > /dev/null && groff  -Thtml -mdoc   $< > $@
-	which mandoc > /dev/null && mandoc -Thtml -Wstyle $< > $@
+	{ which mandoc > /dev/null && mandoc -Thtml -Wstyle $< > $@ ; } || \
+	{ which groff  > /dev/null && groff  -Thtml -mdoc   $< > $@ ; }
 
 # The rest of this file is the relevant portions of old Makefile.am
 # that we need go through to make sure nothing is left behind
