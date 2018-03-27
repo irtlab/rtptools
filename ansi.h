@@ -128,44 +128,6 @@ extern int stty(int fd, struct sgttyb *buf);
 extern int gtty(int fd, struct sgttyb *buf);
 #endif
 
-/* sys/time.h */
-#ifdef _sys_time_h
-/*
-extern int gettimeofday(struct timeval *tp, struct timezone *tzp);
-*/
-extern unsigned mktime(struct tm *tm);
-#endif
-
-/* <sys/time.h> (Solaris) */
-#ifdef _SYS_TIME_H
-/*
-extern int gettimeofday(struct timeval *tp, struct timezone *tzp);
-*/
-#endif
-
-/* <unistd.h> */
-#ifdef  __sys_unistd_h
-extern int ioctl(int fd, int request, ...);
-extern int gethostname(char *name, int namelen);
-extern int getdomainname(char *name, int namelen);
-extern uid_t getuid(void);
-extern int close(int);
-extern int unlink(const char *fn);
-extern int truncate(char *path, off_t length);
-extern int ftruncate(int fd, off_t length);
-#ifdef _sys_uio_h
-extern int writev(int fd, struct iovec *iov, int iovcnt);
-#endif
-#ifdef _sys_time_h
-extern int select(int, fd_set *, fd_set *, fd_set *, struct timeval *);
-#endif
-#endif
-
-/* <unistd.h> (Solaris) */
-#ifdef _UNISTD_H
-extern int getdomainname(char *name, int namelen);
-#endif
-
 #endif /* sun */
 
 /*** SGI ***/
@@ -179,15 +141,5 @@ extern int yp_get_default_domain(char **outdomain);
 /*** HP ***/
 #ifdef hp
 
-/* <unistd.h> */
-#ifdef _UNISTD_INCLUDED
-extern int getdomainname(char *name, int namelen);
-#endif
 #endif /* hp */
 
-/*** IBM ***/
-#ifdef ibm
-#ifdef _UNISTD
-#include <select.h>
-#endif
-#endif /* ibm */

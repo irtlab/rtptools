@@ -135,34 +135,3 @@ void hdestroy(void) {
 		free(e);
 	}
 }
-
-/*
-main() {
-	ENTRY t, *r;
-
-	hcreate(100);
-	t.key = strdup("wxt");
-	t.data = strdup("123455");
-	r = hsearch(t, ENTER);
-	t.key = strdup("fas");
-	t.data = strdup("12das3455");
-	r = hsearch(t, ENTER);
-	t.key = strdup("asas");
-	t.data = strdup("123fda455");
-	r = hsearch(t, ENTER);
-	t.key = strdup("dda");
-	t.data = strdup("12dda3455");
-	r = hsearch(t, ENTER);
-	t.key = strdup("asas");
-	t.data = strdup("123fda455");
-	r = hsearch(t, FIND);
-	printf("%s, %s\n", r->key, r->data);
-	t.key = strdup("ddad");
-	t.data = strdup("12dda3455");
-	r = hsearch(t, FIND);
-	if (r == NULL)
-		printf("Not find.\n");
-	hdestroy();
-	return 0;
-}
-*/

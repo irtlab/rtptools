@@ -1,0 +1,289 @@
+#!/bin/sh
+#
+# $Id: configure,v 1.65 2018/02/27 11:16:23 schwarze Exp $
+#
+# Copyright (c) 2014, 2015, 2016, 2017 Ingo Schwarze <schwarze@openbsd.org>
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+set -e
+
+[ -w config.log ] && mv config.log config.log.old
+[ -w config.h   ] && mv config.h config.h.old
+
+# Output file descriptor usage:
+# 1 (stdout): config.h, Makefile.local
+# 2 (stderr): original stderr, usually to the console
+# 3: config.log
+
+exec 3> config.log
+echo "config.log: writing..."
+
+# --- default settings -------------------------------------------------
+
+SOURCEDIR=`dirname "$0"`
+
+CC=`printf "all:\\n\\t@echo \\\$(CC)\\n" | env -i make -sf -`
+CFLAGS="-g -W -Wall -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings"
+CFLAGS="${CFLAGS} -Wno-unused-parameter"
+LDFLAGS=
+LDADD=
+
+#HAVE_ENDIAN=
+#HAVE_ERR=
+HAVE_LNSL=
+HAVE_MSGCONTROL=
+#HAVE_NTOHL=
+#HAVE_PATH_MAX=
+#HAVE_PROGNAME=
+#HAVE_REALLOCARRAY=
+#HAVE_RECALLOCARRAY=
+HAVE_LSOCKET=
+#HAVE_STRCASESTR=
+#HAVE_STRINGLIST=
+#HAVE_STRLCAT=
+#HAVE_STRLCPY=
+#HAVE_STRNDUP=
+#HAVE_STRTONUM=
+#HAVE_SYS_ENDIAN=
+
+INSTALL="install"
+PREFIX="/usr/local"
+BINDIR=
+MANDIR=
+
+# --- manual settings from configure.local -----------------------------
+
+if [ -r ./configure.local ]; then
+	echo "configure.local: reading..." 1>&2
+	echo "configure.local: reading..." 1>&3
+	cat ./configure.local 1>&3
+	. ./configure.local
+else
+	echo "configure.local: no (fully automatic configuration)" 1>&2
+	echo "configure.local: no (fully automatic configuration)" 1>&3
+fi
+echo 1>&3
+
+# --- tests for config.h  ----------------------------------------------
+
+COMP="${CC} ${CFLAGS} -Wno-unused -Werror"
+
+# Check whether this HAVE_ setting is manually overridden.
+# If yes, use the override, if no, do not decide anything yet.
+# Arguments: lower-case test name, manual value
+ismanual() {
+	[ -z "${3}" ] && return 1
+	echo "${1}: manual (HAVE_${2}=${3})" 1>&2
+	echo "${1}: manual (HAVE_${2}=${3})" 1>&3
+	echo 1>&3
+	return 0
+}
+
+# Run a single autoconfiguration test.
+# In case of success, enable the feature.
+# In case of failure, do not decide anything yet.
+# Arguments: lower-case test name, upper-case test name, additional CFLAGS
+singletest() {
+	cat 1>&3 << __HEREDOC__
+${1}${3}: testing...
+${COMP} -o have-${1} have-${1}.c ${3}
+__HEREDOC__
+
+	if ${COMP} -o "have-${1}" "${SOURCEDIR}/have-${1}.c" ${3} 1>&3 2>&3
+	then
+		echo "${1}${3}: ${CC} succeeded" 1>&3
+	else
+		echo "${1}${3}: ${CC} failed with $?" 1>&3
+		echo 1>&3
+		return 1
+	fi
+
+	if ./have-${1} 1>&3 2>&3; then
+		echo "${1}${3}: yes" 1>&2
+		echo "${1}${3}: yes" 1>&3
+		echo 1>&3
+		eval HAVE_${2}=1
+		rm "have-${1}"
+		return 0
+	else
+		echo "${1}${3}: execution failed with $?" 1>&3
+		echo 1>&3
+		rm "have-${1}"
+		return 1
+	fi
+}
+
+# Run a complete autoconfiguration test, including the check for
+# a manual override and disabling the feature on failure.
+# Arguments: lower case name, upper case name, additional CFLAGS
+runtest() {
+	eval _manual=\${HAVE_${2}}
+	ismanual "${1}" "${2}" "${_manual}" && return 0
+	singletest "${1}" "${2}" "${3}" && return 0
+	echo "${1}${3}: no" 1>&2
+	eval HAVE_${2}=0
+	return 1
+}
+
+# --- library functions ---
+#runtest be32toh		ENDIAN		|| true
+#runtest be32toh		SYS_ENDIAN	-DSYS_ENDIAN || true
+#runtest err		ERR		|| true
+runtest gethostbyname   LNSL		-lnsl	|| true
+runtest msgcontrol	MSGCONTROL	|| true
+#runtest ntohl		NTOHL		|| true
+#runtest PATH_MAX	PATH_MAX	|| true
+#runtest progname	PROGNAME	|| true
+#runtest reallocarray	REALLOCARRAY	|| true
+#runtest recallocarray	RECALLOCARRAY	|| true
+runtest socket		LSOCKET        -lsocket	|| true
+#runtest strcasestr	STRCASESTR	|| true
+#runtest stringlist	STRINGLIST	|| true
+#runtest strlcat		STRLCAT		|| true
+#runtest strlcpy		STRLCPY		|| true
+#runtest strndup		STRNDUP		|| true
+#runtest strtonum	STRTONUM	|| true
+
+#if [ ${HAVE_ENDIAN} -eq 0 -a \
+     #${HAVE_SYS_ENDIAN} -eq 0 -a \
+     #${HAVE_NTOHL} -eq 0 ]; then
+	#echo "FATAL: no endian conversion functions found" 1>&2
+	#echo "FATAL: no endian conversion functions found" 1>&3
+	#exit 1
+#fi
+
+# --- write config.h ---
+
+exec > config.h
+
+cat << __HEREDOC__
+#ifdef __cplusplus
+#error "Do not use C++.  See the INSTALL file."
+#endif
+
+#if !defined(__GNUC__) || (__GNUC__ < 4)
+#define __attribute__(x)
+#endif
+
+#if defined(__linux__) || defined(__MINT__)
+#define _GNU_SOURCE	/* See have-*.c for what needs this. */
+#endif
+
+__HEREDOC__
+
+#[ ${HAVE_REALLOCARRAY} -eq 0 -o ${HAVE_RECALLOCARRAY} -eq 0 -o \
+  #${HAVE_STRLCAT} -eq 0 -o ${HAVE_STRLCPY} -eq 0 -o \
+  #${HAVE_STRNDUP} -eq 0 ] \
+	#&& echo "#include <sys/types.h>"
+
+#echo
+#[ ${HAVE_PATH_MAX} -eq 0 ] && echo "#define PATH_MAX 4096"
+#if [ ${HAVE_ENDIAN} -eq 0 -a ${HAVE_SYS_ENDIAN} -eq 0 ]; then
+	#echo "#define be32toh ntohl"
+	#echo "#define htobe32 htonl"
+#fi
+
+cat << __HEREDOC__
+/*
+#define HAVE_ENDIAN ${HAVE_ENDIAN}
+#define HAVE_ERR ${HAVE_ERR}
+*/
+#define HAVE_MSGCONTROL ${HAVE_MSGCONTROL}
+/*
+#define HAVE_NTOHL ${HAVE_NTOHL}
+#define HAVE_PROGNAME ${HAVE_PROGNAME}
+#define HAVE_REALLOCARRAY ${HAVE_REALLOCARRAY}
+#define HAVE_RECALLOCARRAY ${HAVE_RECALLOCARRAY}
+#define HAVE_STRCASESTR ${HAVE_STRCASESTR}
+#define HAVE_STRINGLIST ${HAVE_STRINGLIST}
+#define HAVE_STRLCAT ${HAVE_STRLCAT}
+#define HAVE_STRLCPY ${HAVE_STRLCPY}
+#define HAVE_STRNDUP ${HAVE_STRNDUP}
+#define HAVE_STRTONUM ${HAVE_STRTONUM}
+#define HAVE_SYS_ENDIAN ${HAVE_SYS_ENDIAN}
+*/
+
+__HEREDOC__
+
+#if [ ${HAVE_ERR} -eq 0 ]; then
+	#echo "extern	void	  err(int, const char *, ...);"
+	#echo "extern	void	  errx(int, const char *, ...);"
+	#echo "extern	void	  warn(const char *, ...);"
+	#echo "extern	void	  warnx(const char *, ...);"
+#fi
+
+#if [ ${HAVE_PROGNAME} -eq 0 ]; then
+	#echo "extern 	const char *getprogname(void);"
+	#echo "extern	void	  setprogname(const char *);"
+#fi
+#
+#[ ${HAVE_REALLOCARRAY} -eq 0 ] && \
+	#echo "extern	void	 *reallocarray(void *, size_t, size_t);"
+#
+#[ ${HAVE_RECALLOCARRAY} -eq 0 ] && \
+	#echo "extern	void	 *recallocarray(void *, size_t, size_t, size_t);"
+#
+#[ ${HAVE_STRCASESTR} -eq 0 ] && \
+	#echo "extern	char	 *strcasestr(const char *, const char *);"
+#
+#[ ${HAVE_STRLCAT} -eq 0 ] && \
+	#echo "extern	size_t	  strlcat(char *, const char *, size_t);"
+#
+#[ ${HAVE_STRLCPY} -eq 0 ] && \
+	#echo "extern	size_t	  strlcpy(char *, const char *, size_t);"
+#
+#[ ${HAVE_STRNDUP} -eq 0 ] && \
+	#echo "extern	char	 *strndup(const char *, size_t);"
+#
+#[ ${HAVE_STRTONUM} -eq 0 ] && \
+	#echo "extern	long long strtonum(const char *, long long, long long, const char **);"
+
+echo "config.h: written" 1>&2
+echo "config.h: written" 1>&3
+
+# --- tests for Makefile.local -----------------------------------------
+
+exec > Makefile.local
+
+[ -z "${BINDIR}"          ] && BINDIR="${PREFIX}/bin"
+[ -z "${MANDIR}"          ] && MANDIR="${PREFIX}/man"
+
+[ ${HAVE_LNSL}    -eq 1 ] && LDADD="${LDADD} -lnsl"
+[ ${HAVE_LSOCKET} -eq 1 ] && LDADD="${LDADD} -lsocket"
+
+cat << __HEREDOC__
+CC		= ${CC}
+CFLAGS		= ${CFLAGS}
+LDFLAGS		= ${LDFLAGS}
+LDADD		= ${LDADD}
+PREFIX		= ${PREFIX}
+BINDIR		= ${BINDIR}
+MANDIR		= ${MANDIR}
+INSTALL		= ${INSTALL}
+__HEREDOC__
+
+echo "Makefile.local: written" 1>&2
+echo "Makefile.local: written" 1>&3
+
+exit 0
+
+# FIXME These are the leftovers of the old configure.ac: anything left behind?
+
+#AC_C_BIGENDIAN
+#AC_CHECK_HEADERS(search.h)
+
+#AC_FUNC_STRFTIME
+#AC_FUNC_VPRINTF
+#AC_CHECK_FUNCS(gettimeofday select \
+        #strdup strerror strstr strtol srand)

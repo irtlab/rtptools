@@ -1,15 +1,3 @@
-/.deps
-aclocal.m4
-Makefile.in
-Makefile
-config.*
-autom4te.cache
-compile
-configure
-depcomp
-install-sh
-missing
-mkinstalldirs
 *.o
 /rpmbuild
 /rtpdump
