@@ -309,9 +309,6 @@ int main(int argc, char *argv[])
   extern int optind;
   extern int hpt(char *h, struct sockaddr *sa, unsigned char *ttl);
 
-  /* For NT, we need to start the socket; dummy function otherwise */
-  startupSocket();
-
   in = stdin; /* Changed below if -f specified */
 
   /* parse command line arguments */

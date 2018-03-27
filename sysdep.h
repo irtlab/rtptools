@@ -206,14 +206,6 @@ extern int winfd_dummy;
 extern char getc_socket(FILE_SOCKET *f);
 extern int sendmsg(int s, const struct msghdr *msg, int flags);
 
-#else /* not WIN32 */
-
-/* Windows NT needs to call this cunction (FIXME: really?).
- * Define it away if we are not on windows. */
-#ifndef startupSocket
-#define startupSocket()
-#endif
-
-#endif
+#endif /* WIN32 */
 
 #endif /* SYSDEP_H */

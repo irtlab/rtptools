@@ -408,8 +408,6 @@ int main(int argc, char *argv[])
 
   extern struct in_addr host2ip(char *);
 
-  /* Set up socket. */
-  startupSocket();
   while ((c = getopt(argc, argv, "d?h")) != EOF) {
     switch(c) {
     case 'd':
