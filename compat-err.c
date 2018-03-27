@@ -1,7 +1,15 @@
+#include "config.h"
+
+#if HAVE_ERR
+
+int dummy;
+
+#else
+
+/* $Id: compat_err.c,v 1.4 2015/11/26 07:42:11 schwarze Exp $ */
 /*
- * (c) 1998-2018 by Columbia University; all rights reserved
- *
- * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 1993
+ *      The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,32 +36,77 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/types.h>
-#include <sys/socket.h>      /* struct sockaddr */
-#include <netdb.h>           /* gethostbyname() */
-#include <netinet/in.h>      /* sockaddr_in */
-#include <arpa/inet.h>       /* inet_addr() */
-#include <string.h>          /* strlen() added by Akira 12/27/01 */ 
-#include "sysdep.h"
+#include <errno.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-/*
-* Return IP address given host name 'host'.
-* If 'host' is "", set to INADDR_ANY.
-*/
-struct in_addr host2ip(char *host)
+static void vwarni(const char *, va_list);
+static void vwarnxi(const char *, va_list);
+
+static void
+vwarnxi(const char *fmt, va_list ap)
 {
-  struct in_addr in;
-  register struct hostent *hep;
-
-  /* Check whether this is a dotted decimal. */
-  if (!host || *host == '\0') {
-    in.s_addr = INADDR_ANY;
-  }
-  else if ((in.s_addr = inet_addr(host)) != -1) {
-  }
-  /* Attempt to resolve host name via DNS. */
-  else if ((hep = gethostbyname(host))) {
-    in = *(struct in_addr *)(hep->h_addr_list[0]);
-  }
-  return in;
+	fprintf(stderr, "%s: ", getprogname());
+	if (fmt != NULL)
+		vfprintf(stderr, fmt, ap);
 }
+
+static void
+vwarni(const char *fmt, va_list ap)
+{
+	int sverrno;
+
+	sverrno = errno;
+	vwarnxi(fmt, ap);
+	if (fmt != NULL)
+		fputs(": ", stderr);
+	fprintf(stderr, "%s\n", strerror(sverrno));
+}
+
+void
+err(int eval, const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	vwarni(fmt, ap);
+	va_end(ap);
+	exit(eval);
+}
+
+void
+errx(int eval, const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	vwarnxi(fmt, ap);
+	va_end(ap);
+	fputc('\n', stderr);
+	exit(eval);
+}
+
+void
+warn(const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	vwarni(fmt, ap);
+	va_end(ap);
+}
+
+void
+warnx(const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	vwarnxi(fmt, ap);
+	va_end(ap);
+	fputc('\n', stderr);
+}
+
+#endif

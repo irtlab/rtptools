@@ -31,26 +31,7 @@
 #ifndef SYSDEP_H
 #define SYSDEP_H
 
-
-#if defined(unix) || defined(__unix) || defined (__unix__)
-/* Code for Unix.  Any Unix compiler should define one of the above three
- * symbols. */
-
-#ifndef startupSocket
-#define startupSocket()
-#endif
-
-#ifndef closesocket
-#define closesocket close
-#endif
-
-#ifndef write_socket
-#define write_socket(r, s, l) write(r, s, l)
-#endif
-
-/* end of 'if unix' */
-
-#elif defined(WIN32) || defined(__WIN32__)
+#if defined(WIN32) || defined(__WIN32__)
 
 #include <winsock2.h>  /* For NT socket */
 #include <ws2tcpip.h>  /* IP_ADD_MEMBERSHIP */
@@ -223,20 +204,16 @@ struct  itimerval {
 
 extern int winfd_dummy;
 extern char getc_socket(FILE_SOCKET *f);
-extern ssize_t write_socket(int fildes, const void *buf, size_t nbyte);
 extern int sendmsg(int s, const struct msghdr *msg, int flags);
 
-/* end of 'ifdef WIN32' */
-#else
-#error "Not Unix or WIN32 -- what system is this?"
+#else /* not WIN32 */
+
+/* Windows NT needs to call this cunction (FIXME: really?).
+ * Define it away if we are not on windows. */
+#ifndef startupSocket
+#define startupSocket()
 #endif
 
-#ifdef HAVE_STDINT_H
-#include <stdint.h>
 #endif
 
-#if !defined(sun4) && !defined(hp) && !defined(nextstep) && !defined(linux)
-#include <sys/select.h>  /* select() */
-#endif
-
-#endif /* end of ifdef SYSDEP_H */
+#endif /* SYSDEP_H */

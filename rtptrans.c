@@ -41,6 +41,8 @@
 #include <unistd.h>      /* select(), perror() */
 #include <stdlib.h>      /* getopt(), atoi() */
 #include <memory.h>      /* memset() */
+
+#include "config.h"
 #include "rtp.h"
 #include "rtpdump.h"
 #include "ansi.h"
@@ -306,7 +308,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
         if (side[i][proto].sock != sock) {
           msg.msg_name = (caddr_t ) &side[i][proto].sin;
           msg.msg_namelen = sizeof(side[i][proto].sin);
-#if HAVE_MSGHDR_MSG_CONTROL
+#if HAVE_MSGCONTROL
           msg.msg_control = 0;
           msg.msg_controllen = 0;
 #else

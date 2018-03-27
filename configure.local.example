@@ -1,0 +1,88 @@
+# Copyright (c) 2014, 2015, 2016, 2017 Ingo Schwarze <schwarze@openbsd.org>
+# Copyright (c) 2018 Jan Stary <hans@stare.cz>
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+# For all settings documented in this file, there are reasonable
+# defaults and/or the ./configure script attempts autodetection.
+# Consequently, you only need to create a file ./configure.local
+# and put any of these settings into it if ./configure autodetection
+# fails or if you want to make different choices for other reasons.
+# If autodetection fails, please tell <hans@stare.cz>
+
+# We recommend that you write ./configure.local from scratch and
+# only put the lines there you need.  This file contains examples.
+# It is not intended as a template to be copied as a whole.
+
+# --- user settings relevant for all builds ----------------------------
+
+
+# The following installation directories are used.
+# It is possible to set only one or a few of these variables,
+# there is no need to copy the whole block.
+# Even if you set PREFIX to something else, the other variables
+# pick it up without copying them all over.
+
+PREFIX="/usr/local"
+BINDIR="${PREFIX}/bin"
+MANDIR="${PREFIX}/man"
+
+# Some platforms might need additional linker flags. For example,
+# Solaris needs -lnsl for gethostbyname(), inet_addr(), inet_ntoa()
+# and -lsocket bind(), socket(), setsockopt(), recvfrom().
+# Put them in LDADD if ./configure fails to detect that.
+
+LDADD="-lnsl -lsocket"
+
+# It is possible to change the utility program used for installation
+# and the modes files are installed with.
+
+INSTALL="install"
+
+# --- settings that rarely need to be touched --------------------------
+
+# Do not set these variables unless you really need to.
+
+# You can manually override the compiler to be used.
+# But that's rarely useful because ./configure asks your make(1)
+# which compiler to use, and that answer will hardly be wrong.
+
+CC=cc
+
+# The default compiler flags are:
+
+CFLAGS="-g -W -Wall -Wstrict-prototypes -Wno-unused-parameter -Wwrite-strings"
+
+# In rare cases, it may be required to skip individual automatic tests.
+# Each of the following variables can be set to 0 (test will not be run
+# and will be regarded as failed) or 1 (test will not be run and will
+# be regarded as successful).
+
+HAVE_ENDIAN=0
+HAVE_ERR=0
+HAVE_MSGCONTROL=0
+HAVE_NTOHL=0
+HAVE_PATH_MAX=0
+HAVE_PROGNAME=0
+HAVE_REALLOCARRAY=0
+HAVE_RECALLOCARRAY=0
+HAVE_STRCASESTR=0
+HAVE_STRINGLIST=0
+HAVE_STRLCAT=0
+HAVE_STRLCPY=0
+HAVE_STRPTIME=0
+HAVE_STRTONUM=0
+HAVE_SYS_ENDIAN=0
+
+HAVE_LSOCKET=0
+HAVE_LNSL=0
