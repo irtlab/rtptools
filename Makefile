@@ -115,7 +115,7 @@ include Makefile.depend
 clean:
 	rm -f $(TARBALL) $(BINS) $(OBJS) $(HTML)
 	rm -rf *.dSYM *.core *~ .*~ win/*~
-	rm -rf rtptools-$(VERSION)
+	rm -rf rtptools-$(VERSION) .rpmbuild
 
 distclean: clean
 	rm -f Makefile.local config.h config.h.old config.log config.log.old
