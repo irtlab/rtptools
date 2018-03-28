@@ -275,12 +275,9 @@ static Notify_value socket_handler(Notify_client client, int sock)
       rtp_hdr_send.cc      = 0;
       rtp_hdr_send.ts      = vat_hdr->ts;
 
-#if defined(Linux) || defined(WIN32)
-      /* 
-       * Stupid little Linux and stupid big Win32 does not support
-       * sendmsg(), thus, use copying instead; contributed by Lutz
-       * Grueneberg <gruen@rvs.uni-hannover.de>.
-       */
+#if defined(WIN32)
+      /* Windows does not support sendmsg(), use copying instead;
+       * contributed by Lutz Grueneberg <gruen@rvs.uni-hannover.de>. */
       {
         unsigned char mbuf[10000];
         int mlength = 0;
@@ -320,7 +317,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
             perror("sendmsg RTCP");
           }
        }
-#endif /* Linux || WIN32 */
+#endif /* WIN32 */
     }
     else if (((struct CtrlMsgHdr *)packet)->type == 1) /* vat ID messages */{
       rtcp_t *rtcp_msg;
