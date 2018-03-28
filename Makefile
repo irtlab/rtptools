@@ -73,26 +73,13 @@ COMPAT_OBJS = \
 OBJS =	$(rtpdump_OBJS) $(rtpplay_OBJS) $(rtpsend_OBJS) $(rtptrans_OBJS)
 OBJS +=	$(COMPAT_OBJS)
 
-# Allegedly, windows need these _empty_ include files.
-# Please say that isn't so and get rid of this.
-EMPTY = \
-	win/include/arpa/inet.h		\
-	win/include/netdb.h		\
-	win/include/netinet/in.h	\
-	win/include/sys/select.h	\
-	win/include/sys/socket.h	\
-	win/include/sys/time.h		\
-	win/include/sys/uio.h		\
-	win/include/unistd.h
-
 WINDOWS = \
 	win/rtptools.sln				\
 	win/rtpdump.vcxproj win/rtpplay.vcxproj		\
 	win/rtpsend.vcxproj win/rtptrans.vcxproj	\
 	win/gettimeofday.c win/gettimeofday.h		\
 	win/winsocklib.c win/winsocklib.h		\
-	win/getopt.c win/getopt.h			\
-	$(EMPTY)
+	win/getopt.c win/getopt.h
 
 DISTFILES = \
 	LICENSE			\
@@ -152,10 +139,6 @@ rtpsend: $(rtpsend_OBJS)
 
 rtptrans: $(rtptrans_OBJS)
 	$(CC) $(CFLAGS) -o rtptrans $(rtptrans_OBJS) $(LDADD)
-
-$(EMPTY):
-	mkdir -p win/include/{arpa,netinet,sys}
-	touch $@
 
 # --- maintainer targets ---
 
