@@ -17,8 +17,6 @@ SRCS = \
 	ansi.h		\
 	host2ip.c	\
 	hpt.c		\
-	hsearch.c	\
-	hsearch.h	\
 	multimer.c	\
 	multimer.h	\
 	notify.c	\
@@ -109,7 +107,6 @@ DISTFILES = \
 
 # FIXME INSTALL
 # FIXME rtptools.spec
-# FIXME hsearch.h hsearch.c: have-hsearch.c, compat-hsearch.c
 
 include Makefile.local
 
@@ -193,8 +190,6 @@ distcheck: dist
 
 # The rest of this file is the relevant portions of old Makefile.am
 # that we need go through to make sure nothing is left behind
-
-#if DARWIN #rtpplay_SOURCES = $(COMMON) rd.c hsearch.c rtpplay.c
 
 #rpm: $(bin_PROGRAMS) rtptools.spec dist
 #mkdir -p ./rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
