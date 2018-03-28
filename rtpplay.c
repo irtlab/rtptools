@@ -40,12 +40,9 @@
 #include <string.h>
 #include <stdlib.h>      /* perror() */
 #include <unistd.h>      /* write() */
+#include <search.h>
+
 #include "sysdep.h"
-#if HAVE_SEARCH_H
-#include <search.h>      /* hash table */
-#else
-#include "hsearch.h"
-#endif
 #include "notify.h"      /* notify_start(), ... */
 #include "rtp.h"         /* RTP headers */
 #include "rtpdump.h"     /* RD_packet_t */
