@@ -79,8 +79,3 @@ you might need to `sudo make install` or `doas make install`.
 ### Windows
 
 Open `rtptools.sln` on MS Visual Studio and press F7 to build.
-
-## TODO
-
-* Fix type mismatch warnings.
-* Generate a Debian package.
