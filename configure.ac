@@ -21,7 +21,7 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 
 AC_CHECK_PROG([FOUND_CLANG], [clang], [yes])
-if test "x$FOUND_CLANG" == "xyes" ; then
+if test "x$FOUND_CLANG" == "xyes" && test "x$CC" == "xgcc" ; then
   CC="clang"
 fi
 
