@@ -44,7 +44,6 @@
 #include "notify.h"      /* notify_start(), ... */
 #include "rtp.h"         /* RTP headers */
 #include "multimer.h"    /* timer_set() */
-#include "ansi.h"
 #include "sysdep.h"
 
 static int verbose = 0;

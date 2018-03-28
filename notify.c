@@ -15,7 +15,6 @@ Copyright 1993 by AT&T Bell Laboratories; all rights reserved
 #include "sysdep.h"
 #include "notify.h"
 #include "multimer.h"
-#include "ansi.h"
 
 #ifdef hp
 #define CAST int *

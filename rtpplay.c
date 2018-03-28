@@ -50,7 +50,6 @@
 #include "rtp.h"         /* RTP headers */
 #include "rtpdump.h"     /* RD_packet_t */
 #include "multimer.h"    /* timer_set() */
-#include "ansi.h"
 
 #define READAHEAD 16 /* must be power of 2 */
 
