@@ -29,22 +29,30 @@
  */
 
 #include <sys/types.h>
+#include <stdlib.h>
+
+#ifdef WIN32
+#include <fcntl.h>       /* O_BINARY */
+#else
+#include <unistd.h>
+#include <sys/time.h>
 #include <sys/socket.h>
-#include <netinet/in.h>  /* struct sockaddr_in */
-#include <arpa/inet.h>   /* inet_ntoa() */
-#include <sys/time.h>    /* gettimeofday() */
+#include <sys/select.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif
+
+#include <signal.h>
 #include <string.h>
 #include <stdio.h>
-#include <signal.h>
 #include <errno.h>
-#include <unistd.h>      /* select(), perror() */
-#include <stdlib.h>      /* getopt(), atoi() */
-#include <fcntl.h>       /* O_BINARY on Win32 */
+
 #include "rtp.h"
 #include "vat.h"
 #include "rtpdump.h"
 #include "ansi.h"
 #include "sysdep.h"
+
 #define RTPFILE_VERSION "1.0"
 
 typedef uint32_t member_t;

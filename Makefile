@@ -113,8 +113,8 @@ distclean: clean
 
 clean:
 	rm -f $(TARBALL) $(BINS) $(OBJS) $(HTML)
-	rm -rf rtptools-$(VERSION) win/include
-	rm -rf *.dSYM *.core *~ .*~
+	rm -rf *.dSYM *.core *~ .*~ win/*~
+	rm -rf rtptools-$(VERSION)
 
 install: $(PROG) $(MAN1)
 	install -d $(BINDIR)      && install -m 0755 $(PROG) $(BINDIR)

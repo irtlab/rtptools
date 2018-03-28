@@ -28,28 +28,29 @@
  * SUCH DAMAGE.
  */
 
-#include <stdint.h>
+
 #include <sys/types.h>
-#include <sys/time.h>    /* gettimeofday() */
-#include <sys/socket.h>  /* struct sockaddr */
-#include <netinet/in.h>
-#include <arpa/inet.h>   /* inet_ntoa() */
-#include <netdb.h>       /* gethostbyname() */
-#include <time.h>
-#include <stdio.h>       /* stderr, printf() */
+#include <search.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
-#include <stdlib.h>      /* perror() */
-#include <unistd.h>      /* write() */
-#include "sysdep.h"
-#if HAVE_SEARCH_H
-#include <search.h>      /* hash table */
-#else
-#include "hsearch.h"
+#include <stdio.h>
+#include <time.h>
+
+#ifndef WIN32
+#include <unistd.h>
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 #endif
-#include "notify.h"      /* notify_start(), ... */
-#include "rtp.h"         /* RTP headers */
-#include "rtpdump.h"     /* RD_packet_t */
-#include "multimer.h"    /* timer_set() */
+
+#include "sysdep.h"
+#include "notify.h"
+#include "rtp.h"
+#include "rtpdump.h"
+#include "multimer.h"
 #include "ansi.h"
 
 #define READAHEAD 16 /* must be power of 2 */

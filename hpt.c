@@ -28,19 +28,22 @@
  * SUCH DAMAGE.
  */
 
-/*
-* Parse [host]/port[/ttl].  Return 0 if ok, -1 if error; set sockaddr and
-* ttl value.
-*/
+
+#include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
+
+#ifndef WIN32
 #include <sys/socket.h>
 #include <netinet/in.h>
+#endif
+
 #include "sysdep.h"
 
 extern struct in_addr host2ip(char *);
 
+/* Parse [host]/port[/ttl]. Return 0 if ok, -1 on error;
+ * set sockaddr and ttl value. */
 int hpt(char *h, struct sockaddr *sa, unsigned char *ttl)
 {
   char *s;
