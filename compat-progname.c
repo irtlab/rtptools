@@ -1,3 +1,12 @@
+#include "config.h"
+
+#if HAVE_PROGNAME
+
+int dummy;
+
+#else
+
+/*	$Id: compat_progname.c,v 1.1 2015/11/06 16:30:33 schwarze Exp $	*/
 /*
  * Copyright (c) 2015 Ingo Schwarze <schwarze@openbsd.org>
  *
@@ -14,28 +23,20 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <stdlib.h>
+static const char *progname;
 
-int
-main(void)
+void
+setprogname(const char *name)
 {
-	const char *errstr;
 
-	if (strtonum("1", 0, 2, &errstr) != 1)
-		return 1;
-	if (errstr != NULL)
-		return 2;
-	if (strtonum("1x", 0, 2, &errstr) != 0)
-		return 3;
-	if (errstr == NULL)
-		return 4;
-	if (strtonum("2", 0, 1, &errstr) != 0)
-		return 5;
-	if (errstr == NULL)
-		return 6;
-	if (strtonum("0", 1, 2, &errstr) != 0)
-		return 7;
-	if (errstr == NULL)
-		return 8;
-	return 0;
+	progname = name;
 }
+
+const char *
+getprogname(void)
+{
+
+	return progname;
+}
+
+#endif

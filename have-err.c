@@ -1,4 +1,3 @@
-/*	$Id: test-err.c,v 1.1 2015/10/11 21:12:55 schwarze Exp $	*/
 /*
  * Copyright (c) 2015 Ingo Schwarze <schwarze@openbsd.org>
  *

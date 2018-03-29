@@ -39,23 +39,27 @@ CFLAGS="${CFLAGS} -Wno-unused-parameter"
 LDFLAGS=
 LDADD=
 
+HAVE_ERR=
+HAVE_HSEARCH=
+HAVE_PROGNAME=
+HAVE_STRTONUM=
+
 #HAVE_ENDIAN=
-#HAVE_ERR=
-HAVE_LNSL=
-HAVE_MSGCONTROL=
 #HAVE_NTOHL=
 #HAVE_PATH_MAX=
-#HAVE_PROGNAME=
 #HAVE_REALLOCARRAY=
 #HAVE_RECALLOCARRAY=
-HAVE_LSOCKET=
 #HAVE_STRCASESTR=
 #HAVE_STRINGLIST=
 #HAVE_STRLCAT=
 #HAVE_STRLCPY=
 #HAVE_STRNDUP=
-#HAVE_STRTONUM=
 #HAVE_SYS_ENDIAN=
+
+HAVE_LNSL=
+HAVE_LSOCKET=
+
+HAVE_MSGCONTROL=
 
 INSTALL="install"
 PREFIX="/usr/local"
@@ -136,24 +140,32 @@ runtest() {
 	return 1
 }
 
-# --- library functions ---
+# --- run the tests ---
+
+# functions
+runtest err		ERR		|| true
+runtest hsearch		HSEARCH		|| true
+runtest progname	PROGNAME	|| true
+runtest strtonum	STRTONUM	|| true
+
 #runtest be32toh		ENDIAN		|| true
 #runtest be32toh		SYS_ENDIAN	-DSYS_ENDIAN || true
-#runtest err		ERR		|| true
-runtest gethostbyname   LNSL		-lnsl	|| true
-runtest msgcontrol	MSGCONTROL	|| true
 #runtest ntohl		NTOHL		|| true
 #runtest PATH_MAX	PATH_MAX	|| true
-#runtest progname	PROGNAME	|| true
 #runtest reallocarray	REALLOCARRAY	|| true
 #runtest recallocarray	RECALLOCARRAY	|| true
-runtest socket		LSOCKET        -lsocket	|| true
 #runtest strcasestr	STRCASESTR	|| true
 #runtest stringlist	STRINGLIST	|| true
 #runtest strlcat		STRLCAT		|| true
 #runtest strlcpy		STRLCPY		|| true
 #runtest strndup		STRNDUP		|| true
-#runtest strtonum	STRTONUM	|| true
+
+# structures
+runtest msgcontrol	MSGCONTROL	|| true
+
+# extra libs needed
+runtest gethostbyname	LNSL	-lnsl	|| true
+runtest socket		LSOCKET	-lsocket|| true
 
 #if [ ${HAVE_ENDIAN} -eq 0 -a \
      #${HAVE_SYS_ENDIAN} -eq 0 -a \
@@ -169,7 +181,7 @@ exec > config.h
 
 cat << __HEREDOC__
 #ifdef __cplusplus
-#error "Do not use C++.  See the INSTALL file."
+#error "Do not use C++"
 #endif
 
 #if !defined(__GNUC__) || (__GNUC__ < 4)
@@ -195,14 +207,14 @@ __HEREDOC__
 #fi
 
 cat << __HEREDOC__
+#define HAVE_ERR ${HAVE_ERR}
+#define HAVE_HSEARCH ${HAVE_HSEARCH}
+#define HAVE_PROGNAME ${HAVE_PROGNAME}
+#define HAVE_STRTONUM ${HAVE_STRTONUM}
+
 /*
 #define HAVE_ENDIAN ${HAVE_ENDIAN}
-#define HAVE_ERR ${HAVE_ERR}
-*/
-#define HAVE_MSGCONTROL ${HAVE_MSGCONTROL}
-/*
 #define HAVE_NTOHL ${HAVE_NTOHL}
-#define HAVE_PROGNAME ${HAVE_PROGNAME}
 #define HAVE_REALLOCARRAY ${HAVE_REALLOCARRAY}
 #define HAVE_RECALLOCARRAY ${HAVE_RECALLOCARRAY}
 #define HAVE_STRCASESTR ${HAVE_STRCASESTR}
@@ -210,24 +222,28 @@ cat << __HEREDOC__
 #define HAVE_STRLCAT ${HAVE_STRLCAT}
 #define HAVE_STRLCPY ${HAVE_STRLCPY}
 #define HAVE_STRNDUP ${HAVE_STRNDUP}
-#define HAVE_STRTONUM ${HAVE_STRTONUM}
 #define HAVE_SYS_ENDIAN ${HAVE_SYS_ENDIAN}
 */
 
+#define HAVE_MSGCONTROL ${HAVE_MSGCONTROL}
+
 __HEREDOC__
 
-#if [ ${HAVE_ERR} -eq 0 ]; then
-	#echo "extern	void	  err(int, const char *, ...);"
-	#echo "extern	void	  errx(int, const char *, ...);"
-	#echo "extern	void	  warn(const char *, ...);"
-	#echo "extern	void	  warnx(const char *, ...);"
-#fi
+if [ ${HAVE_ERR} -eq 0 ]; then
+	echo "extern	void	  err(int, const char *, ...);"
+	echo "extern	void	  errx(int, const char *, ...);"
+	echo "extern	void	  warn(const char *, ...);"
+	echo "extern	void	  warnx(const char *, ...);"
+fi
 
-#if [ ${HAVE_PROGNAME} -eq 0 ]; then
-	#echo "extern 	const char *getprogname(void);"
-	#echo "extern	void	  setprogname(const char *);"
-#fi
-#
+if [ ${HAVE_PROGNAME} -eq 0 ]; then
+	echo "extern 	const char *getprogname(void);"
+	echo "extern	void	  setprogname(const char *);"
+fi
+
+[ ${HAVE_STRTONUM} -eq 0 ] && \
+	echo "extern	long long strtonum(const char *, long long, long long, const char **);"
+
 #[ ${HAVE_REALLOCARRAY} -eq 0 ] && \
 	#echo "extern	void	 *reallocarray(void *, size_t, size_t);"
 #
@@ -245,9 +261,6 @@ __HEREDOC__
 #
 #[ ${HAVE_STRNDUP} -eq 0 ] && \
 	#echo "extern	char	 *strndup(const char *, size_t);"
-#
-#[ ${HAVE_STRTONUM} -eq 0 ] && \
-	#echo "extern	long long strtonum(const char *, long long, long long, const char **);"
 
 echo "config.h: written" 1>&2
 echo "config.h: written" 1>&3

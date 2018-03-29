@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Ingo Schwarze <schwarze@openbsd.org>
+ * Copyright (c) 2015 Jan Stary <hans@stare.cz>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -19,23 +19,5 @@
 int
 main(void)
 {
-	const char *errstr;
-
-	if (strtonum("1", 0, 2, &errstr) != 1)
-		return 1;
-	if (errstr != NULL)
-		return 2;
-	if (strtonum("1x", 0, 2, &errstr) != 0)
-		return 3;
-	if (errstr == NULL)
-		return 4;
-	if (strtonum("2", 0, 1, &errstr) != 0)
-		return 5;
-	if (errstr == NULL)
-		return 6;
-	if (strtonum("0", 1, 2, &errstr) != 0)
-		return 7;
-	if (errstr == NULL)
-		return 8;
-	return 0;
+	return NULL == getprogname();
 }
