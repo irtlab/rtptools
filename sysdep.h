@@ -208,8 +208,10 @@ extern int sendmsg(int s, const struct msghdr *msg, int flags);
 
 #else /* not WIN32 */
 
-/* Windows NT needs to call this cunction (FIXME: really?).
- * Define it away if we are not on windows. */
+/* Windows needs to call this function on <winsock2.h>.
+ Otherwise the first call of socket() will fail
+ "sock[i] = socket(PF_INET, SOCK_DGRAM, 0);"
+ with "socket: No error". Tried on Win10. */
 #ifndef startupSocket
 #define startupSocket()
 #endif
