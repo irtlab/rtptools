@@ -5,10 +5,6 @@ stripped-down version of <xview/notify.h>
 patents pending in the U.S. and foreign countries. OPEN LOOK is
 a trademark of USL. Used by written permission of the owners.
 */
-#ifndef _notify_h
-#define _notify_h
-#include <sys/types.h>
-#include <sys/time.h>
 
 /*
  * Client notification function return values for notifier to client calls.
@@ -114,5 +110,3 @@ extern Notify_func_signal notify_set_signal_func(Notify_client nclient,
 * Initialize Readfds (flag = 0), Writefds (1), Exceptfds (2).
 */
 extern void notify_set_socket(int sock, int flag);
-
-#endif

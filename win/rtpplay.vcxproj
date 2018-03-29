@@ -108,7 +108,6 @@
     <ClInclude Include="include\sys\select.h" />
     <ClInclude Include="include\sys\socket.h" />
     <ClInclude Include="include\sys\time.h" />
-    <ClInclude Include="include\sys\uio.h" />
     <ClInclude Include="include\unistd.h" />
     <ClInclude Include="winsocklib.h" />
   </ItemGroup>

@@ -5,13 +5,17 @@ notify  --  primitive notification service implementing a subset of the SunOS
 Copyright 1993 by AT&T Bell Laboratories; all rights reserved
 */
 
-#include <sys/time.h>
+#include <stdlib.h>
+#include <string.h>
 #include <signal.h>
-#include <stdio.h>     /*DEBUG, fprintf() */
-#include <stdlib.h>    /* malloc() */
-#include <unistd.h>    /* select() */
-#include <errno.h>     /* EINTR,    Added by Akira 12/11/01 */
-#include <string.h>    /* memset(), Added by Akira 12/11/01 */
+#include <stdio.h>
+#include <errno.h>
+
+#ifndef WIN32
+#include <sys/select.h>
+#include <sys/time.h>
+#endif
+
 #include "sysdep.h"
 #include "notify.h"
 #include "multimer.h"

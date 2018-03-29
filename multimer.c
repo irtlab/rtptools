@@ -40,13 +40,17 @@
 /*                                                                          */
 /****************************************************************************/
 
-#include "notify.h"      /* Notify_func */
-#include <stdio.h>
-#include <stdlib.h>      /* */
 #include <sys/types.h>
-#include <sys/time.h>    /* timeval, gettimeofday() */
 #include <assert.h>
-#include "sysdep.h"      /* system-dependent */
+#include <stdlib.h>
+#include <stdio.h>
+
+#ifndef WIN32
+#include <sys/time.h>
+#endif
+
+#include "sysdep.h"
+#include "notify.h"
 
 typedef struct TQE {
     struct TQE *link;           /* link to next timer */

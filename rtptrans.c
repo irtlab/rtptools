@@ -29,18 +29,19 @@
  */
 
 #include <sys/types.h>
-#include <sys/uio.h>
-#include <sys/socket.h>
-#include <netinet/in.h>  /* struct sockaddr_in */
-#include <sys/time.h>    /* gettimeofday() */
-#include <arpa/inet.h>   /* inet_ntoa() */
+#include <signal.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <signal.h>
 #include <errno.h>
-#include <unistd.h>      /* select(), perror() */
-#include <stdlib.h>      /* getopt(), atoi() */
-#include <memory.h>      /* memset() */
+
+#ifndef WIN32
+#include <unistd.h>
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif
 
 #include "config.h"
 #include "rtp.h"

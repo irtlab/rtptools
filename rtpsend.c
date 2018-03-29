@@ -28,22 +28,25 @@
  * SUCH DAMAGE.
  */
 
+#include <sys/types.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <sys/types.h>
-#include <sys/time.h>    /* gettimeofday() */
-#include <sys/socket.h>  /* struct sockaddr */
-#include <netinet/in.h>
-#include <arpa/inet.h>   /* inet_ntoa() */
-#include <netdb.h>       /* gethostbyname() */
 #include <time.h>
-#include <stdio.h>       /* stderr, printf() */
-#include <string.h>
-#include <stdlib.h>      /* perror(), calloc() */
-#include <unistd.h>      /* write() */
-#include "notify.h"      /* notify_start(), ... */
-#include "rtp.h"         /* RTP headers */
-#include "multimer.h"    /* timer_set() */
+
+#ifndef WIN32
+#include <unistd.h>
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#endif
+
+#include "notify.h"
+#include "rtp.h"
+#include "multimer.h"
 #include "ansi.h"
 #include "sysdep.h"
 

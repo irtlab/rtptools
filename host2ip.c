@@ -29,11 +29,15 @@
  */
 
 #include <sys/types.h>
-#include <sys/socket.h>      /* struct sockaddr */
-#include <netdb.h>           /* gethostbyname() */
-#include <netinet/in.h>      /* sockaddr_in */
-#include <arpa/inet.h>       /* inet_addr() */
-#include <string.h>          /* strlen() added by Akira 12/27/01 */ 
+#include <string.h>
+
+#ifndef WIN32
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#endif
+
 #include "sysdep.h"
 
 /*
