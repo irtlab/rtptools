@@ -59,17 +59,63 @@ typedef uint32_t member_t;
 
 static int verbose = 0; /* decode */
 
-typedef enum {F_invalid, F_dump, F_header, F_hex, F_rtcp, F_short,
-   F_payload, F_ascii} t_format;
+typedef enum {
+	F_invalid,
+	F_dump,
+	F_header,
+	F_hex,
+	F_rtcp,
+	F_short,
+	F_payload,
+	F_ascii
+} t_format;
 
 /*
-* Payload type map.
-*/
+ * payload type map, see
+ * http://www.iana.org/assignments/rtp-parameters
+ */
 static struct {
-  char *enc;      /* encoding name */
-  int  rate;      /* sampling rate for audio; clock rate for video */
-  int  ch;        /* audio channels; 0 for video */
-} pt_map[256];
+	const char*	enc;  /* encoding name */
+	int		rate; /* sampling rate (audio) or clock rate (video) */
+	int		ch;   /* audio channels; 0 for video */
+} pt_map[] = {
+	{ "PCMU",	 8000,	1 },
+	{ "reserved",	    0,	0 },
+	{ "reserved",	    0,	0 },
+	{ "GSM ",	 8000,	1 },
+	{ "G723",	 8000,	1 },
+	{ "DVI4",	 8000,	1 },
+	{ "DVI4",	16000,	1 },
+	{ "LPC ",	 8000,	1 },
+	{ "PCMA",	 8000,	1 },
+	{ "G722",	 8000,	1 },
+	{ "L16 ",	44100,	2 },
+	{ "L16 ",	44100,	1 },
+	{ "QCELP",	 8000,	1 },
+	{ "CN  ",	 8000,	0 },
+	{ "MPA ",	90000,	0 },
+	{ "G728",	 8000,	1 },
+	{ "DVI4",	11025,	1 },
+	{ "DVI4",	22050,	1 },
+	{ "G729",	 8000,	1 },
+	{ "reserved",	    0,	0 },
+	{ "unassigned",	    0,	0 },
+	{ "unassigned",	    0,	0 },
+	{ "unassigned",	    0,	0 },
+	{ "unassigned",	    0,	0 },
+	{ "unassigned",	    0,	0 },
+	{ "CelB",	90000,	0 },
+	{ "JPEG",	90000,	0 },
+	{ "unassigned",	    0,	0 },
+	{ "nv  ",	90000,	0 },
+	{ "unassigned",	    0,	0 },
+	{ "unassigned",	    0,	0 },
+	{ "H261",	90000,	0 },
+	{ "MPV ",	90000,	0 },
+	{ "MP2T",	90000,	0 },
+	{ "H263",	90000,	0 },
+	{ NULL,		    0,	0 }
+};
 
 static void usage(char *argv0)
 {
@@ -712,49 +758,6 @@ int main(int argc, char *argv[])
     setmode(fileno(stdin), O_BINARY);
   }
 #endif
-
-  /*
-   * Set up payload type map. We should be able to read this in
-   * from a file.
-   */
-  for (i = 0; i < 256; i++) {
-    pt_map[i].enc  = "????";
-    pt_map[i].rate = 0;
-    pt_map[i].ch   = 0;
-  }
-  /* Updated 11 May 2002 by Akira Tsukamoto with current IANA assignments: */
-  /* http://www.iana.org/assignments/rtp-parameters */
-  /* Marked *r* items are indicated as 'reserved' by the IANA */
-  pt_map[  0].enc = "PCMU"; pt_map[  0].rate =  8000; pt_map[  0].ch = 1;
-  pt_map[  1].enc = "1016"; pt_map[  1].rate =  8000; pt_map[  1].ch = 1;
-  pt_map[  2].enc = "G721"; pt_map[  2].rate =  8000; pt_map[  2].ch = 1;
-  pt_map[  3].enc = "GSM "; pt_map[  3].rate =  8000; pt_map[  3].ch = 1;
-  pt_map[  4].enc = "G723"; pt_map[  4].rate =  8000; pt_map[  4].ch = 1;
-  pt_map[  5].enc = "DVI4"; pt_map[  5].rate =  8000; pt_map[  5].ch = 1;
-  pt_map[  6].enc = "DVI4"; pt_map[  6].rate = 16000; pt_map[  6].ch = 1;
-  pt_map[  7].enc = "LPC "; pt_map[  7].rate =  8000; pt_map[  7].ch = 1;
-  pt_map[  8].enc = "PCMA"; pt_map[  8].rate =  8000; pt_map[  8].ch = 1;
-  pt_map[  9].enc = "G722"; pt_map[  9].rate =  8000; pt_map[  9].ch = 1;
-  pt_map[ 10].enc = "L16 "; pt_map[ 10].rate = 44100; pt_map[ 10].ch = 2;
-  pt_map[ 11].enc = "L16 "; pt_map[ 11].rate = 44100; pt_map[ 11].ch = 1;
-  pt_map[ 12].enc = "QCELP"; pt_map[ 12].rate = 8000; pt_map[ 12].ch = 1;
-  pt_map[ 14].enc = "MPA "; pt_map[ 14].rate = 90000; pt_map[ 14].ch = 0;
-  pt_map[ 15].enc = "G728"; pt_map[ 15].rate =  8000; pt_map[ 15].ch = 1;
-  pt_map[ 16].enc = "DVI4"; pt_map[ 16].rate = 11025; pt_map[ 16].ch = 1;
-  pt_map[ 17].enc = "DVI4"; pt_map[ 17].rate = 22050; pt_map[ 17].ch = 1;
-  pt_map[ 18].enc = "G729"; pt_map[ 18].rate =  8000; pt_map[ 18].ch = 1;
-  pt_map[ 23].enc = "SCR "; pt_map[ 23].rate = 90000; pt_map[ 23].ch = 0; /*r*/
-  pt_map[ 24].enc = "MPEG"; pt_map[ 24].rate = 90000; pt_map[ 24].ch = 0; /*r*/
-  pt_map[ 25].enc = "CelB"; pt_map[ 25].rate = 90000; pt_map[ 25].ch = 0;
-  pt_map[ 26].enc = "JPEG"; pt_map[ 26].rate = 90000; pt_map[ 26].ch = 0;
-  pt_map[ 27].enc = "CUSM"; pt_map[ 27].rate = 90000; pt_map[ 27].ch = 0; /*r*/
-  pt_map[ 28].enc = "nv  "; pt_map[ 28].rate = 90000; pt_map[ 28].ch = 0;
-  pt_map[ 29].enc = "PicW"; pt_map[ 29].rate = 90000; pt_map[ 29].ch = 0; /*r*/
-  pt_map[ 30].enc = "CPV "; pt_map[ 30].rate = 90000; pt_map[ 30].ch = 0; /*r*/
-  pt_map[ 31].enc = "H261"; pt_map[ 31].rate = 90000; pt_map[ 31].ch = 0;
-  pt_map[ 32].enc = "MPV "; pt_map[ 32].rate = 90000; pt_map[ 32].ch = 0;
-  pt_map[ 33].enc = "MP2T"; pt_map[ 33].rate = 90000; pt_map[ 33].ch = 0;
-  pt_map[ 34].enc = "H263"; pt_map[ 34].rate = 90000; pt_map[ 34].ch = 0;
 
   /* set maximum time to gather packets */
   timeout.tv_usec = 0;
