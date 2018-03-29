@@ -6,7 +6,6 @@ int dummy;
 
 #else
 
-/*	$Id: compat_progname.c,v 1.1 2015/11/06 16:30:33 schwarze Exp $	*/
 /*
  * Copyright (c) 2015 Ingo Schwarze <schwarze@openbsd.org>
  *

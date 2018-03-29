@@ -6,7 +6,6 @@ int dummy;
 
 #else
 
-/* $Id: compat_err.c,v 1.4 2015/11/26 07:42:11 schwarze Exp $ */
 /*
  * Copyright (c) 1993
  *      The Regents of the University of California.  All rights reserved.
