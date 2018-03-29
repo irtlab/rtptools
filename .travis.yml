@@ -1,0 +1,9 @@
+dist: trusty
+sudo: false
+
+language: c
+
+script:
+  - ./configure
+  - make
+  - make distcheck
