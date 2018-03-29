@@ -46,6 +46,12 @@
 #include <netdb.h>
 #endif
 
+#if HAVE_SEARCH_H
+#include <search.h>      /* hash table */
+#else
+#include "hsearch.h"
+#endif
+
 #include "sysdep.h"
 #include "notify.h"
 #include "rtp.h"

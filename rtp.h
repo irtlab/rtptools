@@ -31,6 +31,7 @@
 /*
  * rtp.h  --  RTP header file (RFC 1890)
  */
+#include <stdint.h>
 #include "sysdep.h"
 
 /*
