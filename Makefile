@@ -63,12 +63,12 @@ HAVE_SRCS = \
 	have-msgcontrol.c
 
 COMPAT_SRCS = \
-	compat-err.c		\
-	compat-strtonum.c
+	compat_err.c		\
+	compat_strtonum.c
 
 COMPAT_OBJS = \
-	compat-err.o		\
-	compat-strtonum.o
+	compat_err.o		\
+	compat_strtonum.o
 
 OBJS =	$(rtpdump_OBJS) $(rtpplay_OBJS) $(rtpsend_OBJS) $(rtptrans_OBJS)
 OBJS +=	$(COMPAT_OBJS)
@@ -128,17 +128,17 @@ Makefile.local config.h: configure $(HAVESRCS)
 	@echo "$@ is out of date; please run ./configure"
 	@exit 1
 
-rtpdump: $(rtpdump_OBJS) $(COMPAT_OBJS)
-	$(CC) $(CFLAGS) -o rtpdump $(rtpdump_OBJS) $(COMPAT_OBJS) $(LDADD)
+rtpdump: $(rtpdump_OBJS)
+	$(CC) $(CFLAGS) -o rtpdump $(rtpdump_OBJS) $(LDADD)
 
-rtpplay: $(rtpplay_OBJS) $(COMPAT_OBJS)
-	$(CC) $(CFLAGS) -o rtpplay $(rtpplay_OBJS) $(COMPAT_OBJS) $(LDADD)
+rtpplay: $(rtpplay_OBJS)
+	$(CC) $(CFLAGS) -o rtpplay $(rtpplay_OBJS) $(LDADD)
 
-rtpsend: $(rtpsend_OBJS) $(COMPAT_OBJS)
-	$(CC) $(CFLAGS) -o rtpsend $(rtpsend_OBJS) $(COMPAT_OBJS) $(LDADD)
+rtpsend: $(rtpsend_OBJS)
+	$(CC) $(CFLAGS) -o rtpsend $(rtpsend_OBJS) $(LDADD)
 
-rtptrans: $(rtptrans_OBJS) $(COMPAT_OBJS)
-	$(CC) $(CFLAGS) -o rtptrans $(rtptrans_OBJS) $(COMPAT_OBJS) $(LDADD)
+rtptrans: $(rtptrans_OBJS)
+	$(CC) $(CFLAGS) -o rtptrans $(rtptrans_OBJS) $(LDADD)
 
 # --- maintainer targets ---
 
