@@ -30,7 +30,6 @@
 
 
 #include <sys/types.h>
-#include <search.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,10 +45,10 @@
 #include <netdb.h>
 #endif
 
-#if HAVE_SEARCH_H
-#include <search.h>      /* hash table */
+#if HAVE_HSEARCH
+#include <search.h>
 #else
-#include "hsearch.h"
+#include "compat-hsearch.h"
 #endif
 
 #include "sysdep.h"

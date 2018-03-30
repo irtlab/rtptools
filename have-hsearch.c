@@ -14,12 +14,21 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <sys/socket.h>
+#include <string.h>
+#include <search.h>
 
 int
 main(void)
 {
-	struct msghdr hdr;
-	hdr.msg_control = (void*)42;
+	ENTRY item;
+	if (0 == hcreate(100))
+		return 1;
+	item.key = strdup("key");
+	item.data = strdup("data");
+	if (NULL == hsearch(item, ENTER))
+		return 1;
+	if (NULL == hsearch(item, FIND))
+		return 1;
+	hdestroy();
 	return 0;
 }

@@ -17,8 +17,6 @@ SRCS = \
 	ansi.h		\
 	host2ip.c	\
 	hpt.c		\
-	hsearch.c	\
-	hsearch.h	\
 	multimer.c	\
 	multimer.h	\
 	notify.c	\
@@ -59,16 +57,23 @@ rtptrans_OBJS	= hpt.o host2ip.o notify.o multimer.o      rtptrans.o
 HAVE_SRCS = \
 	have-err.c		\
 	have-gethostbyname.c	\
+	have-hsearch.c		\
+	have-progname.c		\
 	have-strtonum.c		\
 	have-msgcontrol.c
 
 COMPAT_SRCS = \
-	compat_err.c		\
-	compat_strtonum.c
+	compat-err.c		\
+	compat-hsearch.c	\
+	compat-hsearch.h	\
+	compat-progname.c	\
+	compat-strtonum.c
 
 COMPAT_OBJS = \
-	compat_err.o		\
-	compat_strtonum.o
+	compat-err.o		\
+	compat-hsearch.o	\
+	compat-progname.o	\
+	compat-strtonum.o
 
 OBJS =	$(rtpdump_OBJS) $(rtpplay_OBJS) $(rtpsend_OBJS) $(rtptrans_OBJS)
 OBJS +=	$(COMPAT_OBJS)
@@ -92,11 +97,11 @@ DISTFILES = \
 	$(MAN1)			\
 	$(MULT)			\
 	$(SRCS)			\
-	$(HAVE_SRCS)
+	$(HAVE_SRCS)		\
+	$(COMPAT_SRCS)
 
 # FIXME INSTALL
 # FIXME rtptools.spec
-# FIXME hsearch.h hsearch.c: have-hsearch.c, compat-hsearch.c
 
 include Makefile.local
 
@@ -128,17 +133,17 @@ Makefile.local config.h: configure $(HAVESRCS)
 	@echo "$@ is out of date; please run ./configure"
 	@exit 1
 
-rtpdump: $(rtpdump_OBJS)
-	$(CC) $(CFLAGS) -o rtpdump $(rtpdump_OBJS) $(LDADD)
+rtpdump: $(rtpdump_OBJS) $(COMPAT_OBJS)
+	$(CC) $(CFLAGS) -o rtpdump $(rtpdump_OBJS) $(COMPAT_OBJS) $(LDADD)
 
-rtpplay: $(rtpplay_OBJS)
-	$(CC) $(CFLAGS) -o rtpplay $(rtpplay_OBJS) $(LDADD)
+rtpplay: $(rtpplay_OBJS) $(COMPAT_OBJS)
+	$(CC) $(CFLAGS) -o rtpplay $(rtpplay_OBJS) $(COMPAT_OBJS) $(LDADD)
 
-rtpsend: $(rtpsend_OBJS)
-	$(CC) $(CFLAGS) -o rtpsend $(rtpsend_OBJS) $(LDADD)
+rtpsend: $(rtpsend_OBJS) $(COMPAT_OBJS)
+	$(CC) $(CFLAGS) -o rtpsend $(rtpsend_OBJS) $(COMPAT_OBJS) $(LDADD)
 
-rtptrans: $(rtptrans_OBJS)
-	$(CC) $(CFLAGS) -o rtptrans $(rtptrans_OBJS) $(LDADD)
+rtptrans: $(rtptrans_OBJS) $(COMPAT_OBJS)
+	$(CC) $(CFLAGS) -o rtptrans $(rtptrans_OBJS) $(COMPAT_OBJS) $(LDADD)
 
 # --- maintainer targets ---
 
