@@ -1,6 +1,5 @@
 host2ip.o: host2ip.c sysdep.h
 hpt.o: hpt.c sysdep.h
-hsearch.o: hsearch.c sysdep.h hsearch.h
 multimer.o: multimer.c multimer.h notify.h sysdep.h
 notify.o: notify.c sysdep.h notify.h multimer.h
 rd.o: rd.c rtpdump.h sysdep.h
@@ -11,6 +10,5 @@ rtpsend.o: rtpsend.c notify.h rtp.h sysdep.h multimer.h
 rtptrans.o: rtptrans.c rtp.h sysdep.h rtpdump.h notify.h multimer.h vat.h
 
 compat-err.o: compat-err.c
-compat-hsearch.o: compat-hsearch.c compat-hsearch.h
 compat-progname.o: compat-progname.c
 compat-strtonum.o: compat-strtonum.c
