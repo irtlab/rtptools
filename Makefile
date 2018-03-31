@@ -112,15 +112,25 @@ install: all
 
 include Makefile.depend
 
-distclean: clean
-	rm -f Makefile.local config.h config.h.old config.log config.log.old
-
 clean:
 	rm -f $(TARBALL) $(BINS) $(OBJS) $(HTML)
 	rm -rf *.dSYM *.core *~ .*~ win/*~
 	rm -rf rtptools-$(VERSION)
 
-install: $(PROG) $(MAN1)
+distclean: clean
+	rm -f Makefile.local config.h config.h.old config.log config.log.old
+
+test: $(PROG) bark.rtp
+	./rtpdump < bark.rtp > /dev/null
+	./rtpdump -F dump < bark.rtp > dump.rtp
+	dd bs=16 skip=3 < bark.rtp > bark
+	dd bs=16 skip=3 < dump.rtp > dump
+	diff bark dump && rm -f dump.rtp dump bark
+	./rtpdump -F payload < bark.rtp > bark.raw
+	which play > /dev/null && play -c 1 -r 8000 -e u-law bark.raw || true
+	rm -f bark.raw
+
+install: $(PROG) $(MAN1) test
 	install -d $(BINDIR)      && install -m 0755 $(PROG) $(BINDIR)
 	install -d $(MANDIR)/man1 && install -m 0444 $(MAN1) $(MANDIR)/man1
 
