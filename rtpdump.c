@@ -50,7 +50,6 @@
 #include "rtp.h"
 #include "vat.h"
 #include "rtpdump.h"
-#include "ansi.h"
 #include "sysdep.h"
 
 #define RTPFILE_VERSION "1.0"

@@ -47,7 +47,6 @@
 #include "notify.h"
 #include "rtp.h"
 #include "multimer.h"
-#include "ansi.h"
 #include "sysdep.h"
 
 static int verbose = 0;

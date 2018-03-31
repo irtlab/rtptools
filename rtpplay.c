@@ -56,7 +56,6 @@
 #include "rtp.h"
 #include "rtpdump.h"
 #include "multimer.h"
-#include "ansi.h"
 
 #define READAHEAD 16 /* must be power of 2 */
 

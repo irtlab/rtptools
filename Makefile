@@ -14,7 +14,6 @@ VERSION = 1.23
 TARBALL = rtptools-$(VERSION).tar.gz
 
 SRCS = \
-	ansi.h		\
 	host2ip.c	\
 	hpt.c		\
 	multimer.c	\

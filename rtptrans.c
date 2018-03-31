@@ -46,7 +46,6 @@
 
 #include "rtp.h"
 #include "rtpdump.h"
-#include "ansi.h"
 #include "notify.h"
 #include "multimer.h"
 #include "vat.h"
