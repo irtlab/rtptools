@@ -37,15 +37,19 @@
 .Op Fl ahlv
 .Op Fl f Ar infile
 .Op Fl s Ar port
-.Ar address Ns / Ns Ar port Ns Op / Ns Ar ttl
+.Oo Ar address Oc Ns / Ns Ar port Ns Op / Ns Ar ttl
 .Sh DESCRIPTION
 .Nm
 sends a stream of RTP and RTCP packets with configurable parameters.
 The packets are sent to the given
 .Ar address Ns / Ns Ar port ,
-optionally with a time-to-live value of
+optionally with a given value of
 .Ar ttl .
 This is intended to test the RTP features of the receiving end.
+If
+.Ar address
+is not given, it defaults to
+.Dq localhost .
 .Pp
 By default,
 .Nm

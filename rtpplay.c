@@ -107,11 +107,11 @@ static double period[128] = {  /* ms per timestamp difference */
 };
 
 
-static void usage(char *argv0)
+static void usage()
 {
-  fprintf(stderr, "usage: %s "
+  fprintf(stderr, "usage: rtpplay "
 	"[-hTv] [-b begin] [-e end] [-f file] [-p profile] [-s port] "
-	"address/port[/ttl]\n", argv0);
+	"[address]/port[/ttl]\n");
   exit(1);
 } /* usage */
 
@@ -320,7 +320,7 @@ int main(int argc, char *argv[])
   in = stdin; /* Changed below if -f specified */
 
   /* parse command line arguments */
-  while ((c = getopt(argc, argv, "b:e:f:p:Ts:vh")) != EOF) {
+  while ((c = getopt(argc, argv, "b:e:f:p:Ts:vh")) != -1) {
     switch(c) {
     case 'b':
       begin = atof(optarg) * 1000;
@@ -348,24 +348,22 @@ int main(int argc, char *argv[])
       break;
     case '?':
     case 'h':
-      usage(argv[0]);
+      usage();
       break;
     }
   }
+  argc -= optind;
+  argv += optind;
 
 //  ftell(in);
 
-  if (optind < argc) {
-    if (hpt(argv[optind], (struct sockaddr *)&sin, &ttl) < 0) {
-      usage(argv[0]);
-      exit(1);
-    }
-    if (sin.sin_addr.s_addr == -1) {
-      fprintf(stderr, "%s: Invalid host. %s\n", argv[0], argv[optind]);
-      usage(argv[0]);
-      exit(1);
-    }
-    if (sin.sin_addr.s_addr == INADDR_ANY) {
+  if (argc != 1)
+	  usage();
+  if (hpt(*argv, (struct sockaddr *)&sin, &ttl) < 0)
+	  usage();
+  if (sin.sin_addr.s_addr == -1)
+	  usage();
+  if (sin.sin_addr.s_addr == INADDR_ANY) {
       struct hostent *host;
       struct in_addr *local;
       if ((host = gethostbyname("localhost")) == NULL) {
@@ -374,7 +372,6 @@ int main(int argc, char *argv[])
       }
       local = (struct in_addr *)host->h_addr_list[0];
       sin.sin_addr = *local;
-    }
   }
 
   /* read header of input file */
