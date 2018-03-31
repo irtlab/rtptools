@@ -443,11 +443,6 @@ int main(int argc, char *argv[])
 
       *s = '\0';
       port = atoi(s+1);
-      if (port & 1) {
-        fprintf(stderr, "%s: Port must be even.\n", argv[0]);
-        usage(argv[0]);
-        exit(1);
-      }
       host[i].sin.sin_port = htons(port);
       s = strchr(s+1, '/');
       if (s) {
