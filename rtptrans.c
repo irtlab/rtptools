@@ -41,9 +41,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "config.h"
 #endif
 
-#include "config.h"
 #include "rtp.h"
 #include "rtpdump.h"
 #include "ansi.h"
@@ -276,7 +276,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
       rtp_hdr_send.cc      = 0;
       rtp_hdr_send.ts      = vat_hdr->ts;
 
-#if defined(WIN32)
+#if WIN32
       /* Windows does not support sendmsg(), use copying instead;
        * contributed by Lutz Grueneberg <gruen@rvs.uni-hannover.de>. */
       {
