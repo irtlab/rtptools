@@ -40,7 +40,7 @@
 #include <time.h>      /* time_t */
 
 #define HAVE_STDINT_H 1
-#define RTP_LITTLE_ENDIAN 1
+#define RTP_BIG_ENDIAN 0
 
 /* Determine if the C(++) compiler requires complete function prototype  */
 #ifndef __P

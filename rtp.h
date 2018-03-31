@@ -35,15 +35,6 @@
 #include "sysdep.h"
 
 /*
- * System endianness -- determined by autoconf.
- */
-#ifdef WORDS_BIGENDIAN
-#define RTP_BIG_ENDIAN 1
-#else
-#define RTP_LITTLE_ENDIAN 1
-#endif
-
-/*
  * Current protocol version.
  */
 #define RTP_VERSION    2
@@ -82,15 +73,13 @@ typedef struct {
     unsigned int cc:4;        /* CSRC count */
     unsigned int m:1;         /* marker bit */
     unsigned int pt:7;        /* payload type */
-#elif RTP_LITTLE_ENDIAN
+#else
     unsigned int cc:4;        /* CSRC count */
     unsigned int x:1;         /* header extension flag */
     unsigned int p:1;         /* padding flag */
     unsigned int version:2;   /* protocol version */
     unsigned int pt:7;        /* payload type */
     unsigned int m:1;         /* marker bit */
-#else
-#error Define one of RTP_LITTLE_ENDIAN or RTP_BIG_ENDIAN
 #endif
     unsigned int seq:16;      /* sequence number */
     uint32_t ts;               /* timestamp */
@@ -113,12 +102,10 @@ typedef struct {
     unsigned int version:2;   /* protocol version */
     unsigned int p:1;         /* padding flag */
     unsigned int count:5;     /* varies by packet type */
-#elif RTP_LITTLE_ENDIAN
+#else
     unsigned int count:5;     /* varies by packet type */
     unsigned int p:1;         /* padding flag */
     unsigned int version:2;   /* protocol version */
-#else
-#error Define one of RTP_LITTLE_ENDIAN or RTP_BIG_ENDIAN
 #endif
     unsigned int pt:8;        /* RTCP packet type */
     unsigned int length:16;   /* pkt len in words, w/o this word */
@@ -126,7 +113,7 @@ typedef struct {
 
 /*
  * Big-endian mask for version, padding bit and packet type pair
- * XXX?
+ * FIXME?
  */
 #define RTCP_VALID_MASK (0xc000 | 0x2000 | 0xfe)
 #define RTCP_VALID_VALUE ((RTP_VERSION << 14) | RTCP_SR)
