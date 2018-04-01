@@ -40,15 +40,19 @@
 .Op Fl f Ar infile
 .Op Fl p Ar profile
 .Op Fl s Ar port
-.Ar address Ns / Ns Ar port Ns Op / Ns Ar ttl
+.Oo Ar address Oc Ns / Ns Ar port Ns Op / Ns Ar ttl
 .Sh DESCRIPTION
 .Nm
 reads RTP session data recorded by
-.Dq rtpdump -F dump ,
+.Dq rtpdump -F dump
 from standard input and resends the traffic to the given
 .Ar address Ns / Ns Ar port ,
-optionally with a time-to-live value of
+optionally with the given value of
 .Ar ttl .
+Without a given
+.Ar address ,
+.Dq localhost
+is used.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds

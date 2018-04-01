@@ -66,11 +66,10 @@ typedef struct node {
 } node_t;
 
 
-static void usage(char *argv0)
+static void usage()
 {
   fprintf(stderr, 
-    "usage: %s [-alv] [-f file] [-s port] address/port[/ttl]\n",
-    argv0);
+    "usage: rtpsend [-alv] [-f file] [-s port] address/port[/ttl]\n");
   exit(1);
 } /* usage */
 
@@ -899,10 +898,12 @@ int main(int argc, char *argv[])
       break;
     case '?':
     case 'h':
-      usage(argv[0]);
+      usage();
       break;
     }
   }
+  argc -= optind;
+  argv += optind;
 
   if (filename) {
     in = fopen(filename, "r");
@@ -916,17 +917,13 @@ int main(int argc, char *argv[])
     loop = 0;
   }
 
-  if (optind < argc) {
-    if (hpt(argv[optind], (struct sockaddr *)&sin, &ttl) < 0) {
-      usage(argv[0]);
-      exit(1);
-    }
-    if (sin.sin_addr.s_addr == -1) {
-      fprintf(stderr, "%s: Invalid host. %s\n", argv[0], argv[optind]);
-      usage(argv[0]);
-      exit(1);
-    }
-    if (sin.sin_addr.s_addr == INADDR_ANY) {
+  if (argc != 1)
+	  usage();
+  if (hpt(*argv, (struct sockaddr *)&sin, &ttl) < 0)
+	  usage();
+  if (sin.sin_addr.s_addr == -1)
+	  usage();
+  if (sin.sin_addr.s_addr == INADDR_ANY) {
       struct hostent *host;
       struct in_addr *local;
       if ((host = gethostbyname("localhost")) == NULL) {
@@ -935,7 +932,6 @@ int main(int argc, char *argv[])
       }
       local = (struct in_addr *)host->h_addr_list[0];
       sin.sin_addr = *local;
-    }
   }
 
   /* create/connect sockets */
