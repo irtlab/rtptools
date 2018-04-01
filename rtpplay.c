@@ -158,8 +158,6 @@ static Notify_value play_handler(Notify_client client)
   char ssrc[12];
   uint32_t ts  = 0;
   uint8_t  pt  = 0;
-  uint16_t seq = 0;
-  uint8_t  m   = 0;
   rtp_hdr_t *r;
   int b = (int)client;  /* buffer to be played now */
   int rp;        /* read pointer */
@@ -223,9 +221,7 @@ static Notify_value play_handler(Notify_client client)
     ENTRY item;
 
     ts  = ntohl(r->ts);
-    seq = ntohs(r->seq);
     pt  = r->pt;
-    m   = r->m;
     sprintf(ssrc, "%lx", (unsigned long)ntohl(r->ssrc));
 
     /* find hash entry */
