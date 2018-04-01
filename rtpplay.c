@@ -305,7 +305,7 @@ static void profile(char *fn)
 
 int main(int argc, char *argv[])
 {
-  char ttl = 1;
+  unsigned char ttl = 1;
   static struct sockaddr_in sin;
   static struct sockaddr_in from;
   int sourceport = 0;  /* source port */
