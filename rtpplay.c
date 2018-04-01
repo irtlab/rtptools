@@ -45,12 +45,6 @@
 #include <netdb.h>
 #endif
 
-#if HAVE_HSEARCH
-#include <search.h>
-#else
-#include "compat-hsearch.h"
-#endif
-
 #include "sysdep.h"
 #include "notify.h"
 #include "rtp.h"
@@ -62,7 +56,7 @@
 static int verbose = 0;        /* be chatty about packets sent */
 static int wallclock = 0;      /* use wallclock time rather than timestamps */
 static uint32_t begin = 0;      /* time of first packet to send */
-static uint32_t end = UINT32_MAX; /* when to stop sending */ 
+static uint32_t end = UINT32_MAX; /* when to stop sending */
 static FILE *in;               /* input file */
 static int sock[2];            /* output sockets */
 static int first = -1;         /* time offset of first packet */
@@ -95,17 +89,48 @@ static double period[128] = {  /* ms per timestamp difference */
   0,         /* 23:      */
   0,         /* 24:      */
   1/90000.,  /* 25: CelB */
-  1/90000.,  /* 26: JPEG */  
-  1/90000.,  /* 27:      */  
-  1/90000.,  /* 28: nv   */  
-  1/90000.,  /* 29:      */  
-  1/90000.,  /* 30: */  
-  1/90000.,  /* 31: H261 */  
-  1/90000.,  /* 32: MPV  */  
-  1/90000.,  /* 33: MP2T */  
+  1/90000.,  /* 26: JPEG */
+  1/90000.,  /* 27:      */
+  1/90000.,  /* 28: nv   */
+  1/90000.,  /* 29:      */
+  1/90000.,  /* 30: */
+  1/90000.,  /* 31: H261 */
+  1/90000.,  /* 32: MPV  */
+  1/90000.,  /* 33: MP2T */
   1/90000.,  /* 34: H263 */
 };
 
+struct rt_ts {
+	struct timeval	rt; /* real-time */
+	unsigned long	ts; /* timestamp */
+};
+
+struct ssrc {
+      uint32_t		ssrc;
+      struct rt_ts	rtts;
+      struct ssrc*	next;
+} *list = NULL;
+
+static struct ssrc*
+find(uint32_t ssrc)
+{
+	struct ssrc* this = NULL;
+	for (this = list; this; this = this->next)
+		if (ssrc == this->ssrc)
+			return this;
+	return NULL;
+}
+
+static void
+insert(struct ssrc* ssrc)
+{
+	if (NULL == ssrc)
+		return;
+	if (list)
+		ssrc->next = list;
+	else
+		list = ssrc;
+}
 
 static void usage(char *argv0)
 {
@@ -131,7 +156,7 @@ static void play_transmit(int b)
     if (send(sock[buffer[b].p.hdr.plen == 0],
         buffer[b].p.data, buffer[b].p.hdr.length, 0) < 0) {
       perror("write");
-    } 
+    }
 
     buffer[b].p.hdr.length = 0;
   }
@@ -147,13 +172,8 @@ static Notify_value play_handler(Notify_client client)
   static struct timeval start;  /* generation time of first played back p. */
   struct timeval now;           /* current time */
   struct timeval next;          /* next packet generation time */
-  ENTRY *e;                     /* hash table entry */
-  struct rt_ts {
-    struct timeval rt;          /* real-time */
-    unsigned long ts;           /* timestamp */
-  };
-  struct rt_ts *t = 0;
-  char ssrc[12];
+  struct ssrc* ssrc = NULL;
+  struct rt_ts t;
   uint32_t ts  = 0;
   uint8_t  pt  = 0;
   uint16_t seq = 0;
@@ -178,7 +198,7 @@ static Notify_value play_handler(Notify_client client)
 
     if (buffer[b].p.hdr.plen) {
       r = (rtp_hdr_t *)buffer[b].p.data;
-      printf(" pt=%u ssrc=%8lx %cts=%9lu seq=%5u",
+      printf(" pt=%u ssrc=%#0lx %cts=%9lu seq=%5u",
         (unsigned int)r->pt,
         (unsigned long)ntohl(r->ssrc), r->m ? '*' : ' ',
         (unsigned long)ntohl(r->ts), ntohs(r->seq));
@@ -196,7 +216,7 @@ static Notify_value play_handler(Notify_client client)
     if (RD_read(in, &buffer[rp]) == 0) return NOTIFY_DONE;
   } while (buffer[rp].p.hdr.offset < begin);
 
-  /* 
+  /*
    * If new packet is after end of alloted time, don't insert into list
    * and set 'end' to zero to avoid reading any more packets from
    * file.
@@ -216,50 +236,39 @@ static Notify_value play_handler(Notify_client client)
   }
   buffer[rp].p.hdr.offset -= first;
 
-  /* RTP played according to timestamp. */
   if (buffer[rp].p.hdr.plen && r->version == 2 && !wallclock) {
-    ENTRY item;
-
+    /* RTP played according to timestamp. */
     ts  = ntohl(r->ts);
     seq = ntohs(r->seq);
     pt  = r->pt;
     m   = r->m;
-    sprintf(ssrc, "%lx", (unsigned long)ntohl(r->ssrc));
 
-    /* find hash entry */
-    item.key  = ssrc;
-    item.data = 0;
-    e = hsearch(item, FIND);
-
-    /* If found in list of sources, compute playout instant. */
-    if (e) {
+    if ((ssrc = find(ntohl(r->ssrc)))) {
+      /* found in list of sources: compute playout instant */
       double d;
 
-      t = (struct rt_ts *)e->data;
-      d = period[pt] * (int)(ts - t->ts);
-      next.tv_sec  = t->rt.tv_sec  + (int)d;
-      next.tv_usec = t->rt.tv_usec + (d - (int)d) * 1000000;
+      t = ssrc->rtts;
+      d = period[pt] * (int)(ts - t.ts);
+      next.tv_sec  = t.rt.tv_sec  + (int)d;
+      next.tv_usec = t.rt.tv_usec + (d - (int)d) * 1000000;
       if (verbose)
-        printf(". %1.3f t=%6lu pt=%u ts=%lu,%lu rp=%2d b=%d d=%f\n", tdbl(&next), 
+        printf(". %1.3f t=%6lu pt=%u ts=%lu,%lu rp=%2d b=%d d=%f\n",tdbl(&next),
         (unsigned long)buffer[rp].p.hdr.offset, (unsigned int)r->pt,
-        (unsigned long)ts, (unsigned long)t->ts,
+        (unsigned long)ts, (unsigned long)t.ts,
         rp, b, d);
-    } else { /* If not on source list, insert and play based on wallclock. */
-      item.key  = malloc(strlen(ssrc)+1);
-      strcpy(item.key, ssrc);
-      t = (struct rt_ts *)malloc(sizeof(struct rt_ts));
-      item.data = (void *)t;
+    } else {
+      /* not on ssrc list, insert and play based on wallclock. */
+      ssrc = calloc(1, sizeof(struct ssrc));
+      ssrc->ssrc = ntohl(r->ssrc);
+      insert(ssrc);
       next.tv_sec  = start.tv_sec  + buffer[rp].p.hdr.offset/1000;
       next.tv_usec = start.tv_usec + (buffer[rp].p.hdr.offset%1000) * 1000;
-      e = hsearch(item, ENTER);
     }
-  }
-  /* RTCP or vat or playing back by wallclock. */
-  else {
+  } else {
+    /* RTCP or vat or playing back by wallclock. */
     /* compute next playout time */
     next.tv_sec  = start.tv_sec  + buffer[rp].p.hdr.offset/1000;
     next.tv_usec = start.tv_usec + (buffer[rp].p.hdr.offset%1000) * 1000;
-    ssrc[0] = '\0';
   }
 
   if (next.tv_usec >= 1000000) {
@@ -267,10 +276,10 @@ static Notify_value play_handler(Notify_client client)
     next.tv_sec  += 1;
   }
 
-  /* Save correct value in record (for timestamp-based playback). */
-  if (t) {
-    t->rt = next;
-    t->ts = ts; 
+  /* Save correct value in for timestamp-based playback. */
+  if (ssrc) {
+    ssrc->rtts.rt = next;
+    ssrc->rtts.ts = ts;
   }
 
   timer_set(&next, play_handler, (Notify_client)rp, 0);
@@ -422,7 +431,7 @@ int main(int argc, char *argv[])
         exit(1);
       }
 
-      if (IN_CLASSD(ntohl(sin.sin_addr.s_addr)) && 
+      if (IN_CLASSD(ntohl(sin.sin_addr.s_addr)) &&
           (setsockopt(sock[i], IPPROTO_IP, IP_MULTICAST_TTL, &ttl,
                    sizeof(ttl)) < 0)) {
         perror("IP_MULTICAST_TTL");
@@ -443,7 +452,7 @@ int main(int argc, char *argv[])
 //  notify_set_socket(sock[i], 1);
   /*
    * Modified by Wenyu and Akira 12/27/01
-   * setting Writefds was causing 
+   * setting Writefds was causing
    *   1)consuming CPU 100% (behave polling)
    *   2)slow
    *   3)large jitter
@@ -454,10 +463,9 @@ int main(int argc, char *argv[])
 
   /* initialize event queue */
   first = -1;
-  hcreate(100); /* create hash table for SSRC entries */
-  for (i = 0; i < READAHEAD; i++) play_handler(-1);
+  list = calloc(1, sizeof(struct ssrc));
+  for (i = 0; i < READAHEAD; i++)
+	  play_handler(-1);
   notify_start();
-  hdestroy();
-
   return 0;
 } /* main */
