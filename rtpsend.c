@@ -866,7 +866,7 @@ static Notify_value send_handler(Notify_client client)
 
 int main(int argc, char *argv[])
 {
-  char ttl = 16;
+  unsigned char ttl = 16;
   static struct sockaddr_in sin;
   static struct sockaddr_in from;
   int i;
