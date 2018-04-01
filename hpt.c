@@ -44,10 +44,9 @@ extern struct in_addr host2ip(char *);
 
 /* Parse [host]/port[/ttl]. Return 0 if ok, -1 on error;
  * set sockaddr and ttl value. */
-int hpt(char *h, struct sockaddr *sa, unsigned char *ttl)
+int hpt(char *h, struct sockaddr_in *sin, unsigned char *ttl)
 {
   char *s;
-  struct sockaddr_in *sin = (struct sockaddr_in *)sa;
 
   sin->sin_family = AF_INET;
 

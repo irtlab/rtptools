@@ -59,6 +59,8 @@
 
 #define READAHEAD 16 /* must be power of 2 */
 
+extern int hpt(char*, struct sockaddr_in*, unsigned char*);
+
 static int verbose = 0;        /* be chatty about packets sent */
 static int wallclock = 0;      /* use wallclock time rather than timestamps */
 static uint32_t begin = 0;      /* time of first packet to send */
@@ -312,7 +314,6 @@ int main(int argc, char *argv[])
   int c;
   extern char *optarg;
   extern int optind;
-  extern int hpt(char *h, struct sockaddr *sa, unsigned char *ttl);
 
   /* For NT, we need to start the socket; dummy function otherwise */
   startupSocket();
@@ -356,7 +357,7 @@ int main(int argc, char *argv[])
 //  ftell(in);
 
   if (optind < argc) {
-    if (hpt(argv[optind], (struct sockaddr *)&sin, &ttl) < 0) {
+    if (hpt(argv[optind], &sin, &ttl) == -1) {
       usage(argv[0]);
       exit(1);
     }
