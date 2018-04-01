@@ -177,14 +177,3 @@ distcheck: dist
 .1.1.html:
 	{ which mandoc > /dev/null && mandoc -Thtml -Wstyle $< > $@ ; } || \
 	{ which groff  > /dev/null && groff  -Thtml -mdoc   $< > $@ ; }
-
-# The rest of this file is the relevant portions of old Makefile.am
-# that we need go through to make sure nothing is left behind
-
-#if DARWIN #rtpplay_SOURCES = $(COMMON) rd.c hsearch.c rtpplay.c
-
-#rpm: $(bin_PROGRAMS) rtptools.spec dist
-#mkdir -p ./rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-#cp rtptools-$(VERSION).tar.gz ./rpmbuild/SOURCES/.
-#sed s/VERSION/$(VERSION)/g  rtptools.spec > ./rpmbuild/SPECS/rtptools-$(VERSION).spec
-#rpmbuild --define "_topdir `pwd`/rpmbuild" -ba rpmbuild/SPECS/rtptools-$(VERSION).spec
