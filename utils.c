@@ -31,6 +31,7 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
+#include <err.h>
 
 #ifndef WIN32
 #include <sys/socket.h>
@@ -68,24 +69,27 @@ host2ip(char *host)
 int 
 hpt(char *h, struct sockaddr_in * sin, unsigned char *ttl)
 {
-	char *s;
+	char *p = NULL, *t = NULL;
+	int port;
 
 	sin->sin_family = AF_INET;
-
-	s = strchr(h, '/');
-	if (!s) {
+	if (NULL == (p = strchr(h, '/')))
 		return -1;
-	} else {
-		int port;
-
-		*s = '\0';
-		port = atoi(s + 1);
-		sin->sin_port = htons(port);
-		s = strchr(s + 1, '/');
-		if (s && ttl) {
-			*ttl = atoi(s + 1);
-		}
-		sin->sin_addr = host2ip(h);
+	*p++ = '\0';
+	sin->sin_addr = host2ip(h);
+	if ((t = strchr(p, '/')))
+		*t++ = '\0';
+	port = atoi(p);
+	if (port <= 0) {
+		warnx("RTP port number must be positive, not %d", port);
+		return -1;
 	}
+	if (port & 1) {
+		warnx("RTP port number should be even, not %d", port);
+		return -1;
+	}
+	sin->sin_port = htons(port);
+	if (t && ttl)
+		*ttl = atoi(t);
 	return 0;
 }
