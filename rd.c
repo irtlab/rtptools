@@ -97,6 +97,6 @@ int RD_read(FILE *in, RD_buffer_t *b)
   /* read actual packet */
   if (fread(b->p.data, b->p.hdr.length, 1, in) == 0) {
     perror("fread body");
-  } 
-  return b->p.hdr.length; 
+  }
+  return b->p.hdr.length;
 } /* RD_read */
