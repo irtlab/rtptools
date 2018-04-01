@@ -28,45 +28,66 @@
  * SUCH DAMAGE.
  */
 
-
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
 
 #ifndef WIN32
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <netinet/in.h>
+#include <netdb.h>
 #endif
 
 #include "sysdep.h"
 
-extern struct in_addr host2ip(char *);
+/*
+* Return IP address given host name 'host'.
+* If 'host' is "", set to INADDR_ANY.
+*/
+struct in_addr 
+host2ip(char *host)
+{
+	struct in_addr in;
+	register struct hostent *hep;
+
+	/* Check whether this is a dotted decimal. */
+	if (!host || *host == '\0') {
+		in.s_addr = INADDR_ANY;
+	} else if ((in.s_addr = inet_addr(host)) != -1) {
+	}
+	/* Attempt to resolve host name via DNS. */
+	else if ((hep = gethostbyname(host))) {
+		in = *(struct in_addr *) (hep->h_addr_list[0]);
+	}
+	return in;
+}
 
 /* Parse [host]/port[/ttl]. Return 0 if ok, -1 on error;
  * set sockaddr and ttl value. */
-int hpt(char *h, struct sockaddr *sa, unsigned char *ttl)
+int 
+hpt(char *h, struct sockaddr * sa, unsigned char *ttl)
 {
-  char *s;
-  struct sockaddr_in *sin = (struct sockaddr_in *)sa;
+	char *s;
+	struct sockaddr_in *sin = (struct sockaddr_in *) sa;
 
-  sin->sin_family = AF_INET;
+	sin->sin_family = AF_INET;
 
-  /* first */
-  s = strchr(h, '/');
-  if (!s) {
-    return -1;
-  }
-  else {
-    int port;
+	/* first */
+	s = strchr(h, '/');
+	if (!s) {
+		return -1;
+	} else {
+		int port;
 
-    *s = '\0';
-    port = atoi(s+1);
-    sin->sin_port = htons(port);
-    s = strchr(s+1, '/');
-    if (s && ttl) {
-      *ttl = atoi(s+1);
-    }
-    sin->sin_addr = host2ip(h);
-  }
-  return 0;
-} /* hpt */
+		*s = '\0';
+		port = atoi(s + 1);
+		sin->sin_port = htons(port);
+		s = strchr(s + 1, '/');
+		if (s && ttl) {
+			*ttl = atoi(s + 1);
+		}
+		sin->sin_addr = host2ip(h);
+	}
+	return 0;
+}

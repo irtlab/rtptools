@@ -163,7 +163,7 @@ static int open_network(char *host, int data, int sock[], struct
   int nfds = 0;
   extern int hpt(char *h, struct sockaddr *sa, unsigned char *ttl);
 
-  if (hpt(host, (struct sockaddr *)sin, 0) < 0) {
+  if (hpt(host, (struct sockaddr *)sin, NULL) < 0) {
     usage("");
     exit(1);
   }
