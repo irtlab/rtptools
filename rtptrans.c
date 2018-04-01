@@ -51,6 +51,8 @@
 #include "vat.h"
 #include "sysdep.h"
 
+extern int host2ip(char*, struct in_addr*);
+
 #define PAD(x,n) (((n) - ((x) & (n-1))) & (n-1))
 #define MAX_HOST 10
 
@@ -403,7 +405,6 @@ int main(int argc, char *argv[])
   int reuse = 1;  /* reuse address */
   int i, j;
 
-  extern struct in_addr host2ip(char *);
 
   /* Set up socket. */
   startupSocket();
@@ -454,8 +455,7 @@ int main(int argc, char *argv[])
         host[i].ttl = atoi(s+1);
       }
     }
-    host[i].sin.sin_addr = host2ip(host[i].name);
-    if (host[i].sin.sin_addr.s_addr == -1) {
+    if (host2ip(host[i].name, &host[i].sin.sin_addr) == -1) {
       fprintf(stderr, "%s: Invalid host. %s\n", argv[0], host[i].name);
       usage(argv[0]);
       exit(1);

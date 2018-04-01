@@ -168,12 +168,6 @@ static int open_network(char *host, int data, int sock[], struct
     usage("");
     exit(1);
   }
-  if (sin->sin_addr.s_addr == -1) {
-    fprintf(stderr, "Invalid multicast.\n");
-    usage("");
-    exit(1);
-  }
-
   /* multicast */
   if (host) {
     mreq.imr_multiaddr = sin->sin_addr;

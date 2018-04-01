@@ -42,26 +42,33 @@
 
 #include "sysdep.h"
 
-/*
-* Return IP address given host name 'host'.
-* If 'host' is "", set to INADDR_ANY.
-*/
-struct in_addr 
-host2ip(char *host)
-{
-	struct in_addr in;
-	register struct hostent *hep;
+int host2ip(char*, struct in_addr*);
+int hpt(char*, struct sockaddr_in*, unsigned char*);
 
-	/* Check whether this is a dotted decimal. */
-	if (!host || *host == '\0') {
-		in.s_addr = INADDR_ANY;
-	} else if ((in.s_addr = inet_addr(host)) != -1) {
+/*
+* Parse an IP address or a host name.
+* For NULL or an empty 'host', set to INADDR_ANY.
+* Return 0 for success, -1 in error.
+*/
+int
+host2ip(char *host, struct in_addr *in)
+{
+	struct hostent *hep;
+
+	if (host == NULL || *host == '\0') {
+		in->s_addr = INADDR_ANY;
+		return 0;
 	}
-	/* Attempt to resolve host name via DNS. */
-	else if ((hep = gethostbyname(host))) {
-		in = *(struct in_addr *) (hep->h_addr_list[0]);
+	if (inet_aton(host, in) == 1) {
+		/* a valid dotted-decimal */
+		return 0;
 	}
-	return in;
+	if ((hep = gethostbyname(host))) {
+		/* a resolved hostname */
+		memcpy(in, hep->h_addr, sizeof(struct in_addr));
+		return 0;
+	}
+	return -1;
 }
 
 /* Parse [host]/port[/ttl]. Return 0 if ok, -1 on error;
@@ -76,7 +83,10 @@ hpt(char *h, struct sockaddr_in * sin, unsigned char *ttl)
 	if (NULL == (p = strchr(h, '/')))
 		return -1;
 	*p++ = '\0';
-	sin->sin_addr = host2ip(h);
+	if (host2ip(h, &sin->sin_addr) == -1) {
+		warnx("Cannot parse address: %s", h);
+		return -1;
+	}
 	if ((t = strchr(p, '/')))
 		*t++ = '\0';
 	port = atoi(p);

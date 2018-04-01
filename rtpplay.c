@@ -358,10 +358,6 @@ int main(int argc, char *argv[])
 
   if (optind < argc) {
     if (hpt(argv[optind], &sin, &ttl) == -1) {
-      usage(argv[0]);
-      exit(1);
-    }
-    if (sin.sin_addr.s_addr == -1) {
       fprintf(stderr, "%s: Invalid host. %s\n", argv[0], argv[optind]);
       usage(argv[0]);
       exit(1);
