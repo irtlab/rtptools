@@ -221,9 +221,10 @@ static Notify_value socket_handler(Notify_client client, int sock)
       if (side[i][proto].sock != sock
           && side[i][proto].sin.sin_addr.s_addr != INADDR_ANY) {
         if (sendto(side[i][2].sock, packet, len, 0,
-          (struct sockaddr *)&side[i][proto].sin,sizeof(side[i][proto].sin))<0)
-//        perror("sendto RTCP");
-          ;
+        (struct sockaddr *)&side[i][proto].sin,
+	sizeof(side[i][proto].sin)) == -1) {
+		perror("sendto RTPC");
+	}
       }
     }
   }
