@@ -659,7 +659,6 @@ static int rtp(char *text, char *packet)
   int ext_pl = 0;  /* extension payload length */
   int wc = 0;
   int cc = 0;
-  int pad = 0;
   rtp_hdr_t *h = (rtp_hdr_t *)packet;
   rtp_hdr_ext_t *ext;
   int length = 0;
@@ -685,7 +684,6 @@ static int rtp(char *text, char *packet)
     }
     else if (strcmp(word, "p") == 0) {
       h->p = (value != 0);
-      pad = value;
     }
     else if (strcmp(word, "m") == 0) {
       h->m = value;
