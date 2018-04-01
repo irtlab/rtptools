@@ -49,6 +49,8 @@
 #include "multimer.h"
 #include "sysdep.h"
 
+extern int hpt(char*, struct sockaddr_in*, unsigned char*);
+
 static int verbose = 0;
 static FILE *in;
 static int sock[2];  /* output sockets */
@@ -876,7 +878,6 @@ int main(int argc, char *argv[])
   char *filename = 0;
   extern char *optarg;
   extern int optind;
-  extern int hpt(char *h, struct sockaddr *sa, unsigned char *ttl);
 
   /* parse command line arguments */
   startupSocket();
@@ -917,7 +918,7 @@ int main(int argc, char *argv[])
   }
 
   if (optind < argc) {
-    if (hpt(argv[optind], (struct sockaddr *)&sin, &ttl) < 0) {
+    if (hpt(argv[optind], &sin, &ttl) == -1) {
       usage(argv[0]);
       exit(1);
     }

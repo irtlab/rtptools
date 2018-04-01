@@ -64,16 +64,14 @@ host2ip(char *host)
 }
 
 /* Parse [host]/port[/ttl]. Return 0 if ok, -1 on error;
- * set sockaddr and ttl value. */
+ * fill in sockaddr; set ttl if requested. */
 int 
-hpt(char *h, struct sockaddr * sa, unsigned char *ttl)
+hpt(char *h, struct sockaddr_in * sin, unsigned char *ttl)
 {
 	char *s;
-	struct sockaddr_in *sin = (struct sockaddr_in *) sa;
 
 	sin->sin_family = AF_INET;
 
-	/* first */
 	s = strchr(h, '/');
 	if (!s) {
 		return -1;
