@@ -760,6 +760,7 @@ int main(int argc, char *argv[])
     source = FromFile;
     sock[0] = fileno(in);  /* stdin */
     sock[1] = -1;          /* not used */
+    memset(&sin, 0, sizeof(struct sockaddr_in));
     RD_header(in, &sin, 0);
     dstart = 0.;
   }
