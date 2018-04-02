@@ -49,6 +49,8 @@
 #include "multimer.h"
 #include "sysdep.h"
 
+extern int hpt(char*, struct sockaddr_in*, unsigned char*);
+
 static int verbose = 0;
 static FILE *in;
 static int sock[2];  /* output sockets */
@@ -657,7 +659,6 @@ static int rtp(char *text, char *packet)
   int ext_pl = 0;  /* extension payload length */
   int wc = 0;
   int cc = 0;
-  int pad = 0;
   rtp_hdr_t *h = (rtp_hdr_t *)packet;
   rtp_hdr_ext_t *ext;
   int length = 0;
@@ -683,7 +684,6 @@ static int rtp(char *text, char *packet)
     }
     else if (strcmp(word, "p") == 0) {
       h->p = (value != 0);
-      pad = value;
     }
     else if (strcmp(word, "m") == 0) {
       h->m = value;
@@ -864,7 +864,7 @@ static Notify_value send_handler(Notify_client client)
 
 int main(int argc, char *argv[])
 {
-  char ttl = 16;
+  unsigned char ttl = 16;
   static struct sockaddr_in sin;
   static struct sockaddr_in from;
   int i;
@@ -876,7 +876,6 @@ int main(int argc, char *argv[])
   char *filename = 0;
   extern char *optarg;
   extern int optind;
-  extern int hpt(char *h, struct sockaddr *sa, unsigned char *ttl);
 
   /* parse command line arguments */
   startupSocket();
@@ -917,11 +916,7 @@ int main(int argc, char *argv[])
   }
 
   if (optind < argc) {
-    if (hpt(argv[optind], (struct sockaddr *)&sin, &ttl) < 0) {
-      usage(argv[0]);
-      exit(1);
-    }
-    if (sin.sin_addr.s_addr == -1) {
+    if (hpt(argv[optind], &sin, &ttl) == -1) {
       fprintf(stderr, "%s: Invalid host. %s\n", argv[0], argv[optind]);
       usage(argv[0]);
       exit(1);

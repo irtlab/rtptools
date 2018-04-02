@@ -14,8 +14,6 @@ VERSION = 1.23
 TARBALL = rtptools-$(VERSION).tar.gz
 
 SRCS = \
-	host2ip.c	\
-	hpt.c		\
 	multimer.c	\
 	multimer.h	\
 	notify.c	\
@@ -28,6 +26,7 @@ SRCS = \
 	rtpsend.c	\
 	rtptrans.c	\
 	sysdep.h	\
+	utils.c		\
 	vat.h
 
 BINS =	rtpdump rtpplay rtpsend rtptrans
@@ -48,10 +47,10 @@ HTML =	multidump.1.html	\
 	rtpsend.1.html		\
 	rtptrans.1.html
 
-rtpdump_OBJS	= hpt.o host2ip.o                     rd.o rtpdump.o
-rtpplay_OBJS	= hpt.o host2ip.o notify.o multimer.o rd.o rtpplay.o
-rtpsend_OBJS	= hpt.o host2ip.o notify.o multimer.o      rtpsend.o
-rtptrans_OBJS	= hpt.o host2ip.o notify.o multimer.o      rtptrans.o
+rtpdump_OBJS	= utils.o                     rd.o rtpdump.o
+rtpplay_OBJS	= utils.o notify.o multimer.o rd.o rtpplay.o
+rtpsend_OBJS	= utils.o notify.o multimer.o      rtpsend.o
+rtptrans_OBJS	= utils.o notify.o multimer.o      rtptrans.o
 
 HAVE_SRCS = \
 	have-err.c		\

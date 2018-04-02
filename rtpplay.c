@@ -59,6 +59,8 @@
 
 #define READAHEAD 16 /* must be power of 2 */
 
+extern int hpt(char*, struct sockaddr_in*, unsigned char*);
+
 static int verbose = 0;        /* be chatty about packets sent */
 static int wallclock = 0;      /* use wallclock time rather than timestamps */
 static uint32_t begin = 0;      /* time of first packet to send */
@@ -156,8 +158,6 @@ static Notify_value play_handler(Notify_client client)
   char ssrc[12];
   uint32_t ts  = 0;
   uint8_t  pt  = 0;
-  uint16_t seq = 0;
-  uint8_t  m   = 0;
   rtp_hdr_t *r;
   int b = (int)client;  /* buffer to be played now */
   int rp;        /* read pointer */
@@ -221,9 +221,7 @@ static Notify_value play_handler(Notify_client client)
     ENTRY item;
 
     ts  = ntohl(r->ts);
-    seq = ntohs(r->seq);
     pt  = r->pt;
-    m   = r->m;
     sprintf(ssrc, "%lx", (unsigned long)ntohl(r->ssrc));
 
     /* find hash entry */
@@ -303,7 +301,7 @@ static void profile(char *fn)
 
 int main(int argc, char *argv[])
 {
-  char ttl = 1;
+  unsigned char ttl = 1;
   static struct sockaddr_in sin;
   static struct sockaddr_in from;
   int sourceport = 0;  /* source port */
@@ -312,7 +310,6 @@ int main(int argc, char *argv[])
   int c;
   extern char *optarg;
   extern int optind;
-  extern int hpt(char *h, struct sockaddr *sa, unsigned char *ttl);
 
   /* For NT, we need to start the socket; dummy function otherwise */
   startupSocket();
@@ -356,11 +353,7 @@ int main(int argc, char *argv[])
 //  ftell(in);
 
   if (optind < argc) {
-    if (hpt(argv[optind], (struct sockaddr *)&sin, &ttl) < 0) {
-      usage(argv[0]);
-      exit(1);
-    }
-    if (sin.sin_addr.s_addr == -1) {
+    if (hpt(argv[optind], &sin, &ttl) == -1) {
       fprintf(stderr, "%s: Invalid host. %s\n", argv[0], argv[optind]);
       usage(argv[0]);
       exit(1);

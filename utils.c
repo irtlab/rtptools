@@ -28,45 +28,78 @@
  * SUCH DAMAGE.
  */
 
-
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
+#include <err.h>
 
 #ifndef WIN32
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <netinet/in.h>
+#include <netdb.h>
 #endif
 
 #include "sysdep.h"
 
-extern struct in_addr host2ip(char *);
+int host2ip(char*, struct in_addr*);
+int hpt(char*, struct sockaddr_in*, unsigned char*);
+
+/*
+* Parse an IP address or a host name.
+* For NULL or an empty 'host', set to INADDR_ANY.
+* Return 0 for success, -1 in error.
+*/
+int
+host2ip(char *host, struct in_addr *in)
+{
+	struct hostent *hep;
+
+	if (host == NULL || *host == '\0') {
+		in->s_addr = INADDR_ANY;
+		return 0;
+	}
+	if (inet_aton(host, in) == 1) {
+		/* a valid dotted-decimal */
+		return 0;
+	}
+	if ((hep = gethostbyname(host))) {
+		/* a resolved hostname */
+		memcpy(in, hep->h_addr, sizeof(struct in_addr));
+		return 0;
+	}
+	return -1;
+}
 
 /* Parse [host]/port[/ttl]. Return 0 if ok, -1 on error;
- * set sockaddr and ttl value. */
-int hpt(char *h, struct sockaddr *sa, unsigned char *ttl)
+ * fill in sockaddr; set ttl if requested. */
+int 
+hpt(char *h, struct sockaddr_in * sin, unsigned char *ttl)
 {
-  char *s;
-  struct sockaddr_in *sin = (struct sockaddr_in *)sa;
+	char *p = NULL, *t = NULL;
+	int port;
 
-  sin->sin_family = AF_INET;
-
-  /* first */
-  s = strchr(h, '/');
-  if (!s) {
-    return -1;
-  }
-  else {
-    int port;
-
-    *s = '\0';
-    port = atoi(s+1);
-    sin->sin_port = htons(port);
-    s = strchr(s+1, '/');
-    if (s && ttl) {
-      *ttl = atoi(s+1);
-    }
-    sin->sin_addr = host2ip(h);
-  }
-  return 0;
-} /* hpt */
+	sin->sin_family = AF_INET;
+	if (NULL == (p = strchr(h, '/')))
+		return -1;
+	*p++ = '\0';
+	if (host2ip(h, &sin->sin_addr) == -1) {
+		warnx("Cannot parse address: %s", h);
+		return -1;
+	}
+	if ((t = strchr(p, '/')))
+		*t++ = '\0';
+	port = atoi(p);
+	if (port <= 0) {
+		warnx("RTP port number must be positive, not %d", port);
+		return -1;
+	}
+	if (port & 1) {
+		warnx("RTP port number should be even, not %d", port);
+		return -1;
+	}
+	sin->sin_port = htons(port);
+	if (t && ttl)
+		*ttl = atoi(t);
+	return 0;
+}

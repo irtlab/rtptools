@@ -1,9 +1,8 @@
-host2ip.o: host2ip.c sysdep.h
-hpt.o: hpt.c sysdep.h
 hsearch.o: hsearch.c sysdep.h hsearch.h
 multimer.o: multimer.c multimer.h notify.h sysdep.h
 notify.o: notify.c sysdep.h notify.h multimer.h
 rd.o: rd.c rtpdump.h sysdep.h
+utils.o: utils.c sysdep.h
 
 rtpdump.o: rtpdump.c rtp.h sysdep.h vat.h rtpdump.h
 rtpplay.o: rtpplay.c sysdep.h notify.h rtp.h rtpdump.h multimer.h

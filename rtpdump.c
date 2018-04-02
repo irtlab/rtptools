@@ -54,6 +54,8 @@
 
 #define RTPFILE_VERSION "1.0"
 
+extern int hpt(char*, struct sockaddr_in*, unsigned char*);
+
 typedef uint32_t member_t;
 
 static int verbose = 0; /* decode */
@@ -161,18 +163,11 @@ static int open_network(char *host, int data, int sock[], struct
   struct ip_mreq mreq;      /* multicast group */
   int i;
   int nfds = 0;
-  extern int hpt(char *h, struct sockaddr *sa, unsigned char *ttl);
 
-  if (hpt(host, (struct sockaddr *)sin, 0) < 0) {
+  if (hpt(host, sin, NULL) == -1) {
     usage("");
     exit(1);
   }
-  if (sin->sin_addr.s_addr == -1) {
-    fprintf(stderr, "Invalid multicast.\n");
-    usage("");
-    exit(1);
-  }
-
   /* multicast */
   if (host) {
     mreq.imr_multiaddr = sin->sin_addr;

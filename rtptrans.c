@@ -51,6 +51,8 @@
 #include "vat.h"
 #include "sysdep.h"
 
+extern int hpt(char*, struct sockaddr_in*, unsigned char*);
+
 #define PAD(x,n) (((n) - ((x) & (n-1))) & (n-1))
 #define MAX_HOST 10
 
@@ -219,9 +221,10 @@ static Notify_value socket_handler(Notify_client client, int sock)
       if (side[i][proto].sock != sock
           && side[i][proto].sin.sin_addr.s_addr != INADDR_ANY) {
         if (sendto(side[i][2].sock, packet, len, 0,
-          (struct sockaddr *)&side[i][proto].sin,sizeof(side[i][proto].sin))<0)
-//        perror("sendto RTCP");
-          ;
+        (struct sockaddr *)&side[i][proto].sin,
+	sizeof(side[i][proto].sin)) == -1) {
+		perror("sendto RTPC");
+	}
       }
     }
   }
@@ -403,7 +406,6 @@ int main(int argc, char *argv[])
   int reuse = 1;  /* reuse address */
   int i, j;
 
-  extern struct in_addr host2ip(char *);
 
   /* Set up socket. */
   startupSocket();
@@ -427,39 +429,18 @@ int main(int argc, char *argv[])
 
   /* Parse host descriptions. */
   for (i = 0; i < argc - optind; i++) {
-    char *s;
+    if (i >= MAX_HOST)
+	    break;
 
-    if (i >= MAX_HOST) break;
     host[i].ttl  = 16;
     host[i].name = argv[optind+i];
-    host[i].sin.sin_family = AF_INET;
-    s = strchr(host[i].name, '/');
-    if (!s) {
+    if (hpt(host[i].name, (struct sockaddr_in*) &host[i].sin.sin_addr,
+    &host[i].ttl) == -1) {
+      fprintf(stderr, "Invalid host specification %s\n", host[i].name);
       usage(argv[0]);
       exit(1);
     }
-    else {
-      int port;
 
-      *s = '\0';
-      port = atoi(s+1);
-      if (port & 1) {
-        fprintf(stderr, "%s: Port must be even.\n", argv[0]);
-        usage(argv[0]);
-        exit(1);
-      }
-      host[i].sin.sin_port = htons(port);
-      s = strchr(s+1, '/');
-      if (s) {
-        host[i].ttl = atoi(s+1);
-      }
-    }
-    host[i].sin.sin_addr = host2ip(host[i].name);
-    if (host[i].sin.sin_addr.s_addr == -1) {
-      fprintf(stderr, "%s: Invalid host. %s\n", argv[0], host[i].name);
-      usage(argv[0]);
-      exit(1);
-    }
     if (IN_CLASSD(ntohl(host[i].sin.sin_addr.s_addr))) {
       host[i].mreq.imr_multiaddr        = host[i].sin.sin_addr;
       host[i].mreq.imr_interface.s_addr = htonl(INADDR_ANY);
