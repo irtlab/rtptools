@@ -31,13 +31,13 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
-#include <err.h>
 
 #ifndef WIN32
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <err.h>
 #endif
 
 #include "sysdep.h"

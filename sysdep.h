@@ -33,13 +33,13 @@
 
 #if defined(WIN32) || defined(__WIN32__)
 
-#include <winsock2.h>  /* For NT socket */
-#include <ws2tcpip.h>  /* IP_ADD_MEMBERSHIP */
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <windows.h>
-#include <stdio.h>     /* stderr */
-#include <time.h>      /* time_t */
+#include <stdio.h>
+#include <time.h>
 
-#define HAVE_STDINT_H 1
+#define HAVE_ERR 0
 #define RTP_BIG_ENDIAN 0
 
 /* Determine if the C(++) compiler requires complete function prototype  */

@@ -89,6 +89,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="../utils.c" />
+    <ClCompile Include="../compat-err.c" />
     <ClCompile Include="../multimer.c" />
     <ClCompile Include="../notify.c" />
     <ClCompile Include="../rtpsend.c" />
