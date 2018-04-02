@@ -258,7 +258,7 @@ static void rtpdump_header(FILE *out, struct sockaddr_in *sin,
   if (fwrite((char *)&hdr, sizeof(hdr), 1, out) < 1) {
     perror("fwrite");
     exit(1);
-  } 
+  }
 } /* rtpdump_header */
 
 
@@ -294,11 +294,9 @@ static int parse_header(char *buf)
   }
   else if (r->version == RTP_VERSION) {
     hlen = 12 + r->cc * 4;
-    
     if (r->x) {  /* header extension */
       ext = (rtp_hdr_ext_t *)((char *)buf + hlen);
       ext_len = ntohs(ext->len);
-      
       hlen += 4 + (ext_len * 4);
     }
   }
@@ -395,7 +393,7 @@ void member_sdes(FILE *out, member_t m, rtcp_sdes_type_t t, char *b, int len)
     rtcp_sdes_type_t t;
     const char *name;
   } map[] = {
-    {RTCP_SDES_END,    "end"}, 
+    {RTCP_SDES_END,    "end"},
     {RTCP_SDES_CNAME,  "CNAME"},
     {RTCP_SDES_NAME,   "NAME"},
     {RTCP_SDES_EMAIL,  "EMAIL"},
@@ -439,7 +437,7 @@ static char *rtp_read_sdes(FILE *out, char *b, int len)
     total_len += rsp->length + 2;
   }
   if (total_len >= len) {
-    fprintf(stderr, 
+    fprintf(stderr,
       "Remaining length of %d bytes for SSRC item too short (has %u bytes)\n",
       len, total_len);
     return 0;
@@ -464,7 +462,7 @@ static int parse_control(FILE *out, char *buf, int len)
     struct CtrlMsgHdr *v = (struct CtrlMsgHdr *)buf;
 
     fprintf(out, "flags=0x%x type=0x%x confid=%u\n",
-      v->flags, v->type, v->confid); 
+      v->flags, v->type, v->confid);
   }
   else if (r->common.version == RTP_VERSION) {
     fprintf(out, "\n");
@@ -499,11 +497,11 @@ static int parse_control(FILE *out, char *buf, int len)
            (unsigned long)ntohl(r->r.sr.rr[i].lsr),
            (unsigned long)ntohl(r->r.sr.rr[i].dlsr));
         }
-        fprintf(out, " )\n"); 
+        fprintf(out, " )\n");
         break;
 
       case RTCP_RR:
-        fprintf(out, " (RR ssrc=0x%lx p=%d count=%d len=%d\n", 
+        fprintf(out, " (RR ssrc=0x%lx p=%d count=%d len=%d\n",
           (unsigned long)ntohl(r->r.rr.ssrc), r->common.p, r->common.count,
           ntohs(r->common.length));
         for (i = 0; i < r->common.count; i++) {
@@ -516,21 +514,21 @@ static int parse_control(FILE *out, char *buf, int len)
             (unsigned long)ntohl(r->r.rr.rr[i].lsr),
             (unsigned long)ntohl(r->r.rr.rr[i].dlsr));
         }
-        fprintf(out, " )\n"); 
+        fprintf(out, " )\n");
         break;
 
       case RTCP_SDES:
-        fprintf(out, " (SDES p=%d count=%d len=%d\n", 
+        fprintf(out, " (SDES p=%d count=%d len=%d\n",
           r->common.p, r->common.count, ntohs(r->common.length));
         buf = (char *)&r->r.sdes;
         for (i = 0; i < r->common.count; i++) {
           int remaining = (ntohs(r->common.length) << 2) -
                           (buf - (char *)&r->r.sdes);
 
-          fprintf(out, "  (src=0x%lx ", 
+          fprintf(out, "  (src=0x%lx ",
             (unsigned long)ntohl(((struct rtcp_sdes *)buf)->src));
           if (remaining > 0) {
-            buf = rtp_read_sdes(out, buf, 
+            buf = rtp_read_sdes(out, buf,
               (ntohs(r->common.length) << 2) - (buf - (char *)&r->r.sdes));
             if (!buf) return -1;
           }
@@ -538,29 +536,29 @@ static int parse_control(FILE *out, char *buf, int len)
             fprintf(stderr, "Missing at least %d bytes.\n", -remaining);
             return -1;
           }
-          fprintf(out, ")\n"); 
+          fprintf(out, ")\n");
         }
-        fprintf(out, " )\n"); 
+        fprintf(out, " )\n");
         break;
 
       case RTCP_BYE:
-        fprintf(out, " (BYE p=%d count=%d len=%d\n", 
+        fprintf(out, " (BYE p=%d count=%d len=%d\n",
           r->common.p, r->common.count, ntohs(r->common.length));
         for (i = 0; i < r->common.count; i++) {
-          fprintf(out, "  (ssrc[%d]=0x%0lx ", i, 
+          fprintf(out, "  (ssrc[%d]=0x%0lx ", i,
             (unsigned long)ntohl(r->r.bye.src[i]));
         }
         fprintf(out, ")\n");
         if (ntohs(r->common.length) > r->common.count) {
           buf = (char *)&r->r.bye.src[r->common.count];
-          fprintf(out, "reason=\"%*.*s\"", *buf, *buf, buf+1); 
+          fprintf(out, "reason=\"%*.*s\"", *buf, *buf, buf+1);
         }
         fprintf(out, " )\n");
         break;
 
       /* invalid type */
       default:
-        fprintf(out, "(? pt=%d src=0x%lx)\n", r->common.pt, 
+        fprintf(out, "(? pt=%d src=0x%lx)\n", r->common.pt,
           (unsigned long)ntohl(r->r.sdes.src));
       break;
       }
@@ -670,7 +668,7 @@ int main(int argc, char *argv[])
     {"short",   F_short},
     {"payload", F_payload},
     {"ascii",   F_ascii},
-    {0,0} 
+    {0,0}
   };
   t_format format = F_ascii;
   struct sockaddr_in sin;
@@ -743,16 +741,16 @@ int main(int argc, char *argv[])
   }
 
 #if defined(WIN32)
-  /* 
+  /*
    * If using dump or binary format, make stdout and stdin use binary
    * format on Win32, to assure that files generated can be read on both
-   * Unix and Windows systems. 
+   * Unix and Windows systems.
    */
   if (format == F_dump || format == F_header) {
     if (out == stdout) {
       setmode(fileno(stdout), O_BINARY);
     }
-  } 
+  }
   if (in == stdin) {
     setmode(fileno(stdin), O_BINARY);
   }

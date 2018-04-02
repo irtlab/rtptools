@@ -62,7 +62,7 @@
 static int verbose = 0;        /* be chatty about packets sent */
 static int wallclock = 0;      /* use wallclock time rather than timestamps */
 static uint32_t begin = 0;      /* time of first packet to send */
-static uint32_t end = UINT32_MAX; /* when to stop sending */ 
+static uint32_t end = UINT32_MAX; /* when to stop sending */
 static FILE *in;               /* input file */
 static int sock[2];            /* output sockets */
 static int first = -1;         /* time offset of first packet */
@@ -95,14 +95,14 @@ static double period[128] = {  /* ms per timestamp difference */
   0,         /* 23:      */
   0,         /* 24:      */
   1/90000.,  /* 25: CelB */
-  1/90000.,  /* 26: JPEG */  
-  1/90000.,  /* 27:      */  
-  1/90000.,  /* 28: nv   */  
-  1/90000.,  /* 29:      */  
-  1/90000.,  /* 30: */  
-  1/90000.,  /* 31: H261 */  
-  1/90000.,  /* 32: MPV  */  
-  1/90000.,  /* 33: MP2T */  
+  1/90000.,  /* 26: JPEG */
+  1/90000.,  /* 27:      */
+  1/90000.,  /* 28: nv   */
+  1/90000.,  /* 29:      */
+  1/90000.,  /* 30: */
+  1/90000.,  /* 31: H261 */
+  1/90000.,  /* 32: MPV  */
+  1/90000.,  /* 33: MP2T */
   1/90000.,  /* 34: H263 */
 };
 
@@ -131,7 +131,7 @@ static void play_transmit(int b)
     if (send(sock[buffer[b].p.hdr.plen == 0],
         buffer[b].p.data, buffer[b].p.hdr.length, 0) < 0) {
       perror("write");
-    } 
+    }
 
     buffer[b].p.hdr.length = 0;
   }
@@ -196,7 +196,7 @@ static Notify_value play_handler(Notify_client client)
     if (RD_read(in, &buffer[rp]) == 0) return NOTIFY_DONE;
   } while (buffer[rp].p.hdr.offset < begin);
 
-  /* 
+  /*
    * If new packet is after end of alloted time, don't insert into list
    * and set 'end' to zero to avoid reading any more packets from
    * file.
@@ -240,7 +240,7 @@ static Notify_value play_handler(Notify_client client)
       next.tv_sec  = t->rt.tv_sec  + (int)d;
       next.tv_usec = t->rt.tv_usec + (d - (int)d) * 1000000;
       if (verbose)
-        printf(". %1.3f t=%6lu pt=%u ts=%lu,%lu rp=%2d b=%d d=%f\n", tdbl(&next), 
+        printf(". %1.3f t=%6lu pt=%u ts=%lu,%lu rp=%2d b=%d d=%f\n", tdbl(&next),
         (unsigned long)buffer[rp].p.hdr.offset, (unsigned int)r->pt,
         (unsigned long)ts, (unsigned long)t->ts,
         rp, b, d);
@@ -270,7 +270,7 @@ static Notify_value play_handler(Notify_client client)
   /* Save correct value in record (for timestamp-based playback). */
   if (t) {
     t->rt = next;
-    t->ts = ts; 
+    t->ts = ts;
   }
 
   timer_set(&next, play_handler, (Notify_client)rp, 0);
@@ -422,7 +422,7 @@ int main(int argc, char *argv[])
         exit(1);
       }
 
-      if (IN_CLASSD(ntohl(sin.sin_addr.s_addr)) && 
+      if (IN_CLASSD(ntohl(sin.sin_addr.s_addr)) &&
           (setsockopt(sock[i], IPPROTO_IP, IP_MULTICAST_TTL, &ttl,
                    sizeof(ttl)) < 0)) {
         perror("IP_MULTICAST_TTL");
@@ -443,7 +443,7 @@ int main(int argc, char *argv[])
 //  notify_set_socket(sock[i], 1);
   /*
    * Modified by Wenyu and Akira 12/27/01
-   * setting Writefds was causing 
+   * setting Writefds was causing
    *   1)consuming CPU 100% (behave polling)
    *   2)slow
    *   3)large jitter

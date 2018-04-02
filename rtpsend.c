@@ -59,7 +59,7 @@ static int loop = 0; /* play file indefinitely if set */
 * Node either has a parameter or a non-zero pointer to list.
 */
 typedef struct node {
-  struct node *next, *list;  /* parameter in list, level down */ 
+  struct node *next, *list;  /* parameter in list, level down */
   char *type;    /* parameter type */
   unsigned long num;       /* numeric value */
   char *string;  /* string value */
@@ -68,7 +68,7 @@ typedef struct node {
 
 static void usage(char *argv0)
 {
-  fprintf(stderr, 
+  fprintf(stderr,
     "usage: %s [-alv] [-f file] [-s port] address/port[/ttl]\n",
     argv0);
   exit(1);
@@ -90,7 +90,7 @@ static int hex(char *text, char *buffer)
   byte[2] = '\0';
   for (s = text; *s; s++) {
     if (isspace((int)*s)) continue;
-    
+
     byte[nibble++] = *s;
     if (nibble == 2) {
       nibble = 0;
@@ -176,14 +176,14 @@ static node_t *parse(char *text)
           }
         }
         n->type = malloc(strlen(tmp) + 1);
-        strcpy(n->type, tmp);      
+        strcpy(n->type, tmp);
       }
     }
     /* parameters, separated by white space */
     else {
       tmp[c++] = *s;
     }
-  } 
+  }
 
   return first;
 } /* parse */
@@ -199,7 +199,7 @@ static uint32_t parse_uint(char *word)
   uint32_t value = 0;
 
   if ((s = strchr(word, '='))) {
-    value = strtoul(s+1, (char **)NULL, 0);    
+    value = strtoul(s+1, (char **)NULL, 0);
     *s = '\0';
   }
   else {
@@ -246,8 +246,8 @@ static int rtcp_sdes_item(char *type, char *string, char *packet)
     {"phone", RTCP_SDES_PHONE},
     {"loc",   RTCP_SDES_LOC},
     {"tool",  RTCP_SDES_TOOL},
-    {"note",  RTCP_SDES_NOTE}, 
-    {"priv",  RTCP_SDES_PRIV}, 
+    {"note",  RTCP_SDES_NOTE},
+    {"priv",  RTCP_SDES_PRIV},
     {0,0}
   };
   int i;
@@ -307,7 +307,7 @@ static int rtcp_write_sdes(node_t *list, char *packet)
   node_t *n;
   int len = 0, total = RTCP_SDES_HDR_LEN, count = 0;
   rtcp_t *r = (rtcp_t *)packet;
-  
+
   r->common.length  = 0;
   r->common.count   = 0;
   r->common.version = RTP_VERSION;
@@ -413,7 +413,7 @@ static int rtcp_write_sr(node_t *list, char *packet)
   int len = 0, total = RTCP_SR_HDR_LEN, count = 0;
   rtcp_t *r = (rtcp_t *)packet;
   struct timeval now;
-  
+
   gettimeofday(&now, 0);
   r->common.length  = 0;
   r->common.count   = 0;
@@ -421,7 +421,7 @@ static int rtcp_write_sr(node_t *list, char *packet)
   r->common.pt      = RTCP_SR;
   r->common.p       = 0;
   r->r.sr.ntp_sec   = htonl((uint32_t)now.tv_sec + GETTIMEOFDAY_TO_NTP_OFFSET);
-  r->r.sr.ntp_frac  = htonl(usec2ntp((u_int)now.tv_usec)); 
+  r->r.sr.ntp_frac  = htonl(usec2ntp((u_int)now.tv_usec));
 
   packet += RTCP_SR_HDR_LEN; /* skip common header and ssrc */
 
@@ -476,7 +476,7 @@ static int rtcp_write_rr(node_t *list, char *packet)
   node_t *n;
   int len = 0, total = RTCP_RR_HDR_LEN, count = 0;
   rtcp_t *r = (rtcp_t *)packet;
-  
+
   r->common.length  = 0;
   r->common.count   = 0;
   r->common.version = RTP_VERSION;
@@ -542,7 +542,7 @@ static int rtcp_write_bye(node_t *list, char *packet)
   node_t *n;
   int len = 0, total = RTCP_BYE_HDR_LEN, count = 0;
   rtcp_t *r = (rtcp_t *)packet;
-  
+
   r->common.length  = 0;
   r->common.count   = 0;
   r->common.version = RTP_VERSION;
@@ -640,7 +640,7 @@ static int rtcp(char *text, char *packet)
       packet += len;
       total += len;
     }
-  } 
+  }
   node_free(node_list);
 
   return total;
@@ -701,7 +701,7 @@ static int rtp(char *text, char *packet)
       int k = atoi(&word[5]);
       h->csrc[k] = value;
       if (k > cc) cc = k;
-    } 
+    }
     /* we'd better have h->cc already */
     else if (strcmp(word, "ext_type") == 0) {
       ext = (rtp_hdr_ext_t *)(packet + 12 + h->cc*4);
@@ -717,7 +717,7 @@ static int rtp(char *text, char *packet)
     else if (strcmp(word, "ext_data") == 0) {
       int dummy;
       dummy = hex(&word[9], packet + 12 + h->cc*4 + 4);
-    } 
+    }
     /* data is in hex; words may be separated by spaces */
     else if (strcmp(word, "data") == 0) {
       pl = hex(&word[5], packet + 12 + h->cc*4 + ext_pl);
@@ -800,21 +800,21 @@ static Notify_value send_handler(Notify_client client)
     int length;
     double time;
     int type;
-    char data[1500]; 
+    char data[1500];
   } packet = { 0, -1, 0};
   FILE *in = (FILE *)client;
   static char line[MAX_TEXT_LINE];       /* last line read (may be next packet) */
   char text[MAX_TEXT_LINE];              /* current line from the file, including cont. lines */
   static int isfirstpacket = 1; /* is this the first packet? */
   double this;                  /* time this packet is being sent */
-  static double basetime;       /* base time (first packet) */ 
+  static double basetime;       /* base time (first packet) */
   struct timeval next_tv;       /* time for next packet */
   char *s;
 
   /* send any pending packet */
   if (packet.length && send(sock[packet.type], packet.data, packet.length, 0) < 0) {
     perror("write");
-  } 
+  }
 
   /* read line; continuation lines start with white space */
   if (feof(in)) {
@@ -976,13 +976,13 @@ int main(int argc, char *argv[])
       exit(1);
     }
 
-    if (IN_CLASSD(sin.sin_addr.s_addr) && 
+    if (IN_CLASSD(sin.sin_addr.s_addr) &&
         (setsockopt(sock[i], IPPROTO_IP, IP_MULTICAST_TTL, &ttl,
                    sizeof(ttl)) < 0)) {
       perror("IP_MULTICAST_TTL");
       exit(1);
     }
-    if (alert && 
+    if (alert &&
         (setsockopt(sock[i], IPPROTO_IP, IP_OPTIONS, (void *)ra,
                   sizeof(ra)) < 0)) {
       perror("IP router alert option");
@@ -1002,7 +1002,7 @@ int main(int argc, char *argv[])
 //  notify_set_socket(sock[i], 1);
   /*
    * Modified by Wenyu and Akira 12/27/01
-   * setting Writefds was causing 
+   * setting Writefds was causing
    *   1)consuming CPU 100% (behave polling)
    *   2)slow
    *   3)large jitter
