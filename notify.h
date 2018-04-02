@@ -80,11 +80,11 @@ extern Notify_func notify_set_output_func (Notify_client nclient,
   Notify_func func, int fd);
 
 /*
- * Establish event handler that is called periodically. 
+ * Establish event handler that is called periodically.
  * The function 'func' is called every 'interval' milliseconds.
  * To change the period, call the function with the original
  * 'client' and 'func' values, and a changed value of 'interval'.
- * An interval value of 0 disables the periodic invocation of 
+ * An interval value of 0 disables the periodic invocation of
  * 'func'. No return value.
  */
 extern void notify_set_periodic_func(Notify_client client, Notify_func

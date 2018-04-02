@@ -68,7 +68,7 @@ static TQE *timerQ = (TQE *)0;
 static TQE *freeTQEQ = (TQE *)0;
 
 #ifndef timeradd
-void timeradd(struct timeval *a, struct timeval *b, 
+void timeradd(struct timeval *a, struct timeval *b,
   struct timeval *sum)
 {
   sum->tv_usec = a->tv_usec + b->tv_usec;
@@ -116,7 +116,7 @@ void timer_check(void)
 * client:    in: first argument for the handler function
 * relative:  in: flag; set relative to current time
 */
-struct timeval *timer_set(struct timeval *interval, 
+struct timeval *timer_set(struct timeval *interval,
   Notify_func func, Notify_client client, int relative)
 {
   register struct TQE *np, *op, *tp;    /* To scan the timer queue */
@@ -230,5 +230,5 @@ struct timeval *timer_get(struct timeval *timeout)
 */
 int timer_pending(void)
 {
-  return timerQ != 0; 
+  return timerQ != 0;
 } /* timer_pending */

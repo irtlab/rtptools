@@ -62,8 +62,8 @@ static struct {
   struct sockaddr_in sin;
 } side[MAX_HOST][3];  /* [host][proto] */
 
-/* 
- * create a linked list for traversing the sequence numbers of the different 
+/*
+ * create a linked list for traversing the sequence numbers of the different
  * streams arriving over a multicast link to a unicast network
  */
 typedef struct stream_id{
@@ -75,7 +75,7 @@ typedef struct stream_id{
 
 typedef struct stream_id stream;
 
-/* 
+/*
  * We need to keep in memory the sequence number of the last sent packet
  * for each data stream.
  */
@@ -131,19 +131,19 @@ int create_stream(int addr, int next)
       elem->next=new_stream;
       last=new_stream;
       return new_stream->seq;
-    } 
+    }
   }
       ;
   if(elem->next==NULL) {
     elem->next=new_stream;
     last=new_stream;
     return new_stream->seq;
-  }   
+  }
   return new_stream->seq;
 }
 
 
-/* 
+/*
  * Add a stream to the list.
  */
 int find_stream(int addr, int ts, int next, int m)
@@ -204,8 +204,8 @@ static Notify_value socket_handler(Notify_client client, int sock)
     struct timeval now;
 
     gettimeofday(&now, 0);
-    printf("%0.3f %s %4d [%s/%d]\n", 
-      now.tv_sec + now.tv_usec/1e6, 
+    printf("%0.3f %s %4d [%s/%d]\n",
+      now.tv_sec + now.tv_usec/1e6,
       rtp_hdr->version==2 ? (proto ? "RTCP" : "RTP ") :
         rtp_hdr->version==0 ? (proto ? "vatC" : "vat ") : "UKWN", len,
       inet_ntoa(sin_from.sin_addr), ntohs(sin_from.sin_port));
@@ -229,9 +229,9 @@ static Notify_value socket_handler(Notify_client client, int sock)
     struct msghdr msg;
     if (!proto) { /* translate VAT packets */
       struct iovec iov[2];
-      char type; 
+      char type;
       int samples = len-VAT_LEN;
-      vat_hdr=(vat_hdr_t *)packet;   
+      vat_hdr=(vat_hdr_t *)packet;
 
       if(vat_hdr->flags&VATHF_NEWTS)
         rtp_hdr_send.m = 1;
@@ -294,7 +294,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
           }
         }
       }
-#else 
+#else
       iov[0].iov_base = (char *)&(rtp_hdr_send);
       iov[0].iov_len = sizeof(rtp_hdr_t)-4;
       iov[1].iov_base = packet+VAT_LEN;
@@ -312,7 +312,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
           msg.msg_accrights = 0;
           msg.msg_accrightslen = 0;
 #endif
-          if ((sendmsg(side[i][2].sock, &msg,0))!= 
+          if ((sendmsg(side[i][2].sock, &msg,0))!=
             iov[0].iov_len +iov[1].iov_len)
             perror("sendmsg RTCP");
           }
@@ -327,7 +327,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
       int length;
       item=NULL;
 
-      /* total length of the packet = IP address+ site entry of vat+ 2 type+ 2 
+      /* total length of the packet = IP address+ site entry of vat+ 2 type+ 2
         length + 4 common header+ 4 ssrc + 8 empty RR */
       length = strlen(inet_ntoa(sin_from.sin_addr)) +
         strlen(packet+sizeof(struct CtrlMsgHdr)) + 12 + 8;
@@ -529,7 +529,7 @@ again:
         }
       }
       if (j < 2) {
-        notify_set_input_func((Notify_client)j, socket_handler, 
+        notify_set_input_func((Notify_client)j, socket_handler,
           side[i][j].sock);
       }
     } /* for j (protocols) */
