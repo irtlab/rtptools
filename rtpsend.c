@@ -236,8 +236,8 @@ static void node_free(node_t *list)
 static int rtcp_sdes_item(char *type, char *string, char *packet)
 {
   struct {
-    char *name;
-    rtcp_sdes_type_t type;
+    const char *name;
+    rtcp_sdes_type_t type; 
   } map[] = {
     {"end",   RTCP_SDES_END},
     {"cname", RTCP_SDES_CNAME},
@@ -595,7 +595,7 @@ static int rtcp_write_app(node_t *list, char *packet)
 static int rtcp_packet(node_t *list, char *packet)
 {
   struct {
-    char *pt;
+    const char *pt;
     int  (*rtcp_write)(node_t *list, char *packet);
   } rtcp_map[] = {
     { "SDES",  rtcp_write_sdes },

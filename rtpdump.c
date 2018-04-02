@@ -116,7 +116,7 @@ static struct {
 	{ NULL,		    0,	0 }
 };
 
-static void usage(char *argv0)
+static void usage(const char *argv0)
 {
   fprintf(stderr, "usage: %s "
 	"[-F hex|ascii|rtcp|short|payload|dump|header] "
@@ -265,7 +265,7 @@ static void rtpdump_header(FILE *out, struct sockaddr_in *sin,
 /*
 * Return type of packet, either "RTP", "RTCP", "VATD" or "VATC".
 */
-static char *parse_type(int type, char *buf)
+static const char *parse_type(int type, char *buf)
 {
   if (type == 0) {
     rtp_hdr_t *r = (rtp_hdr_t *)buf;
@@ -391,7 +391,7 @@ void member_sdes(FILE *out, member_t m, rtcp_sdes_type_t t, char *b, int len)
 {
   static struct {
     rtcp_sdes_type_t t;
-    char *name;
+    const char *name;
   } map[] = {
     {RTCP_SDES_END,    "end"},
     {RTCP_SDES_CNAME,  "CNAME"},
@@ -658,7 +658,7 @@ int main(int argc, char *argv[])
 {
   int c;
   static struct {
-    char *name;
+    const char *name;
     t_format format;
   } formats[] = {
     {"dump",    F_dump},
