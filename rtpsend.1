@@ -26,7 +26,7 @@
 .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
-.Dd November 23, 2017
+.Dd April 2, 2018
 .Dt RTPSEND 1
 .Os
 .Sh NAME
@@ -37,15 +37,20 @@
 .Op Fl ahlv
 .Op Fl f Ar infile
 .Op Fl s Ar port
-.Ar address Ns / Ns Ar port Ns Op / Ns Ar ttl
+.Oo Ar address Oc Ns / Ns Ar port Ns Op / Ns Ar ttl
 .Sh DESCRIPTION
 .Nm
 sends a stream of RTP and RTCP packets with configurable parameters.
 The packets are sent to the given
 .Ar address Ns / Ns Ar port ,
-optionally with a time-to-live value of
+optionally with a given value of
 .Ar ttl .
 This is intended to test the RTP features of the receiving end.
+The
+.Ar address
+defaults to
+.Dq localhost .
+The port number must be an even number.
 .Pp
 By default,
 .Nm
