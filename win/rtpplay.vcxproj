@@ -94,6 +94,7 @@
     <ClCompile Include="../multimer.c" />
     <ClCompile Include="../notify.c" />
     <ClCompile Include="../payload.c" />
+    <ClCompile Include="../payload.h" />
     <ClCompile Include="../rd.c" />
     <ClCompile Include="../rtpplay.c" />
     <ClCompile Include="../win\getopt.c" />
