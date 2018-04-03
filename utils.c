@@ -53,14 +53,16 @@ int hpt(char*, struct sockaddr_in*, unsigned char*);
 int
 host2ip(char *host, struct in_addr *in)
 {
+	in_addr_t a;
 	struct hostent *hep;
 
 	if (host == NULL || *host == '\0') {
 		in->s_addr = INADDR_ANY;
 		return 0;
 	}
-	if (inet_aton(host, in) == 1) {
+	if ((a = inet_addr(host)) != INADDR_NONE) {
 		/* a valid dotted-decimal */
+		in->s_addr = a;
 		return 0;
 	}
 	if ((hep = gethostbyname(host))) {
