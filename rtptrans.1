@@ -26,7 +26,7 @@
 .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
-.Dd November 23, 2017
+.Dd April 2, 2018
 .Dt RTPTRANS 1
 .Os
 .Sh NAME
@@ -43,6 +43,7 @@
 translates RTP/RTCP packets arriving from one of the specified addresses
 to all the other addresses.
 Addresses can be multicast or unicast.
+The port number must be an even number.
 The optional TTL values are ignored for unicast addresses.
 .Pp
 Additionally, the translator can translate VAT packets into RTP packets.
