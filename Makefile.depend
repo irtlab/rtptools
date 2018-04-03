@@ -1,6 +1,7 @@
 hsearch.o: hsearch.c sysdep.h hsearch.h
 multimer.o: multimer.c multimer.h notify.h sysdep.h
 notify.o: notify.c sysdep.h notify.h multimer.h
+payload.o: payload.c payload.h
 rd.o: rd.c rtpdump.h sysdep.h
 utils.o: utils.c sysdep.h
 

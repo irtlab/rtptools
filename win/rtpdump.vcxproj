@@ -90,6 +90,7 @@
     <ClCompile Include="../compat-err.c" />
     <ClCompile Include="../multimer.c" />
     <ClCompile Include="../notify.c" />
+    <ClCompile Include="../payload.c" />
     <ClCompile Include="../rd.c" />
     <ClCompile Include="../rtpdump.c" />
     <ClCompile Include="../win\getopt.c" />

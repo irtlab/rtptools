@@ -38,7 +38,6 @@
 .Op Fl b Ar time
 .Op Fl e Ar time
 .Op Fl f Ar infile
-.Op Fl p Ar profile
 .Op Fl s Ar port
 .Oo Ar address Oc Ns / Ns Ar port Ns Op / Ns Ar ttl
 .Sh DESCRIPTION
@@ -71,22 +70,6 @@ Read input from the given
 instead of from standard input.
 .It Fl h
 Print a short usage summary and exit.
-.It Fl p Ar profile
-Use the specified
-.Ar profile
-of payload type to frequency mapping.
-By default,
-.Nm
-uses the frequency profile specified in RFC 1890.
-For example, A-law PCM audio will be a single channel
-with a sample rate of 8 kHz.
-The
-.Ar profile
-file consists of lines containing two numeric values:
-the numeric payload type and the sample rate.
-This is silently ignored if
-.Fl T
-is used.
 .It Fl s Ar port
 Send packets from the specified
 .Ar port .

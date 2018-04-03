@@ -93,6 +93,7 @@
     <ClCompile Include="../compat-hsearch.c" />
     <ClCompile Include="../multimer.c" />
     <ClCompile Include="../notify.c" />
+    <ClCompile Include="../payload.c" />
     <ClCompile Include="../rd.c" />
     <ClCompile Include="../rtpplay.c" />
     <ClCompile Include="../win\getopt.c" />

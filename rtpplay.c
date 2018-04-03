@@ -56,10 +56,12 @@
 #include "rtp.h"
 #include "rtpdump.h"
 #include "multimer.h"
+#include "payload.h"
 
 #define READAHEAD 16 /* must be power of 2 */
 
 extern int hpt(char*, struct sockaddr_in*, unsigned char*);
+extern struct pt payload[];
 
 static int verbose = 0;        /* be chatty about packets sent */
 static int wallclock = 0;      /* use wallclock time rather than timestamps */
@@ -70,49 +72,10 @@ static int sock[2];            /* output sockets */
 static int first = -1;         /* time offset of first packet */
 static RD_buffer_t buffer[READAHEAD];
 
-static double period[128] = {  /* ms per timestamp difference */
-  1/8000.,   /*  0: PCMU */
-  1/8000.,   /*  1: 1016 */
-  1/8000.,   /*  2: G721 */
-  1/8000.,   /*  3: GSM  */
-  1/8000.,   /*  4: G723 */
-  1/8000.,   /*  5: DVI4 */
-  1/16000.,  /*  6: DVI4 */
-  1/8000.,   /*  7: LPC  */
-  1/8000.,   /*  8: PCMA */
-  1/16000.,  /*  9: G722 */
-  1/44100.,  /* 10: L16  */
-  1/44100.,  /* 11: L16  */
-  0,         /* 12:      */
-  0,         /* 13:      */
-  1/90000.,  /* 14: MPA  */
-  1/90000.,  /* 15: G728 */
-  1/11025.,  /* 16: DVI4 */
-  1/22050.,  /* 17: DVI4 */
-  0,         /* 18:      */
-  0,         /* 19:      */
-  0,         /* 20:      */
-  0,         /* 21:      */
-  0,         /* 22:      */
-  0,         /* 23:      */
-  0,         /* 24:      */
-  1/90000.,  /* 25: CelB */
-  1/90000.,  /* 26: JPEG */
-  1/90000.,  /* 27:      */
-  1/90000.,  /* 28: nv   */
-  1/90000.,  /* 29:      */
-  1/90000.,  /* 30: */
-  1/90000.,  /* 31: H261 */
-  1/90000.,  /* 32: MPV  */
-  1/90000.,  /* 33: MP2T */
-  1/90000.,  /* 34: H263 */
-};
-
-
 static void usage(char *argv0)
 {
   fprintf(stderr, "usage: %s "
-	"[-hTv] [-b begin] [-e end] [-f file] [-p profile] [-s port] "
+	"[-hTv] [-b begin] [-e end] [-f file] [-s port] "
 	"address/port[/ttl]\n", argv0);
   exit(1);
 } /* usage */
@@ -234,7 +197,7 @@ static Notify_value play_handler(Notify_client client)
       double d;
 
       t = (struct rt_ts *)e->data;
-      d = period[pt] * (int)(ts - t->ts);
+      d = payload[pt].rate ? ((1.0) * (int)(ts - t->ts)) / payload[pt].rate : 0;
       next.tv_sec  = t->rt.tv_sec  + (int)d;
       next.tv_usec = t->rt.tv_usec + (d - (int)d) * 1000000;
       if (verbose)
@@ -276,28 +239,6 @@ static Notify_value play_handler(Notify_client client)
 } /* play_handler */
 
 
-/*
-* Read profile file, containing one line for each PT.
-*/
-static void profile(char *fn)
-{
-  FILE *f;
-  int pt, r;
-
-  if (!(f = fopen(fn, "r"))) {
-    perror(fn);
-    exit(1);
-  }
-  while (fscanf(f, "%d %d", &pt, &r) != EOF) {
-    if (pt >= 0 && pt < 128 && r > 0 && r < 100000) {
-      period[pt] = 1/(double)r;
-    }
-    else {
-      fprintf(stderr, "PT=%d or rate=%d is invalid.\n", pt, r);
-    }
-  }
-} /* profile */
-
 
 int main(int argc, char *argv[])
 {
@@ -330,9 +271,6 @@ int main(int argc, char *argv[])
         perror(optarg);
         exit(1);
       }
-      break;
-    case 'p':
-      profile(optarg);
       break;
     case 'T':
       wallclock = 1;
