@@ -239,7 +239,7 @@ static int rtcp_sdes_item(char *type, char *string, char *packet)
 {
   struct {
     const char *name;
-    rtcp_sdes_type_t type; 
+    rtcp_sdes_type_t type;
   } map[] = {
     {"end",   RTCP_SDES_END},
     {"cname", RTCP_SDES_CNAME},

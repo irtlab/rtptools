@@ -73,7 +73,7 @@ host2ip(char *host, struct in_addr *in)
 
 /* Parse [host]/port[/ttl]. Return 0 if ok, -1 on error;
  * fill in sockaddr; set ttl if requested. */
-int 
+int
 hpt(char *h, struct sockaddr_in * sin, unsigned char *ttl)
 {
 	char *p = NULL, *t = NULL;
