@@ -66,10 +66,10 @@ int gettimeofday(struct timeval *tv, void *t)
 
   if (!QueryPerformanceCounter(&count))
     return -1;
-  c = count.QuadPart;
-  tv->tv_sec  = stv.tv_sec  + (long)((c - sct) / tick);
-  tv->tv_usec = stv.tv_usec + (long)(((c - sct) % tick) * 1000000 / tick);
-  if (tv->tv_usec >= 1000000) {
+    c = count.QuadPart;
+    tv->tv_sec  = stv.tv_sec  + (long)((c - sct) / tick);
+    tv->tv_usec = stv.tv_usec + (long)(((c - sct) % tick) * 1000000 / tick);
+    if (tv->tv_usec >= 1000000) {
     tv->tv_sec++;
     tv->tv_usec -= 1000000;
   }
