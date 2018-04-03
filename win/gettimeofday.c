@@ -79,5 +79,3 @@ int gettimeofday(struct timeval *tv, void *t)
   return 0;
 }
 #endif /* WIN32 */
-
- 
