@@ -83,6 +83,7 @@
 #define EADDRNOTAVAIL WSAEADDRNOTAVAIL
 #endif
 
+typedef UINT32  in_addr_t;
 typedef SSIZE_T ssize_t;
 
 typedef  INT32 pid_t;
