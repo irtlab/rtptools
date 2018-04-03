@@ -67,18 +67,6 @@
 #define timeb _timeb
 #endif /* _MSC_VER */
 
-#ifndef SIGBUS
-#define SIGBUS SIGINT
-#endif
-
-#ifndef SIGHUP
-#define SIGHUP SIGINT
-#endif
-
-#ifndef SIGPIPE
-#define SIGPIPE SIGINT
-#endif
-
 #ifndef EADDRNOTAVAIL
 #define EADDRNOTAVAIL WSAEADDRNOTAVAIL
 #endif
@@ -92,12 +80,6 @@ typedef UINT32 uid_t;
 
 typedef char *   caddr_t;        /* core address */
 typedef long  fd_mask;
-#define NBBY  8   /* number of bits in a byte */
-#define NFDBITS (sizeof(fd_mask) * NBBY)  /* bits per mask */
-
-#ifndef howmany
-#define howmany(x, y) (((x) + ((y) - 1)) / (y))
-#endif
 
 struct iovec {
     void  *iov_base;    /* Starting address */
@@ -182,10 +164,6 @@ struct  itimerval {
 
 #ifndef ETIME
 #define ETIME 1
-#endif
-
-#ifndef SIGKILL
-#define SIGKILL SIGTERM
 #endif
 
 #define fork() 0
