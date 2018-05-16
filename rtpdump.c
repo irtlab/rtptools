@@ -118,12 +118,14 @@ static struct {
 	{ NULL,		    0,	0 }
 };
 
+int dyn_payload_rtpevent = 101; /* Default payload type for RTPEvent packets */
+
 static void usage(const char *argv0)
 {
   fprintf(stderr, "usage: %s "
 	"[-F hex|ascii|rtcp|short|payload|dump|header] "
 	"[-f infile] [-o outfile] [-t minutes] [-x bytes] "
-	"[address]/port > file\n", argv0);
+	"[-d event_payload_id] [address]/port > file\n", argv0);
 }
 
 
@@ -309,6 +311,7 @@ static int parse_data(FILE *out, char *buf, int len)
   rtp_hdr_ext_t *ext;
   int i, ext_len;
   int hlen = 0;
+  char *payload_data = NULL;
 
   /* Show vat format packets. */
   if (r->version == 0) {
@@ -334,6 +337,29 @@ static int parse_data(FILE *out, char *buf, int len)
     for (i = 0; i < r->cc; i++) {
       fprintf(out, "csrc[%d]=0x%0lx ", i, r->csrc[i]);
     }
+
+    /* Check if it is an RTPEvent Packet */
+    if (dyn_payload_rtpevent == r->pt)
+    {
+
+	    payload_data = (char*)buf + 12 + (r->cc*4);
+	    if (payload_data[0] == 10)
+	    {
+
+		    payload_data[0] = '*';
+	    }
+	    else if (payload_data[0] == 11)
+	    {
+		    payload_data[0] = '#';
+	    }
+	    else
+	    {
+		    payload_data[0] += '0';
+	    }
+      	    fprintf(out, "dtmf=%c duration=%dms end=%d ", payload_data[0], ntohs(*(short*)(payload_data+2))/8,(payload_data[1]>>7)&0x1);
+	    
+    }
+
     if (r->x) {  /* header extension */
       ext = (rtp_hdr_ext_t *)((char *)buf + hlen);
       ext_len = ntohs(ext->len);
@@ -577,7 +603,6 @@ void packet_handler(FILE *out, t_format format, int trunc,
   double dnow = tdbl(&now);
   int hlen;   /* header length */
   int offset;
-
   switch(format) {
     case F_header:
       offset = (dnow - dstart) * 1000;
@@ -684,7 +709,7 @@ int main(int argc, char *argv[])
   extern double tdbl(struct timeval *);
 
   startupSocket();
-  while ((c = getopt(argc, argv, "F:f:o:t:x:h")) != EOF) {
+  while ((c = getopt(argc, argv, "F:f:o:t:x:d:h")) != EOF) {
     switch(c) {
     /* output format */
     case 'F':
@@ -725,6 +750,11 @@ int main(int argc, char *argv[])
     /* bytes to show for F_hex or F_dump */
     case 'x':
       trunc = atoi(optarg);
+      break;
+
+      /* Dynamic Payload Type for RTPEVENT packets */
+    case 'd':
+      dyn_payload_rtpevent = atoi(optarg);
       break;
 
     case '?':
