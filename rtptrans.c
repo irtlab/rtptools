@@ -41,15 +41,15 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "config.h"
 #endif
+
+#include "sysdep.h"
 
 #include "rtp.h"
 #include "rtpdump.h"
 #include "notify.h"
 #include "multimer.h"
 #include "vat.h"
-#include "sysdep.h"
 
 extern int hpt(char*, struct sockaddr_in*, unsigned char*);
 
