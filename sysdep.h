@@ -31,16 +31,28 @@
 #ifndef SYSDEP_H
 #define SYSDEP_H
 
+/* In this file, we basically decide whether we are on Windows or not.
+ * On Windows, define a bunch of stuff that Windows needs defined
+ * (TODO: it could probably be cleand up a bit); otherwise,
+ * simply include the config.h produced by configure. */
+
 #if defined(WIN32) || defined(__WIN32__)
+
+#define HAVE_ERR	0
+#define HAVE_HSEARCH	0
+#define HAVE_PROGNAME	0
+#define HAVE_STRTONUM	0
+#define HAVE_LNSL	0
+#define HAVE_LSOCKET	0
+#define HAVE_BIGENDIAN	0
+#define HAVE_MSGCONTROL	0
+#define RTP_BIG_ENDIAN	0
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
 #include <stdio.h>
 #include <time.h>
-
-#define HAVE_ERR 0
-#define RTP_BIG_ENDIAN 0
 
 /* Determine if the C(++) compiler requires complete function prototype  */
 #ifndef __P
@@ -209,13 +221,13 @@ extern int sendmsg(int s, const struct msghdr *msg, int flags);
 
 #else /* not WIN32 */
 
-/* Windows needs to call this function on <winsock2.h>.
- Otherwise the first call of socket() will fail
- "sock[i] = socket(PF_INET, SOCK_DGRAM, 0);"
- with "socket: No error". Tried on Win10. */
-#ifndef startupSocket
+#include "config.h"
+
+/* Windows needs to call this function as the first thing
+ * to iit its sockat stack as described in <winsock2.h>.
+ * Use it uniformly in the code, but define it away if
+ * we are not on Windows. */
 #define startupSocket()
-#endif
 
 #endif
 
