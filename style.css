@@ -1,0 +1,69 @@
+body {
+  margin-right: 3em;
+  margin-left: 3em;
+  font-family: arial,verdana,sans-serif;
+  font-size: small
+}
+
+h1 {
+  width: 100%;
+  font-size: 160%;
+  font-weight: bold;
+  background-color: #A0A0A0;
+  color: white;
+  padding-left: 1em;
+  border-bottom:1px solid #36c;
+}
+
+h2 {
+  width: 100%;
+  font-size: 120%;
+  font-weight: bold;
+  background-color: #A0A0A0;
+  color: white;
+  padding-left: 1em;
+  border-bottom:1px solid #36c;
+}
+
+dt {
+  font-weight: bold;
+}
+
+.pts:before {content: "["}
+.pts:after {content: "] "}
+.pts {
+  color: #9900CC;
+  font-weight: bold
+}
+
+.solution {
+}
+
+a:link {text-decoration: none}
+a:visited {text-decoration: none}
+a:hover {text-decoration: underline; color:#888}
+
+blockquote { 
+  background-color: #ccffcc;
+}
+
+.notice {
+  background: #fff6bf url(exclamation.png) center no-repeat;
+  background-position: 15px 50%; /* x-pos y-pos */
+  text-align: left;
+  padding: 5px 20px 5px 45px;
+  border-top: 2px solid #ffd324;
+  border-bottom: 2px solid #ffd324;
+}
+
+tr:nth-child(odd)       { background-color:#eee; }
+tr:nth-child(even)      { background-color:#fff; }
+
+tr.odd {background-color: #cccccc}
+tr.even {background-color: #eeeeee}
+.heading {
+  font-size: 110%;
+  font-weight: bold; 
+  background-color: #336699;
+  color: white;
+}
