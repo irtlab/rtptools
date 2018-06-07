@@ -127,6 +127,9 @@ uninstall:
 	cd $(BINDIR)      && rm $(PROG)
 	cd $(MANDIR)/man1 && rm $(MAN1)
 
+lint: $(MAN1)
+	mandoc -Tlint -Wstyle $(MAN1)
+
 Makefile.local config.h: configure $(HAVESRCS)
 	@echo "$@ is out of date; please run ./configure"
 	@exit 1
