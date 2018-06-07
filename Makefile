@@ -127,6 +127,9 @@ uninstall:
 	cd $(BINDIR)      && rm $(PROG)
 	cd $(MANDIR)/man1 && rm $(MAN1)
 
+lint: $(MAN1)
+	mandoc -Tlint -Wstyle $(MAN1)
+
 Makefile.local config.h: configure $(HAVESRCS)
 	@echo "$@ is out of date; please run ./configure"
 	@exit 1
@@ -174,5 +177,5 @@ distcheck: dist
 	$(CC) $(CFLAGS) -c $<
 
 .1.1.html:
-	{ which mandoc > /dev/null && mandoc -Thtml -Wstyle $< > $@ ; } || \
-	{ which groff  > /dev/null && groff  -Thtml -mdoc   $< > $@ ; }
+	mandoc -Thtml -O style=style.css,man=%N.%S.html -Wstyle $< > $@ || \
+	groff  -Thtml -mdoc   $< > $@
