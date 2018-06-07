@@ -177,5 +177,5 @@ distcheck: dist
 	$(CC) $(CFLAGS) -c $<
 
 .1.1.html:
-	mandoc -Thtml -O style=style.css,man=./%N.%S.html -Wstyle $< > $@ || \
+	mandoc -Thtml -O style=style.css,man=%N.%S.html -Wstyle $< > $@ || \
 	groff  -Thtml -mdoc   $< > $@
