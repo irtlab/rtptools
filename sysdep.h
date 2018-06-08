@@ -39,6 +39,7 @@
 #if defined(WIN32) || defined(__WIN32__)
 
 #define HAVE_ERR	0
+#define HAVE_GETOPT	0
 #define HAVE_HSEARCH	0
 #define HAVE_PROGNAME	0
 #define HAVE_STRTONUM	0
@@ -224,7 +225,7 @@ extern int sendmsg(int s, const struct msghdr *msg, int flags);
 #include "config.h"
 
 /* Windows needs to call this function as the first thing
- * to iit its sockat stack as described in <winsock2.h>.
+ * to init its socket stack as described in <winsock2.h>.
  * Use it uniformly in the code, but define it away if
  * we are not on Windows. */
 #define startupSocket()
