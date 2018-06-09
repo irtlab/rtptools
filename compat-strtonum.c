@@ -1,4 +1,4 @@
-#include "config.h"
+#include "sysdep.h"
 
 #if HAVE_STRTONUM
 
