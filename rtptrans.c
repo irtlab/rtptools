@@ -343,7 +343,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
       rtcp_msg->common.p=0;
       rtcp_msg->common.count=0;
       rtcp_msg->common.pt=RTCP_RR;
-      rtcp_msg->r.rr.ssrc = random();
+      rtcp_msg->r.rr.ssrc = rand();
       rtcp_msg->common.length=(8 >> 2) - 1;
 
       ctl_msg=(struct sdes_msg *)&rtcp_msg->r.rr.rr[0];
