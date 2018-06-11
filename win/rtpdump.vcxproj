@@ -88,16 +88,16 @@
   <ItemGroup>
     <ClCompile Include="../utils.c" />
     <ClCompile Include="../compat-err.c" />
+    <ClCompile Include="../compat-getopt.c" />
+    <ClCompile Include="../compat-progname.c" />
     <ClCompile Include="../multimer.c" />
     <ClCompile Include="../notify.c" />
     <ClCompile Include="../rd.c" />
     <ClCompile Include="../rtpdump.c" />
-    <ClCompile Include="../win\getopt.c" />
     <ClCompile Include="../win\gettimeofday.c" />
     <ClCompile Include="../win\winsocklib.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="getopt.h" />
     <ClInclude Include="gettimeofday.h" />
     <ClInclude Include="include\arpa\inet.h" />
     <ClInclude Include="include\netdb.h" />

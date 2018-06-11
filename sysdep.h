@@ -220,6 +220,13 @@ extern int winfd_dummy;
 extern char getc_socket(FILE_SOCKET *f);
 extern int sendmsg(int s, const struct msghdr *msg, int flags);
 
+extern char*	optarg;
+extern int	opterr;
+extern int	optind;
+extern int	optopt;
+extern int	optreset;
+extern int	getopt(int, char* const*, const char*);
+
 #else /* not WIN32 */
 
 #include "config.h"
