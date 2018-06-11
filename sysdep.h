@@ -55,31 +55,6 @@
 #include <stdio.h>
 #include <time.h>
 
-/* Determine if the C(++) compiler requires complete function prototype  */
-#ifndef __P
-#if defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
-#define __P(x) x
-#else
-#define __P(x) ()
-#endif
-#endif
-
-#ifdef __BORLANDC__
-#include <io.h>
-#define strcasecmp stricmp
-#define strncasecmp strnicmp
-#endif /* __BORLANDC__ */
-
-#ifdef _MSC_VER
-#define strcasecmp _stricmp
-#define strncasecmp _strnicmp
-#define open _open
-#define write _write
-#define close _close
-#define ftime _ftime
-#define timeb _timeb
-#endif /* _MSC_VER */
-
 #ifndef SIGBUS
 #define SIGBUS SIGINT
 #endif
