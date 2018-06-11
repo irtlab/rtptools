@@ -55,6 +55,9 @@
 #include <stdio.h>
 #include <time.h>
 
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+
 #ifndef SIGBUS
 #define SIGBUS SIGINT
 #endif
@@ -65,10 +68,6 @@
 
 #ifndef SIGPIPE
 #define SIGPIPE SIGINT
-#endif
-
-#ifndef EADDRNOTAVAIL
-#define EADDRNOTAVAIL WSAEADDRNOTAVAIL
 #endif
 
 typedef UINT32  in_addr_t;
@@ -166,10 +165,6 @@ struct  itimerval {
       (result)->tv_usec += 1000000;                                           \
     }                                                                         \
   } while (0)
-#endif
-
-#ifndef ETIME
-#define ETIME 1
 #endif
 
 #ifndef SIGKILL

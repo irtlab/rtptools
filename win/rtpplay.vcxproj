@@ -101,6 +101,7 @@
     <ClCompile Include="../win\winsocklib.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="../sysdep.h" />
     <ClInclude Include="getopt.h" />
     <ClInclude Include="gettimeofday.h" />
     <ClInclude Include="include\arpa\inet.h" />
