@@ -55,21 +55,17 @@ rtptrans_OBJS	= utils.o notify.o multimer.o      rtptrans.o
 HAVE_SRCS = \
 	have-err.c		\
 	have-gethostbyname.c	\
-	have-hsearch.c		\
 	have-progname.c		\
 	have-strtonum.c		\
 	have-msgcontrol.c
 
 COMPAT_SRCS = \
 	compat-err.c		\
-	compat-hsearch.c	\
-	compat-hsearch.h	\
 	compat-progname.c	\
 	compat-strtonum.c
 
 COMPAT_OBJS = \
 	compat-err.o		\
-	compat-hsearch.o	\
 	compat-progname.o	\
 	compat-strtonum.o
 
