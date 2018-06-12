@@ -111,7 +111,6 @@
     <ClInclude Include="include\sys\socket.h" />
     <ClInclude Include="include\sys\time.h" />
     <ClInclude Include="include\unistd.h" />
-    <ClInclude Include="winsocklib.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -81,8 +81,8 @@ WINDOWS = \
 	win/rtpdump.vcxproj win/rtpplay.vcxproj		\
 	win/rtpsend.vcxproj win/rtptrans.vcxproj	\
 	win/gettimeofday.c win/gettimeofday.h		\
-	win/winsocklib.c win/winsocklib.h		\
-	win/getopt.c win/getopt.h
+	win/getopt.c win/getopt.h			\
+	win/winsocklib.c
 
 DISTFILES = \
 	LICENSE			\
