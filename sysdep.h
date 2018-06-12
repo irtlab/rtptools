@@ -62,26 +62,17 @@
 #define SIGHUP SIGINT
 #endif
 
-typedef char *   caddr_t;        /* core address */
-typedef long  fd_mask;
-#define NBBY  8   /* number of bits in a byte */
-#define NFDBITS (sizeof(fd_mask) * NBBY)  /* bits per mask */
-
-#ifndef howmany
-#define howmany(x, y) (((x) + ((y) - 1)) / (y))
-#endif
-
 struct iovec {
     void  *iov_base;    /* Starting address */
     size_t iov_len;     /* Number of bytes to transfer */
 };
 
 struct msghdr {
-        caddr_t msg_name;               /* optional address */
+        char*   msg_name;               /* optional address */
         int     msg_namelen;            /* size of address */
         struct  iovec *msg_iov;         /* scatter/gather array */
         int     msg_iovlen;             /* # elements in msg_iov */
-        caddr_t msg_accrights;          /* access rights sent/received */
+        char*   msg_accrights;          /* access rights sent/received */
         int     msg_accrightslen;
 };
 
@@ -91,46 +82,6 @@ struct  itimerval {
         struct  timeval it_interval;    /* timer interval */
         struct  timeval it_value;       /* current value */
 };
-
-#ifndef timerisset
-#define timerisset(tvp)        ((tvp)->tv_sec || (tvp)->tv_usec)
-#endif
-
-#ifndef timerclear
-#define timerclear(tvp)        ((tvp)->tv_sec = (tvp)->tv_usec = 0)
-#endif
-
-#ifndef timercmp
-#define timercmp(a, b, CMP)                                                  \
-  (((a)->tv_sec == (b)->tv_sec) ?                                             \
-   ((a)->tv_usec CMP (b)->tv_usec) :                                          \
-   ((a)->tv_sec CMP (b)->tv_sec))
-#endif
-
-#ifndef timeradd
-#define timeradd(a, b, result)                                               \
-  do {                                                                        \
-    (result)->tv_sec = (a)->tv_sec + (b)->tv_sec;                             \
-    (result)->tv_usec = (a)->tv_usec + (b)->tv_usec;                          \
-    if ((result)->tv_usec >= 1000000)                                         \
-      {                                                                       \
-        ++(result)->tv_sec;                                                   \
-        (result)->tv_usec -= 1000000;                                         \
-      }                                                                       \
-  } while (0)
-#endif
-
-#ifndef timersub
-#define timersub(a, b, result)                                               \
-  do {                                                                        \
-    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;                             \
-    (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;                          \
-    if ((result)->tv_usec < 0) {                                              \
-      --(result)->tv_sec;                                                     \
-      (result)->tv_usec += 1000000;                                           \
-    }                                                                         \
-  } while (0)
-#endif
 
 extern int winfd_dummy;
 extern int sendmsg(int s, const struct msghdr *msg, int flags);
