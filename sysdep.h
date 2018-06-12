@@ -193,10 +193,10 @@ extern int sendmsg(int s, const struct msghdr *msg, int flags);
 
 /* declare the missing functions */
 
-extern void err(int, const char *, ...);"
-extern void errx(int, const char *, ...);"
-extern void warn(const char *, ...);"
-extern void warnx(const char *, ...);"
+extern void err(int, const char *, ...);
+extern void errx(int, const char *, ...);
+extern void warn(const char *, ...);
+extern void warnx(const char *, ...);
 
 extern char* optarg;
 extern int   opterr;
