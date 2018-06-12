@@ -58,24 +58,9 @@
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
 
-#ifndef SIGBUS
-#define SIGBUS SIGINT
-#endif
-
 #ifndef SIGHUP
 #define SIGHUP SIGINT
 #endif
-
-#ifndef SIGPIPE
-#define SIGPIPE SIGINT
-#endif
-
-typedef UINT32  in_addr_t;
-typedef SSIZE_T ssize_t;
-
-typedef  INT32 pid_t;
-typedef UINT32 gid_t;
-typedef UINT32 uid_t;
 
 typedef char *   caddr_t;        /* core address */
 typedef long  fd_mask;
@@ -100,27 +85,7 @@ struct msghdr {
         int     msg_accrightslen;
 };
 
-struct passwd {
-        char    *pw_name;
-        char    *pw_passwd;
-        uid_t   pw_uid;
-        gid_t   pw_gid;
-        char    *pw_age;
-        char    *pw_comment;
-        char    *pw_gecos;
-        char    *pw_dir;
-        char    *pw_shell;
-};
-
 #define  ITIMER_REAL     0       /* Decrements in real time */
-
-#ifndef _TIMESPEC_T
-#define _TIMESPEC_T
-typedef struct  timespec {              /* definition per POSIX.4 */
-        time_t          tv_sec;         /* seconds */
-        long            tv_nsec;        /* and nanoseconds */
-} timespec_t;
-#endif  /* _TIMESPEC_T */
 
 struct  itimerval {
         struct  timeval it_interval;    /* timer interval */
@@ -167,27 +132,7 @@ struct  itimerval {
   } while (0)
 #endif
 
-#ifndef SIGKILL
-#define SIGKILL SIGTERM
-#endif
-
-#define fork() 0
-#define setsid() {}
-
-#ifndef FILE_SOCKET
-#define FILE_SOCKET int
-#endif
-
-#ifndef fdopen_socket
-#define fdopen_socket(f, g) &f
-#endif
-
-#ifndef fclose_socket
-#define fclose_socket(f) closesocket(*f)
-#endif
-
 extern int winfd_dummy;
-extern char getc_socket(FILE_SOCKET *f);
 extern int sendmsg(int s, const struct msghdr *msg, int flags);
 
 #else /* not WIN32 */
