@@ -54,6 +54,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <time.h>
+#include <stdint.h>
 
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
@@ -62,6 +63,7 @@
 #define SIGHUP SIGINT
 #endif
 
+typedef uint32_t      in_addr_t;
 typedef char *   caddr_t;        /* core address */
 typedef long  fd_mask;
 #define NBBY  8   /* number of bits in a byte */
