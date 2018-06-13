@@ -135,6 +135,24 @@ struct  itimerval {
 extern int winfd_dummy;
 extern int sendmsg(int s, const struct msghdr *msg, int flags);
 
+
+/* declare the missing functions */
+
+extern void err(int, const char *, ...);
+extern void errx(int, const char *, ...);
+extern void warn(const char *, ...);
+extern void warnx(const char *, ...);
+
+extern char* optarg;
+extern int   opterr;
+extern int   optind;
+extern int   optopt;
+extern int   optreset;
+extern int   getopt(int, char* const*, const char*);
+
+extern const char* getprogname(void);
+extern void        setprogname(const char *);
+
 #else /* not WIN32 */
 
 #include "config.h"
