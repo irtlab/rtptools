@@ -54,6 +54,7 @@ rtptrans_OBJS	= utils.o notify.o multimer.o      rtptrans.o
 
 HAVE_SRCS = \
 	have-err.c		\
+	have-getopt.c		\
 	have-gethostbyname.c	\
 	have-hsearch.c		\
 	have-progname.c		\
@@ -62,6 +63,7 @@ HAVE_SRCS = \
 
 COMPAT_SRCS = \
 	compat-err.c		\
+	compat-getopt.c		\
 	compat-hsearch.c	\
 	compat-hsearch.h	\
 	compat-progname.c	\
@@ -69,6 +71,7 @@ COMPAT_SRCS = \
 
 COMPAT_OBJS = \
 	compat-err.o		\
+	compat-getopt.o		\
 	compat-hsearch.o	\
 	compat-progname.o	\
 	compat-strtonum.o
@@ -81,7 +84,6 @@ WINDOWS = \
 	win/rtpdump.vcxproj win/rtpplay.vcxproj		\
 	win/rtpsend.vcxproj win/rtptrans.vcxproj	\
 	win/gettimeofday.c win/gettimeofday.h		\
-	win/getopt.c win/getopt.h			\
 	win/winsocklib.c
 
 DISTFILES = \
