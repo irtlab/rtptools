@@ -39,9 +39,6 @@
  */
 #define RTP_VERSION    2
 
-#define RTP_SEQ_MOD (1<<16)
-#define RTP_MAX_SDES 255      /* maximum text length for SDES */
-
 typedef enum {
     RTCP_SR   = 200,
     RTCP_RR   = 201,
@@ -110,13 +107,6 @@ typedef struct {
     unsigned int pt:8;        /* RTCP packet type */
     unsigned int length:16;   /* pkt len in words, w/o this word */
 } rtcp_common_t;
-
-/*
- * Big-endian mask for version, padding bit and packet type pair
- * FIXME?
- */
-#define RTCP_VALID_MASK (0xc000 | 0x2000 | 0xfe)
-#define RTCP_VALID_VALUE ((RTP_VERSION << 14) | RTCP_SR)
 
 /*
  * Reception report block
