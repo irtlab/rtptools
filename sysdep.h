@@ -86,9 +86,7 @@ struct  itimerval {
         struct  timeval it_value;       /* current value */
 };
 
-extern int winfd_dummy;
 extern int sendmsg(int s, const struct msghdr *msg, int flags);
-
 
 /* declare the missing functions */
 
