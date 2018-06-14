@@ -94,12 +94,10 @@
     <ClCompile Include="../notify.c" />
     <ClCompile Include="../rd.c" />
     <ClCompile Include="../rtpdump.c" />
-    <ClCompile Include="../win\gettimeofday.c" />
-    <ClCompile Include="../win\winsocklib.c" />
+    <ClCompile Include="../win/winsocklib.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="../sysdep.h" />
-    <ClInclude Include="gettimeofday.h" />
     <ClInclude Include="include\arpa\inet.h" />
     <ClInclude Include="include\netdb.h" />
     <ClInclude Include="include\netinet\in.h" />
