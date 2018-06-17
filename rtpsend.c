@@ -368,7 +368,7 @@ static int rtcp_rr(node_t *list, char *packet)
       else if (strcmp(n->type, "fraction") == 0)
         rr->fraction = (n->num)*256;
       else if (strcmp(n->type, "lost") == 0)   /* PP: alignment OK? */
-        rr->lost = htonl(n->num);
+        RTCP_SET_LOST(rr, n->num);
       else if (strcmp(n->type, "last_seq") == 0)
         rr->last_seq = htonl(n->num);
       else if (strcmp(n->type, "jit") == 0)
