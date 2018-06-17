@@ -109,7 +109,7 @@ int create_stream(int addr, int next)
   if(head==NULL) { /* initialize the list */
     head=new_stream;
     middle=new_stream;
-    list_len
+    list_len=1;
     new_stream->seq=rand();
     last=new_stream;
     return new_stream->seq;
