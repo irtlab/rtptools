@@ -306,7 +306,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
       msg.msg_iovlen = 2;
       for (i = 0; i < hostc; i++) {
         if (side[i][proto].sock != sock) {
-          msg.msg_name = (caddr_t ) &side[i][proto].sin;
+          msg.msg_name = (char*) &side[i][proto].sin;
           msg.msg_namelen = sizeof(side[i][proto].sin);
 #if HAVE_MSGCONTROL
           msg.msg_control = 0;

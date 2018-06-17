@@ -10,6 +10,7 @@ rtpsend.o: rtpsend.c notify.h rtp.h sysdep.h multimer.h
 rtptrans.o: rtptrans.c rtp.h sysdep.h rtpdump.h notify.h multimer.h vat.h
 
 compat-err.o: compat-err.c
+compat-getopt.o: compat-getopt.c
 compat-hsearch.o: compat-hsearch.c compat-hsearch.h
 compat-progname.o: compat-progname.c
 compat-strtonum.o: compat-strtonum.c

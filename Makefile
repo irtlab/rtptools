@@ -54,6 +54,7 @@ rtptrans_OBJS	= utils.o notify.o multimer.o      rtptrans.o
 
 HAVE_SRCS = \
 	have-err.c		\
+	have-getopt.c		\
 	have-gethostbyname.c	\
 	have-hsearch.c		\
 	have-progname.c		\
@@ -62,6 +63,7 @@ HAVE_SRCS = \
 
 COMPAT_SRCS = \
 	compat-err.c		\
+	compat-getopt.c		\
 	compat-hsearch.c	\
 	compat-hsearch.h	\
 	compat-progname.c	\
@@ -69,6 +71,7 @@ COMPAT_SRCS = \
 
 COMPAT_OBJS = \
 	compat-err.o		\
+	compat-getopt.o		\
 	compat-hsearch.o	\
 	compat-progname.o	\
 	compat-strtonum.o
@@ -81,8 +84,7 @@ WINDOWS = \
 	win/rtpdump.vcxproj win/rtpplay.vcxproj		\
 	win/rtpsend.vcxproj win/rtptrans.vcxproj	\
 	win/gettimeofday.c win/gettimeofday.h		\
-	win/winsocklib.c win/winsocklib.h		\
-	win/getopt.c win/getopt.h
+	win/winsocklib.c
 
 DISTFILES = \
 	LICENSE			\
@@ -111,13 +113,23 @@ install: all
 
 include Makefile.depend
 
-distclean: clean
-	rm -f Makefile.local config.h config.h.old config.log config.log.old
-
 clean:
 	rm -f $(TARBALL) $(BINS) $(OBJS) $(HTML)
 	rm -rf *.dSYM *.core *~ .*~ win/*~
 	rm -rf rtptools-$(VERSION)
+
+distclean: clean
+	rm -f Makefile.local config.h config.h.old config.log config.log.old
+
+check: $(PROG) bark.rtp
+	./rtpdump < bark.rtp > /dev/null
+	./rtpdump -F dump < bark.rtp > dump.rtp
+	dd bs=16 skip=3 < bark.rtp > bark
+	dd bs=16 skip=3 < dump.rtp > dump
+	diff bark dump && rm -f dump.rtp dump bark
+	./rtpdump -F payload < bark.rtp > bark.raw
+	which play > /dev/null && play -c 1 -r 8000 -e u-law bark.raw || true
+	rm -f bark.raw
 
 install: $(PROG) $(MAN1)
 	install -d $(BINDIR)      && install -m 0755 $(PROG) $(BINDIR)

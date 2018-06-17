@@ -90,15 +90,16 @@
   <ItemGroup>
     <ClCompile Include="../utils.c" />
     <ClCompile Include="../compat-err.c" />
+    <ClCompile Include="../compat-getopt.c" />
+    <ClCompile Include="../compat-progname.c" />
     <ClCompile Include="../multimer.c" />
     <ClCompile Include="../notify.c" />
     <ClCompile Include="../rtpsend.c" />
-    <ClCompile Include="../win\getopt.c" />
     <ClCompile Include="../win\gettimeofday.c" />
     <ClCompile Include="../win\winsocklib.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="getopt.h" />
+    <ClInclude Include="../sysdep.h" />
     <ClInclude Include="gettimeofday.h" />
     <ClInclude Include="include\arpa\inet.h" />
     <ClInclude Include="include\netdb.h" />
@@ -107,7 +108,6 @@
     <ClInclude Include="include\sys\socket.h" />
     <ClInclude Include="include\sys\time.h" />
     <ClInclude Include="include\unistd.h" />
-    <ClInclude Include="winsocklib.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
