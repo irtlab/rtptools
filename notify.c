@@ -135,25 +135,6 @@ Notify_func_input notify_set_input_func(
 
 
 /*
-* Interval timer initialization.
-*/
-Notify_func notify_set_itimer_func(
-  Notify_client client,      /* value passed to function */
-  Notify_func timer_func,    /* function to be called */
-  int which,                 /* not used */
-  struct itimerval *value,   /* interval */
-  struct itimerval *ovalue)  /* not used */
-{
-  struct timeval *t;
-
-  /* set relative to now */
-  t = timer_set(value ? &(value->it_value) : 0, timer_func, client, 1);
-  *t = value->it_interval;
-  return 0;   /* kludge */
-} /* notify_set_itimer_func */
-
-
-/*
 * Don't wait if there are no other events.
 */
 static struct timeval *timer_get_pending(struct timeval *timeout, int max_fd)

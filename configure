@@ -40,6 +40,7 @@ LDADD=
 
 HAVE_ERR=
 HAVE_GETOPT=
+HAVE_GETIMEOFDAY=
 HAVE_HSEARCH=
 HAVE_PROGNAME=
 HAVE_STRTONUM=
@@ -144,6 +145,7 @@ runtest() {
 # functions
 runtest err		ERR		|| true
 runtest getopt		GETOPT		|| true
+runtest gettimeofday	GETTIMEOFDAY	|| true
 runtest hsearch		HSEARCH		|| true
 runtest progname	PROGNAME	|| true
 runtest strtonum	STRTONUM	|| true
@@ -196,6 +198,7 @@ __HEREDOC__
 cat << __HEREDOC__
 #define HAVE_ERR ${HAVE_ERR}
 #define HAVE_GETOPT ${HAVE_GETOPT}
+#define HAVE_GETTIMEOFDAY ${HAVE_GETTIMEOFDAY}
 #define HAVE_HSEARCH ${HAVE_HSEARCH}
 #define HAVE_PROGNAME ${HAVE_PROGNAME}
 #define HAVE_STRTONUM ${HAVE_STRTONUM}

@@ -38,16 +38,17 @@
 
 #if defined(WIN32) || defined(__WIN32__)
 
-#define HAVE_ERR	0
-#define HAVE_GETOPT	0
-#define HAVE_HSEARCH	0
-#define HAVE_PROGNAME	0
-#define HAVE_STRTONUM	0
-#define HAVE_LNSL	0
-#define HAVE_LSOCKET	0
-#define HAVE_BIGENDIAN	0
-#define HAVE_MSGCONTROL	0
-#define RTP_BIG_ENDIAN	0
+#define HAVE_ERR		0
+#define HAVE_GETOPT		0
+#define HAVE_GETTIMEOFDAY	0
+#define HAVE_HSEARCH		0
+#define HAVE_PROGNAME		0
+#define HAVE_STRTONUM		0
+#define HAVE_LNSL		0
+#define HAVE_LSOCKET		0
+#define HAVE_BIGENDIAN		0
+#define HAVE_MSGCONTROL		0
+#define RTP_BIG_ENDIAN		0
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -81,29 +82,26 @@ struct msghdr {
 
 #define  ITIMER_REAL     0       /* Decrements in real time */
 
-struct  itimerval {
-        struct  timeval it_interval;    /* timer interval */
-        struct  timeval it_value;       /* current value */
-};
-
 extern int sendmsg(int s, const struct msghdr *msg, int flags);
 
 /* declare the missing functions */
 
-extern void err(int, const char *, ...);
-extern void errx(int, const char *, ...);
-extern void warn(const char *, ...);
-extern void warnx(const char *, ...);
+extern void		err(int, const char *, ...);
+extern void		errx(int, const char *, ...);
+extern void		warn(const char *, ...);
+extern void		warnx(const char *, ...);
 
-extern char* optarg;
-extern int   opterr;
-extern int   optind;
-extern int   optopt;
-extern int   optreset;
-extern int   getopt(int, char* const*, const char*);
+extern char*		optarg;
+extern int		opterr;
+extern int		optind;
+extern int		optopt;
+extern int		optreset;
+extern int		getopt(int, char* const*, const char*);
 
-extern const char* getprogname(void);
-extern void        setprogname(const char *);
+extern int		gettimeofday(struct timeval*, void*);
+
+extern const char*	getprogname(void);
+extern void		setprogname(const char *);
 
 #else /* not WIN32 */
 
