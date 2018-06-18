@@ -91,16 +91,15 @@
     <ClCompile Include="../utils.c" />
     <ClCompile Include="../compat-err.c" />
     <ClCompile Include="../compat-getopt.c" />
+    <ClCompile Include="../compat-gettimeofday.c" />
     <ClCompile Include="../compat-progname.c" />
     <ClCompile Include="../multimer.c" />
     <ClCompile Include="../notify.c" />
     <ClCompile Include="../rtpsend.c" />
-    <ClCompile Include="../win/gettimeofday.c" />
     <ClCompile Include="../win/winsocklib.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="../sysdep.h" />
-    <ClInclude Include="gettimeofday.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

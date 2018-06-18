@@ -1,3 +1,14 @@
+#include "sysdep.h"
+
+#if HAVE_GETTIMEOFDAY
+
+int dummy;
+
+#else
+
+/* This will only get used on Windows,
+ * other systems have gettimeofday(). */
+
 /*
  * (c) 1998-2018 by Columbia University; all rights reserved
  *
@@ -28,21 +39,52 @@
  * SUCH DAMAGE.
  */
 
-#ifndef GETTIMEOFDAY_H_
-#define GETTIMEOFDAY_H_
+#include <sys/timeb.h>
 
-#include "sysdep.h"
+int gettimeofday(struct timeval *tv, void *t)
+{
+  static struct timeval stv;    /* initial timeval */
+  static INT64 sct, tick;
+  static int initialized = -1;
+  LARGE_INTEGER startCount;  
+  LARGE_INTEGER tickPerSec;
+  struct timeb tb;
 
-#ifdef  __cplusplus
-extern "C" {
+  LARGE_INTEGER count;
+  INT64 c;
+
+  if (initialized == -1) {
+    ftime(&tb);
+    stv.tv_sec  = tb.time;
+    stv.tv_usec = tb.millitm * 1000;
+    if (QueryPerformanceFrequency(&tickPerSec) == FALSE) {
+      fprintf(stderr, "QueryPerformanceFrequency(): No high-reso counter.\n");
+      exit(1);
+    }
+    if (QueryPerformanceCounter(&startCount) == FALSE) {
+      fprintf(stderr, "QueryPerformanceCounter(): No high-reso counter.\n");
+      exit(1);
+    }
+    sct = startCount.QuadPart; tick = tickPerSec.QuadPart;
+    initialized = 0;
+#ifdef DEBUG
+    printf("init: gettimeofday: %ld %06ld\n", stv.tv_sec, stv.tv_usec);
 #endif
+  }
 
-#ifndef HAVE_GETTIMEOFDAY
-extern int gettimeofday(struct timeval *tv, void *t);
+  if (!QueryPerformanceCounter(&count))
+    return -1;
+    c = count.QuadPart;
+    tv->tv_sec  = stv.tv_sec  + (long)((c - sct) / tick);
+    tv->tv_usec = stv.tv_usec + (long)(((c - sct) % tick) * 1000000 / tick);
+    if (tv->tv_usec >= 1000000) {
+    tv->tv_sec++;
+    tv->tv_usec -= 1000000;
+  }
+#ifdef DEBUG
+  printf("gettimeofday: %ld %06ld\n", tv->tv_sec, tv->tv_usec);
 #endif
-
-#ifdef  __cplusplus
+  return 0;
 }
-#endif
 
-#endif /* GETTIMEOFDAY_H_ */
+#endif
