@@ -56,6 +56,7 @@ HAVE_SRCS = \
 	have-err.c		\
 	have-getopt.c		\
 	have-gethostbyname.c	\
+	have-gettimeofday.c	\
 	have-hsearch.c		\
 	have-progname.c		\
 	have-strtonum.c		\
