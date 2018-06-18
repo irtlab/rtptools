@@ -28,15 +28,20 @@
  * SUCH DAMAGE.
  */
 
-#include <stdio.h>
 #include <sys/types.h>
-#include <sys/socket.h>  /* struct sockaddr */
-#include <netinet/in.h>
-#include <arpa/inet.h>   /* inet_ntoa() */
-#include <string.h>      /* strncmp() */
+#include <string.h>
+#include <stdio.h>
+#include <time.h>
+
+#ifndef WIN32
 #include <sys/time.h>
-#include <time.h>        /* localtime() added by Akira 12/27/01 */
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif
+
 #include "rtpdump.h"
+
 #define RTPFILE_VERSION "1.0"
 
 /*
@@ -92,6 +97,6 @@ int RD_read(FILE *in, RD_buffer_t *b)
   /* read actual packet */
   if (fread(b->p.data, b->p.hdr.length, 1, in) == 0) {
     perror("fread body");
-  } 
-  return b->p.hdr.length; 
+  }
+  return b->p.hdr.length;
 } /* RD_read */

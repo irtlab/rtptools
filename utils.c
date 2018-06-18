@@ -29,31 +29,79 @@
  */
 
 #include <sys/types.h>
-#include <sys/socket.h>      /* struct sockaddr */
-#include <netdb.h>           /* gethostbyname() */
-#include <netinet/in.h>      /* sockaddr_in */
-#include <arpa/inet.h>       /* inet_addr() */
-#include <string.h>          /* strlen() added by Akira 12/27/01 */ 
+#include <stdlib.h>
+#include <string.h>
+
+#ifndef WIN32
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <err.h>
+#endif
+
 #include "sysdep.h"
 
-/*
-* Return IP address given host name 'host'.
-* If 'host' is "", set to INADDR_ANY.
-*/
-struct in_addr host2ip(char *host)
-{
-  struct in_addr in;
-  register struct hostent *hep;
+int host2ip(char*, struct in_addr*);
+int hpt(char*, struct sockaddr_in*, unsigned char*);
 
-  /* Check whether this is a dotted decimal. */
-  if (!host || *host == '\0') {
-    in.s_addr = INADDR_ANY;
-  }
-  else if ((in.s_addr = inet_addr(host)) != -1) {
-  }
-  /* Attempt to resolve host name via DNS. */
-  else if ((hep = gethostbyname(host))) {
-    in = *(struct in_addr *)(hep->h_addr_list[0]);
-  }
-  return in;
+/*
+* Parse an IP address or a host name.
+* For NULL or an empty 'host', set to INADDR_ANY.
+* Return 0 for success, -1 in error.
+*/
+int
+host2ip(char *host, struct in_addr *in)
+{
+	in_addr_t a;
+	struct hostent *hep;
+
+	if (host == NULL || *host == '\0') {
+		in->s_addr = INADDR_ANY;
+		return 0;
+	}
+	if ((a = inet_addr(host)) != INADDR_NONE) {
+		/* a valid dotted-decimal */
+		in->s_addr = a;
+		return 0;
+	}
+	if ((hep = gethostbyname(host))) {
+		/* a resolved hostname */
+		memcpy(in, hep->h_addr, sizeof(struct in_addr));
+		return 0;
+	}
+	return -1;
+}
+
+/* Parse [host]/port[/ttl]. Return 0 if ok, -1 on error;
+ * fill in sockaddr; set ttl if requested. */
+int
+hpt(char *h, struct sockaddr_in * sin, unsigned char *ttl)
+{
+	char *p = NULL, *t = NULL;
+	int port;
+
+	sin->sin_family = AF_INET;
+	if (NULL == (p = strchr(h, '/')))
+		return -1;
+	*p++ = '\0';
+	if (host2ip(h, &sin->sin_addr) == -1) {
+		warnx("Cannot parse address: %s", h);
+		return -1;
+	}
+	if ((t = strchr(p, '/')))
+		*t++ = '\0';
+	port = atoi(p);
+	if (port <= 0) {
+		warnx("RTP port number must be positive, not %d", port);
+		return -1;
+	}
+	if (port & 1) {
+		warnx("RTP port number should be even, not %d", port);
+		return -1;
+	}
+	sin->sin_port = htons(port);
+	if (t && ttl)
+		*ttl = atoi(t);
+	return 0;
 }

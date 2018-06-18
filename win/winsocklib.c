@@ -38,7 +38,7 @@ void startupSocket(void)
   WSADATA wsaData;      /* WSAStartup() */
 
   /* startup winsock */
-  if (WSAStartup(MAKEWORD(1, 1), &wsaData)) {
+  if (WSAStartup(MAKEWORD(2, 2), &wsaData)) {
     fprintf(stderr, "WSAStartup(): Could not start up WinSock.\n");
     exit(1);
   }

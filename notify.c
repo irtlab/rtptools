@@ -5,17 +5,20 @@ notify  --  primitive notification service implementing a subset of the SunOS
 Copyright 1993 by AT&T Bell Laboratories; all rights reserved
 */
 
-#include <sys/time.h>
+#include <stdlib.h>
+#include <string.h>
 #include <signal.h>
-#include <stdio.h>     /*DEBUG, fprintf() */
-#include <stdlib.h>    /* malloc() */
-#include <unistd.h>    /* select() */
-#include <errno.h>     /* EINTR,    Added by Akira 12/11/01 */
-#include <string.h>    /* memset(), Added by Akira 12/11/01 */
+#include <stdio.h>
+#include <errno.h>
+
+#ifndef WIN32
+#include <sys/select.h>
+#include <sys/time.h>
+#endif
+
 #include "sysdep.h"
 #include "notify.h"
 #include "multimer.h"
-#include "ansi.h"
 
 #ifdef hp
 #define CAST int *
@@ -27,7 +30,7 @@ typedef struct event_t {
   struct event_t *next;
   Notify_client client;
   Notify_func_input func;
-  int fd;  
+  int fd;
   enum type_t {N_input, N_itimer} type;
 } event_t;
 
@@ -46,7 +49,7 @@ static struct {
 
 static event_t *search(
   Notify_client client,  /* ignored if fd >= 0 */
-  int fd, 
+  int fd,
   enum type_t type,
   event_t **prev         /* element before target */
 )
@@ -67,7 +70,7 @@ static event_t *search(
 void check_clr_fd(void)
 {
   static int cleared = -1;
-  
+
   if (cleared == -1) {
     FD_ZERO(&Readfds);
     FD_ZERO(&Writefds);
@@ -119,7 +122,7 @@ Notify_func_input notify_set_input_func(
   else {
     if (func == NOTIFY_FUNC_INPUT_NULL) {
       FD_CLR(fd, &Readfds);
-      if (prev) prev->next = e->next; 
+      if (prev) prev->next = e->next;
       else el = e->next;
       free(e);
       set_max_fd();  /* find new maximum fd */
@@ -132,28 +135,9 @@ Notify_func_input notify_set_input_func(
 
 
 /*
-* Interval timer initialization.
-*/
-Notify_func notify_set_itimer_func(
-  Notify_client client,      /* value passed to function */
-  Notify_func timer_func,    /* function to be called */
-  int which,                 /* not used */
-  struct itimerval *value,   /* interval */
-  struct itimerval *ovalue)  /* not used */
-{
-  struct timeval *t;
-
-  /* set relative to now */
-  t = timer_set(value ? &(value->it_value) : 0, timer_func, client, 1);
-  *t = value->it_interval;
-  return 0;   /* kludge */
-} /* notify_set_itimer_func */
-
-
-/*
 * Don't wait if there are no other events.
 */
-static struct timeval *timer_get_pending(struct timeval *timeout, int max_fd) 
+static struct timeval *timer_get_pending(struct timeval *timeout, int max_fd)
 {
   struct timeval *tvp;
 
@@ -163,7 +147,7 @@ static struct timeval *timer_get_pending(struct timeval *timeout, int max_fd)
     notify_stop();
     return timeout;     /* added by Akira 12/11/01 */
   }
-  if (!tvp) 
+  if (!tvp)
     return timeout;     /* return 0.100000 sec, by Akira 12/11/01 */
 
   return tvp;           /* return first timer event, by Akira 12/11/01 */
@@ -189,7 +173,7 @@ Notify_error notify_start(void)
     timeout.tv_sec  = 0;
     timeout.tv_usec = 100000;     /* modified from 0 by Akira 12/11/01 */
 
-    found = select(max_fd+1, (CAST)&readfds, (CAST)&writefds, (CAST)&exceptfds, 
+    found = select(max_fd+1, (CAST)&readfds, (CAST)&writefds, (CAST)&exceptfds,
                     timer_get_pending(&timeout, max_fd));
 
 #if defined(WIN32)
@@ -206,7 +190,7 @@ Notify_error notify_start(void)
     }
 #endif
 
-    /* found = 0: just a timer -> do nothing, 
+    /* found = 0: just a timer -> do nothing,
                   timer_get() will execute the handler */
     /* found > 0: scan the fd_event */
     if (found) {
@@ -251,7 +235,7 @@ static void sig_handler(int sig)
 /*
 * Install signal handler.
 */
-Notify_func_signal notify_set_signal_func(Notify_client client, 
+Notify_func_signal notify_set_signal_func(Notify_client client,
   Notify_func_signal signal_func, int sig, Notify_signal_mode when)
 {
   Notify_func_signal old_func = s[sig].signal_func;

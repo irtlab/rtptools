@@ -14,12 +14,12 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <sys/socket.h>
+#include <stdint.h>
 
 int
 main(void)
 {
-	struct msghdr hdr;
-	hdr.msg_control = (void*)42;
-	return 0;
+	uint32_t d = 0x00010203;
+	unsigned char *p = (unsigned char*) &d;
+	return !((p[0] == 0) && (p[1] == 1) && (p[2] == 2) && (p[3] == 3));
 }

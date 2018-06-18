@@ -14,12 +14,10 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <sys/socket.h>
+#include <stdlib.h>
 
 int
 main(void)
 {
-	struct msghdr hdr;
-	hdr.msg_control = (void*)42;
-	return 0;
+	return NULL == getprogname();
 }

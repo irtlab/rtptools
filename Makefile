@@ -14,11 +14,6 @@ VERSION = 1.23
 TARBALL = rtptools-$(VERSION).tar.gz
 
 SRCS = \
-	ansi.h		\
-	host2ip.c	\
-	hpt.c		\
-	hsearch.c	\
-	hsearch.h	\
 	multimer.c	\
 	multimer.h	\
 	notify.c	\
@@ -31,6 +26,7 @@ SRCS = \
 	rtpsend.c	\
 	rtptrans.c	\
 	sysdep.h	\
+	utils.c		\
 	vat.h
 
 BINS =	rtpdump rtpplay rtpsend rtptrans
@@ -51,48 +47,46 @@ HTML =	multidump.1.html	\
 	rtpsend.1.html		\
 	rtptrans.1.html
 
-rtpdump_OBJS	= hpt.o host2ip.o                     rd.o rtpdump.o
-rtpplay_OBJS	= hpt.o host2ip.o notify.o multimer.o rd.o rtpplay.o
-rtpsend_OBJS	= hpt.o host2ip.o notify.o multimer.o      rtpsend.o
-rtptrans_OBJS	= hpt.o host2ip.o notify.o multimer.o      rtptrans.o
+rtpdump_OBJS	= utils.o                     rd.o rtpdump.o
+rtpplay_OBJS	= utils.o notify.o multimer.o rd.o rtpplay.o
+rtpsend_OBJS	= utils.o notify.o multimer.o      rtpsend.o
+rtptrans_OBJS	= utils.o notify.o multimer.o      rtptrans.o
 
 HAVE_SRCS = \
 	have-err.c		\
+	have-getopt.c		\
 	have-gethostbyname.c	\
+	have-gettimeofday.c	\
+	have-hsearch.c		\
+	have-progname.c		\
 	have-strtonum.c		\
 	have-msgcontrol.c
 
 COMPAT_SRCS = \
-	compat_err.c		\
-	compat_strtonum.c
+	compat-err.c		\
+	compat-getopt.c		\
+	compat-gettimeofday.c	\
+	compat-hsearch.c	\
+	compat-hsearch.h	\
+	compat-progname.c	\
+	compat-strtonum.c
 
 COMPAT_OBJS = \
-	compat_err.o		\
-	compat_strtonum.o
+	compat-err.o		\
+	compat-getopt.o		\
+	compat-gettimeofday.o	\
+	compat-hsearch.o	\
+	compat-progname.o	\
+	compat-strtonum.o
 
 OBJS =	$(rtpdump_OBJS) $(rtpplay_OBJS) $(rtpsend_OBJS) $(rtptrans_OBJS)
 OBJS +=	$(COMPAT_OBJS)
-
-# Allegedly, windows need these _empty_ include files.
-# Please say that isn't so and get rid of this.
-EMPTY = \
-	win/include/arpa/inet.h		\
-	win/include/netdb.h		\
-	win/include/netinet/in.h	\
-	win/include/sys/select.h	\
-	win/include/sys/socket.h	\
-	win/include/sys/time.h		\
-	win/include/sys/uio.h		\
-	win/include/unistd.h
 
 WINDOWS = \
 	win/rtptools.sln				\
 	win/rtpdump.vcxproj win/rtpplay.vcxproj		\
 	win/rtpsend.vcxproj win/rtptrans.vcxproj	\
-	win/gettimeofday.c win/gettimeofday.h		\
-	win/winsocklib.c win/winsocklib.h		\
-	win/getopt.c win/getopt.h			\
-	$(EMPTY)
+	win/winsocklib.c
 
 DISTFILES = \
 	LICENSE			\
@@ -105,11 +99,11 @@ DISTFILES = \
 	$(MAN1)			\
 	$(MULT)			\
 	$(SRCS)			\
-	$(HAVE_SRCS)
+	$(HAVE_SRCS)		\
+	$(COMPAT_SRCS)
 
 # FIXME INSTALL
 # FIXME rtptools.spec
-# FIXME hsearch.h hsearch.c: have-hsearch.c, compat-hsearch.c
 
 include Makefile.local
 
@@ -121,13 +115,23 @@ install: all
 
 include Makefile.depend
 
+clean:
+	rm -f $(TARBALL) $(BINS) $(OBJS) $(HTML)
+	rm -rf *.dSYM *.core *~ .*~ win/*~
+	rm -rf rtptools-$(VERSION)
+
 distclean: clean
 	rm -f Makefile.local config.h config.h.old config.log config.log.old
 
-clean:
-	rm -f $(TARBALL) $(BINS) $(OBJS) $(HTML)
-	rm -rf rtptools-$(VERSION) .rpmbuild win/include
-	rm -rf *.dSYM *.core *~ .*~
+check: $(PROG) bark.rtp
+	./rtpdump < bark.rtp > /dev/null
+	./rtpdump -F dump < bark.rtp > dump.rtp
+	dd bs=16 skip=3 < bark.rtp > bark
+	dd bs=16 skip=3 < dump.rtp > dump
+	diff bark dump && rm -f dump.rtp dump bark
+	./rtpdump -F payload < bark.rtp > bark.raw
+	which play > /dev/null && play -c 1 -r 8000 -e u-law bark.raw || true
+	rm -f bark.raw
 
 install: $(PROG) $(MAN1)
 	install -d $(BINDIR)      && install -m 0755 $(PROG) $(BINDIR)
@@ -137,25 +141,24 @@ uninstall:
 	cd $(BINDIR)      && rm $(PROG)
 	cd $(MANDIR)/man1 && rm $(MAN1)
 
+lint: $(MAN1)
+	mandoc -Tlint -Wstyle $(MAN1)
+
 Makefile.local config.h: configure $(HAVESRCS)
 	@echo "$@ is out of date; please run ./configure"
 	@exit 1
 
-rtpdump: $(rtpdump_OBJS)
-	$(CC) $(CFLAGS) -o rtpdump $(rtpdump_OBJS) $(LDADD)
+rtpdump: $(rtpdump_OBJS) $(COMPAT_OBJS)
+	$(CC) $(CFLAGS) -o rtpdump $(rtpdump_OBJS) $(COMPAT_OBJS) $(LDADD)
 
-rtpplay: $(rtpplay_OBJS)
-	$(CC) $(CFLAGS) -o rtpplay $(rtpplay_OBJS) $(LDADD)
+rtpplay: $(rtpplay_OBJS) $(COMPAT_OBJS)
+	$(CC) $(CFLAGS) -o rtpplay $(rtpplay_OBJS) $(COMPAT_OBJS) $(LDADD)
 
-rtpsend: $(rtpsend_OBJS)
-	$(CC) $(CFLAGS) -o rtpsend $(rtpsend_OBJS) $(LDADD)
+rtpsend: $(rtpsend_OBJS) $(COMPAT_OBJS)
+	$(CC) $(CFLAGS) -o rtpsend $(rtpsend_OBJS) $(COMPAT_OBJS) $(LDADD)
 
-rtptrans: $(rtptrans_OBJS)
-	$(CC) $(CFLAGS) -o rtptrans $(rtptrans_OBJS) $(LDADD)
-
-$(EMPTY):
-	mkdir -p win/include/{arpa,netinet,sys}
-	touch $@
+rtptrans: $(rtptrans_OBJS) $(COMPAT_OBJS)
+	$(CC) $(CFLAGS) -o rtptrans $(rtptrans_OBJS) $(COMPAT_OBJS) $(LDADD)
 
 # --- maintainer targets ---
 
@@ -197,5 +200,5 @@ rpm: $(TARBALL) rtptools.spec
 	$(CC) $(CFLAGS) -c $<
 
 .1.1.html:
-	{ which mandoc > /dev/null && mandoc -Thtml -Wstyle $< > $@ ; } || \
-	{ which groff  > /dev/null && groff  -Thtml -mdoc   $< > $@ ; }
+	mandoc -Thtml -O style=style.css,man=%N.%S.html -Wstyle $< > $@ || \
+	groff  -Thtml -mdoc   $< > $@

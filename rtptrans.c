@@ -29,27 +29,29 @@
  */
 
 #include <sys/types.h>
-#include <sys/uio.h>
-#include <sys/socket.h>
-#include <netinet/in.h>  /* struct sockaddr_in */
-#include <sys/time.h>    /* gettimeofday() */
-#include <arpa/inet.h>   /* inet_ntoa() */
+#include <signal.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <signal.h>
 #include <errno.h>
-#include <unistd.h>      /* select(), perror() */
-#include <stdlib.h>      /* getopt(), atoi() */
-#include <memory.h>      /* memset() */
 
-#include "config.h"
+#ifndef WIN32
+#include <unistd.h>
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif
+
+#include "sysdep.h"
+
 #include "rtp.h"
 #include "rtpdump.h"
-#include "ansi.h"
 #include "notify.h"
 #include "multimer.h"
 #include "vat.h"
-#include "sysdep.h"
+
+extern int hpt(char*, struct sockaddr_in*, unsigned char*);
 
 #define PAD(x,n) (((n) - ((x) & (n-1))) & (n-1))
 #define MAX_HOST 10
@@ -62,8 +64,8 @@ static struct {
   struct sockaddr_in sin;
 } side[MAX_HOST][3];  /* [host][proto] */
 
-/* 
- * create a linked list for traversing the sequence numbers of the different 
+/*
+ * create a linked list for traversing the sequence numbers of the different
  * streams arriving over a multicast link to a unicast network
  */
 typedef struct stream_id{
@@ -75,7 +77,7 @@ typedef struct stream_id{
 
 typedef struct stream_id stream;
 
-/* 
+/*
  * We need to keep in memory the sequence number of the last sent packet
  * for each data stream.
  */
@@ -131,19 +133,19 @@ int create_stream(int addr, int next)
       elem->next=new_stream;
       last=new_stream;
       return new_stream->seq;
-    } 
+    }
   }
       ;
   if(elem->next==NULL) {
     elem->next=new_stream;
     last=new_stream;
     return new_stream->seq;
-  }   
+  }
   return new_stream->seq;
 }
 
 
-/* 
+/*
  * Add a stream to the list.
  */
 int find_stream(int addr, int ts, int next, int m)
@@ -204,8 +206,8 @@ static Notify_value socket_handler(Notify_client client, int sock)
     struct timeval now;
 
     gettimeofday(&now, 0);
-    printf("%0.3f %s %4d [%s/%d]\n", 
-      now.tv_sec + now.tv_usec/1e6, 
+    printf("%0.3f %s %4d [%s/%d]\n",
+      now.tv_sec + now.tv_usec/1e6,
       rtp_hdr->version==2 ? (proto ? "RTCP" : "RTP ") :
         rtp_hdr->version==0 ? (proto ? "vatC" : "vat ") : "UKWN", len,
       inet_ntoa(sin_from.sin_addr), ntohs(sin_from.sin_port));
@@ -219,9 +221,10 @@ static Notify_value socket_handler(Notify_client client, int sock)
       if (side[i][proto].sock != sock
           && side[i][proto].sin.sin_addr.s_addr != INADDR_ANY) {
         if (sendto(side[i][2].sock, packet, len, 0,
-          (struct sockaddr *)&side[i][proto].sin,sizeof(side[i][proto].sin))<0)
-//        perror("sendto RTCP");
-          ;
+        (struct sockaddr *)&side[i][proto].sin,
+	sizeof(side[i][proto].sin)) == -1) {
+		perror("sendto RTPC");
+	}
       }
     }
   }
@@ -229,9 +232,9 @@ static Notify_value socket_handler(Notify_client client, int sock)
     struct msghdr msg;
     if (!proto) { /* translate VAT packets */
       struct iovec iov[2];
-      char type; 
+      char type;
       int samples = len-VAT_LEN;
-      vat_hdr=(vat_hdr_t *)packet;   
+      vat_hdr=(vat_hdr_t *)packet;
 
       if(vat_hdr->flags&VATHF_NEWTS)
         rtp_hdr_send.m = 1;
@@ -275,12 +278,9 @@ static Notify_value socket_handler(Notify_client client, int sock)
       rtp_hdr_send.cc      = 0;
       rtp_hdr_send.ts      = vat_hdr->ts;
 
-#if defined(Linux) || defined(WIN32)
-      /* 
-       * Stupid little Linux and stupid big Win32 does not support
-       * sendmsg(), thus, use copying instead; contributed by Lutz
-       * Grueneberg <gruen@rvs.uni-hannover.de>.
-       */
+#if WIN32
+      /* Windows does not support sendmsg(), use copying instead;
+       * contributed by Lutz Grueneberg <gruen@rvs.uni-hannover.de>. */
       {
         unsigned char mbuf[10000];
         int mlength = 0;
@@ -297,7 +297,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
           }
         }
       }
-#else 
+#else
       iov[0].iov_base = (char *)&(rtp_hdr_send);
       iov[0].iov_len = sizeof(rtp_hdr_t)-4;
       iov[1].iov_base = packet+VAT_LEN;
@@ -306,7 +306,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
       msg.msg_iovlen = 2;
       for (i = 0; i < hostc; i++) {
         if (side[i][proto].sock != sock) {
-          msg.msg_name = (caddr_t ) &side[i][proto].sin;
+          msg.msg_name = (char*) &side[i][proto].sin;
           msg.msg_namelen = sizeof(side[i][proto].sin);
 #if HAVE_MSGCONTROL
           msg.msg_control = 0;
@@ -315,12 +315,12 @@ static Notify_value socket_handler(Notify_client client, int sock)
           msg.msg_accrights = 0;
           msg.msg_accrightslen = 0;
 #endif
-          if ((sendmsg(side[i][2].sock, &msg,0))!= 
+          if ((sendmsg(side[i][2].sock, &msg,0))!=
             iov[0].iov_len +iov[1].iov_len)
             perror("sendmsg RTCP");
           }
        }
-#endif /* Linux || WIN32 */
+#endif /* WIN32 */
     }
     else if (((struct CtrlMsgHdr *)packet)->type == 1) /* vat ID messages */{
       rtcp_t *rtcp_msg;
@@ -330,7 +330,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
       int length;
       item=NULL;
 
-      /* total length of the packet = IP address+ site entry of vat+ 2 type+ 2 
+      /* total length of the packet = IP address+ site entry of vat+ 2 type+ 2
         length + 4 common header+ 4 ssrc + 8 empty RR */
       length = strlen(inet_ntoa(sin_from.sin_addr)) +
         strlen(packet+sizeof(struct CtrlMsgHdr)) + 12 + 8;
@@ -342,8 +342,8 @@ static Notify_value socket_handler(Notify_client client, int sock)
       rtcp_msg->common.version=2;
       rtcp_msg->common.p=0;
       rtcp_msg->common.count=0;
-      rtcp_msg->common.pt=201;
-      rtcp_msg->r.rr.ssrc=sin_from.sin_addr.s_addr;
+      rtcp_msg->common.pt=RTCP_RR;
+      rtcp_msg->r.rr.ssrc = rand();
       rtcp_msg->common.length=(8 >> 2) - 1;
 
       ctl_msg=(struct sdes_msg *)&rtcp_msg->r.rr.rr[0];
@@ -406,7 +406,6 @@ int main(int argc, char *argv[])
   int reuse = 1;  /* reuse address */
   int i, j;
 
-  extern struct in_addr host2ip(char *);
 
   /* Set up socket. */
   startupSocket();
@@ -430,39 +429,18 @@ int main(int argc, char *argv[])
 
   /* Parse host descriptions. */
   for (i = 0; i < argc - optind; i++) {
-    char *s;
+    if (i >= MAX_HOST)
+	    break;
 
-    if (i >= MAX_HOST) break;
     host[i].ttl  = 16;
     host[i].name = argv[optind+i];
-    host[i].sin.sin_family = AF_INET;
-    s = strchr(host[i].name, '/');
-    if (!s) {
+    if (hpt(host[i].name, (struct sockaddr_in*) &host[i].sin.sin_addr,
+    &host[i].ttl) == -1) {
+      fprintf(stderr, "Invalid host specification %s\n", host[i].name);
       usage(argv[0]);
       exit(1);
     }
-    else {
-      int port;
 
-      *s = '\0';
-      port = atoi(s+1);
-      if (port & 1) {
-        fprintf(stderr, "%s: Port must be even.\n", argv[0]);
-        usage(argv[0]);
-        exit(1);
-      }
-      host[i].sin.sin_port = htons(port);
-      s = strchr(s+1, '/');
-      if (s) {
-        host[i].ttl = atoi(s+1);
-      }
-    }
-    host[i].sin.sin_addr = host2ip(host[i].name);
-    if (host[i].sin.sin_addr.s_addr == -1) {
-      fprintf(stderr, "%s: Invalid host. %s\n", argv[0], host[i].name);
-      usage(argv[0]);
-      exit(1);
-    }
     if (IN_CLASSD(ntohl(host[i].sin.sin_addr.s_addr))) {
       host[i].mreq.imr_multiaddr        = host[i].sin.sin_addr;
       host[i].mreq.imr_interface.s_addr = htonl(INADDR_ANY);
@@ -532,7 +510,7 @@ again:
         }
       }
       if (j < 2) {
-        notify_set_input_func((Notify_client)j, socket_handler, 
+        notify_set_input_func((Notify_client)j, socket_handler,
           side[i][j].sock);
       }
     } /* for j (protocols) */

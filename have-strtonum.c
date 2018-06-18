@@ -1,4 +1,3 @@
-/*	$Id: test-strtonum.c,v 1.2 2015/10/06 18:32:20 schwarze Exp $	*/
 /*
  * Copyright (c) 2015 Ingo Schwarze <schwarze@openbsd.org>
  *

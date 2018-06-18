@@ -1,0 +1,18 @@
+language: c
+sudo: false
+
+matrix:
+    include:
+        - os: linux
+          dist: trusty
+          env: OS=Ubuntu14.04
+        - os: linux
+          dist: precise
+          env: OS=Ubuntu12.04
+        - os: osx
+          env: OS=MacOS
+
+script:
+  - ./configure
+  - make
+  - make distcheck

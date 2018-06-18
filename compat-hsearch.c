@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "sysdep.h"
-#include "hsearch.h"
+#include "compat-hsearch.h"
 
 typedef struct entryb {
 	ENTRY *entry;

@@ -1,5 +1,13 @@
+#include "sysdep.h"
+
+#if HAVE_PROGNAME
+
+int dummy;
+
+#else
+
 /*
- * Copyright (c) 2018 Jan Stary <hans@stare.cz>
+ * Copyright (c) 2015 Ingo Schwarze <schwarze@openbsd.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,12 +22,20 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <sys/socket.h>
+static const char *progname;
 
-int
-main(void)
+void
+setprogname(const char *name)
 {
-	struct msghdr hdr;
-	hdr.msg_control = (void*)42;
-	return 0;
+
+	progname = name;
 }
+
+const char *
+getprogname(void)
+{
+
+	return progname;
+}
+
+#endif

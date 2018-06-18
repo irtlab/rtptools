@@ -1,8 +1,7 @@
 #!/bin/sh
 #
-# $Id: configure,v 1.65 2018/02/27 11:16:23 schwarze Exp $
-#
 # Copyright (c) 2014, 2015, 2016, 2017 Ingo Schwarze <schwarze@openbsd.org>
+# Copyright (c) 2018 Jan Stary <hans@stare.cz>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -39,23 +38,28 @@ CFLAGS="${CFLAGS} -Wno-unused-parameter"
 LDFLAGS=
 LDADD=
 
-#HAVE_ENDIAN=
-#HAVE_ERR=
-HAVE_LNSL=
-HAVE_MSGCONTROL=
+HAVE_ERR=
+HAVE_GETOPT=
+HAVE_GETIMEOFDAY=
+HAVE_HSEARCH=
+HAVE_PROGNAME=
+HAVE_STRTONUM=
+
 #HAVE_NTOHL=
 #HAVE_PATH_MAX=
-#HAVE_PROGNAME=
 #HAVE_REALLOCARRAY=
 #HAVE_RECALLOCARRAY=
-HAVE_LSOCKET=
 #HAVE_STRCASESTR=
 #HAVE_STRINGLIST=
 #HAVE_STRLCAT=
 #HAVE_STRLCPY=
 #HAVE_STRNDUP=
-#HAVE_STRTONUM=
-#HAVE_SYS_ENDIAN=
+
+HAVE_LNSL=
+HAVE_LSOCKET=
+
+HAVE_BIGENDIAN=
+HAVE_MSGCONTROL=
 
 INSTALL="install"
 PREFIX="/usr/local"
@@ -136,32 +140,33 @@ runtest() {
 	return 1
 }
 
-# --- library functions ---
-#runtest be32toh		ENDIAN		|| true
-#runtest be32toh		SYS_ENDIAN	-DSYS_ENDIAN || true
-#runtest err		ERR		|| true
-runtest gethostbyname   LNSL		-lnsl	|| true
-runtest msgcontrol	MSGCONTROL	|| true
+# --- run the tests ---
+
+# functions
+runtest err		ERR		|| true
+runtest getopt		GETOPT		|| true
+runtest gettimeofday	GETTIMEOFDAY	|| true
+runtest hsearch		HSEARCH		|| true
+runtest progname	PROGNAME	|| true
+runtest strtonum	STRTONUM	|| true
+
 #runtest ntohl		NTOHL		|| true
 #runtest PATH_MAX	PATH_MAX	|| true
-#runtest progname	PROGNAME	|| true
 #runtest reallocarray	REALLOCARRAY	|| true
 #runtest recallocarray	RECALLOCARRAY	|| true
-runtest socket		LSOCKET        -lsocket	|| true
 #runtest strcasestr	STRCASESTR	|| true
 #runtest stringlist	STRINGLIST	|| true
 #runtest strlcat		STRLCAT		|| true
 #runtest strlcpy		STRLCPY		|| true
 #runtest strndup		STRNDUP		|| true
-#runtest strtonum	STRTONUM	|| true
 
-#if [ ${HAVE_ENDIAN} -eq 0 -a \
-     #${HAVE_SYS_ENDIAN} -eq 0 -a \
-     #${HAVE_NTOHL} -eq 0 ]; then
-	#echo "FATAL: no endian conversion functions found" 1>&2
-	#echo "FATAL: no endian conversion functions found" 1>&3
-	#exit 1
-#fi
+# structures
+runtest bigendian	BIGENDIAN	|| true
+runtest msgcontrol	MSGCONTROL	|| true
+
+# extra libs needed
+runtest gethostbyname	LNSL	-lnsl	|| true
+runtest socket		LSOCKET	-lsocket|| true
 
 # --- write config.h ---
 
@@ -169,7 +174,7 @@ exec > config.h
 
 cat << __HEREDOC__
 #ifdef __cplusplus
-#error "Do not use C++.  See the INSTALL file."
+#error "Do not use C++"
 #endif
 
 #if !defined(__GNUC__) || (__GNUC__ < 4)
@@ -189,20 +194,17 @@ __HEREDOC__
 
 #echo
 #[ ${HAVE_PATH_MAX} -eq 0 ] && echo "#define PATH_MAX 4096"
-#if [ ${HAVE_ENDIAN} -eq 0 -a ${HAVE_SYS_ENDIAN} -eq 0 ]; then
-	#echo "#define be32toh ntohl"
-	#echo "#define htobe32 htonl"
-#fi
 
 cat << __HEREDOC__
-/*
-#define HAVE_ENDIAN ${HAVE_ENDIAN}
 #define HAVE_ERR ${HAVE_ERR}
-*/
-#define HAVE_MSGCONTROL ${HAVE_MSGCONTROL}
+#define HAVE_GETOPT ${HAVE_GETOPT}
+#define HAVE_GETTIMEOFDAY ${HAVE_GETTIMEOFDAY}
+#define HAVE_HSEARCH ${HAVE_HSEARCH}
+#define HAVE_PROGNAME ${HAVE_PROGNAME}
+#define HAVE_STRTONUM ${HAVE_STRTONUM}
+
 /*
 #define HAVE_NTOHL ${HAVE_NTOHL}
-#define HAVE_PROGNAME ${HAVE_PROGNAME}
 #define HAVE_REALLOCARRAY ${HAVE_REALLOCARRAY}
 #define HAVE_RECALLOCARRAY ${HAVE_RECALLOCARRAY}
 #define HAVE_STRCASESTR ${HAVE_STRCASESTR}
@@ -210,24 +212,28 @@ cat << __HEREDOC__
 #define HAVE_STRLCAT ${HAVE_STRLCAT}
 #define HAVE_STRLCPY ${HAVE_STRLCPY}
 #define HAVE_STRNDUP ${HAVE_STRNDUP}
-#define HAVE_STRTONUM ${HAVE_STRTONUM}
-#define HAVE_SYS_ENDIAN ${HAVE_SYS_ENDIAN}
 */
+
+#define RTP_BIG_ENDIAN ${HAVE_BIGENDIAN}
+#define HAVE_MSGCONTROL ${HAVE_MSGCONTROL}
 
 __HEREDOC__
 
-#if [ ${HAVE_ERR} -eq 0 ]; then
-	#echo "extern	void	  err(int, const char *, ...);"
-	#echo "extern	void	  errx(int, const char *, ...);"
-	#echo "extern	void	  warn(const char *, ...);"
-	#echo "extern	void	  warnx(const char *, ...);"
-#fi
+if [ ${HAVE_ERR} -eq 0 ]; then
+	echo "extern	void	  err(int, const char *, ...);"
+	echo "extern	void	  errx(int, const char *, ...);"
+	echo "extern	void	  warn(const char *, ...);"
+	echo "extern	void	  warnx(const char *, ...);"
+fi
 
-#if [ ${HAVE_PROGNAME} -eq 0 ]; then
-	#echo "extern 	const char *getprogname(void);"
-	#echo "extern	void	  setprogname(const char *);"
-#fi
-#
+if [ ${HAVE_PROGNAME} -eq 0 ]; then
+	echo "extern 	const char *getprogname(void);"
+	echo "extern	void	  setprogname(const char *);"
+fi
+
+[ ${HAVE_STRTONUM} -eq 0 ] && \
+	echo "extern	long long strtonum(const char *, long long, long long, const char **);"
+
 #[ ${HAVE_REALLOCARRAY} -eq 0 ] && \
 	#echo "extern	void	 *reallocarray(void *, size_t, size_t);"
 #
@@ -245,9 +251,6 @@ __HEREDOC__
 #
 #[ ${HAVE_STRNDUP} -eq 0 ] && \
 	#echo "extern	char	 *strndup(const char *, size_t);"
-#
-#[ ${HAVE_STRTONUM} -eq 0 ] && \
-	#echo "extern	long long strtonum(const char *, long long, long long, const char **);"
 
 echo "config.h: written" 1>&2
 echo "config.h: written" 1>&3
@@ -277,13 +280,3 @@ echo "Makefile.local: written" 1>&2
 echo "Makefile.local: written" 1>&3
 
 exit 0
-
-# FIXME These are the leftovers of the old configure.ac: anything left behind?
-
-#AC_C_BIGENDIAN
-#AC_CHECK_HEADERS(search.h)
-
-#AC_FUNC_STRFTIME
-#AC_FUNC_VPRINTF
-#AC_CHECK_FUNCS(gettimeofday select \
-        #strdup strerror strstr strtol srand)
