@@ -245,7 +245,7 @@ static void rtpdump_header(FILE *out, struct sockaddr_in *sin,
   RD_hdr_t hdr;
 
   fprintf(out, "#!rtpplay%s %s/%d\n", RTPFILE_VERSION,
-    inet_ntoa(sin->sin_addr), sin->sin_port);
+    inet_ntoa(sin->sin_addr), ntohs(sin->sin_port));
   hdr.start.tv_sec  = htonl(start->tv_sec);
   hdr.start.tv_usec = htonl(start->tv_usec);
   hdr.source = sin->sin_addr.s_addr;
