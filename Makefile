@@ -18,6 +18,8 @@ SRCS = \
 	multimer.h	\
 	notify.c	\
 	notify.h	\
+	payload.c	\
+	payload.h	\
 	rd.c		\
 	rtp.h		\
 	rtpdump.c	\
@@ -47,10 +49,10 @@ HTML =	multidump.1.html	\
 	rtpsend.1.html		\
 	rtptrans.1.html
 
-rtpdump_OBJS	= utils.o                     rd.o rtpdump.o
-rtpplay_OBJS	= utils.o notify.o multimer.o rd.o rtpplay.o
-rtpsend_OBJS	= utils.o notify.o multimer.o      rtpsend.o
-rtptrans_OBJS	= utils.o notify.o multimer.o      rtptrans.o
+rtpdump_OBJS	= utils.o                     payload.o rd.o rtpdump.o
+rtpplay_OBJS	= utils.o notify.o multimer.o payload.o rd.o rtpplay.o
+rtpsend_OBJS	= utils.o notify.o multimer.o                rtpsend.o
+rtptrans_OBJS	= utils.o notify.o multimer.o                rtptrans.o
 
 HAVE_SRCS = \
 	have-err.c		\

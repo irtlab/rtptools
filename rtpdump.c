@@ -49,12 +49,14 @@
 
 #include "rtp.h"
 #include "vat.h"
+#include "payload.h"
 #include "rtpdump.h"
 #include "sysdep.h"
 
 #define RTPFILE_VERSION "1.0"
 
 extern int hpt(char*, struct sockaddr_in*, unsigned char*);
+extern struct pt payload[];
 
 typedef uint32_t member_t;
 
@@ -70,53 +72,6 @@ typedef enum {
 	F_payload,
 	F_ascii
 } t_format;
-
-/*
- * payload type map, see
- * http://www.iana.org/assignments/rtp-parameters
- */
-static struct {
-	const char*	enc;  /* encoding name */
-	int		rate; /* sampling rate (audio) or clock rate (video) */
-	int		ch;   /* audio channels; 0 for video */
-} pt_map[] = {
-	{ "PCMU",	 8000,	1 },
-	{ "reserved",	    0,	0 },
-	{ "reserved",	    0,	0 },
-	{ "GSM ",	 8000,	1 },
-	{ "G723",	 8000,	1 },
-	{ "DVI4",	 8000,	1 },
-	{ "DVI4",	16000,	1 },
-	{ "LPC ",	 8000,	1 },
-	{ "PCMA",	 8000,	1 },
-	{ "G722",	 8000,	1 },
-	{ "L16 ",	44100,	2 },
-	{ "L16 ",	44100,	1 },
-	{ "QCELP",	 8000,	1 },
-	{ "CN  ",	 8000,	0 },
-	{ "MPA ",	90000,	0 },
-	{ "G728",	 8000,	1 },
-	{ "DVI4",	11025,	1 },
-	{ "DVI4",	22050,	1 },
-	{ "G729",	 8000,	1 },
-	{ "reserved",	    0,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "CelB",	90000,	0 },
-	{ "JPEG",	90000,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "nv  ",	90000,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "H261",	90000,	0 },
-	{ "MPV ",	90000,	0 },
-	{ "MP2T",	90000,	0 },
-	{ "H263",	90000,	0 },
-	{ NULL,		    0,	0 }
-};
 
 static void usage(const char *argv0)
 {
@@ -327,7 +282,7 @@ static int parse_data(FILE *out, char *buf, int len)
     fprintf(out,
     "v=%d p=%d x=%d cc=%d m=%d pt=%d (%s,%d,%d) seq=%u ts=%lu ssrc=0x%lx ",
       r->version, r->p, r->x, r->cc, r->m,
-      r->pt, pt_map[r->pt].enc, pt_map[r->pt].ch, pt_map[r->pt].rate,
+      r->pt, payload[r->pt].enc, payload[r->pt].ch, payload[r->pt].rate,
       ntohs(r->seq),
       (unsigned long)ntohl(r->ts),
       (unsigned long)ntohl(r->ssrc));
