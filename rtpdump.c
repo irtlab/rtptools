@@ -483,10 +483,10 @@ static int parse_control(FILE *out, char *buf, int len)
           (unsigned long)ntohl(r->r.sr.psent),
           (unsigned long)ntohl(r->r.sr.osent));
         for (i = 0; i < r->common.count; i++) {
-          fprintf(out, "  (ssrc=0x%lx fraction=%g lost=%lu last_seq=%lu jit=%lu lsr=%lu dlsr=%lu )\n",
+          fprintf(out, "  (ssrc=0x%lx fraction=%g lost=%ld last_seq=%lu jit=%lu lsr=%lu dlsr=%lu )\n",
            (unsigned long)ntohl(r->r.sr.rr[i].ssrc),
            r->r.sr.rr[i].fraction / 256.,
-           (unsigned long)ntohl(r->r.sr.rr[i].lost), /* XXX I'm pretty sure this is wrong */
+           (long)RTCP_GET_LOST(&r->r.sr.rr[i]),
            (unsigned long)ntohl(r->r.sr.rr[i].last_seq),
            (unsigned long)ntohl(r->r.sr.rr[i].jitter),
            (unsigned long)ntohl(r->r.sr.rr[i].lsr),
@@ -500,10 +500,10 @@ static int parse_control(FILE *out, char *buf, int len)
           (unsigned long)ntohl(r->r.rr.ssrc), r->common.p, r->common.count,
           ntohs(r->common.length));
         for (i = 0; i < r->common.count; i++) {
-          fprintf(out, "  (ssrc=0x%lx fraction=%g lost=%lu last_seq=%lu jit=%lu lsr=%lu dlsr=%lu )\n",
+          fprintf(out, "  (ssrc=0x%lx fraction=%g lost=%ld last_seq=%lu jit=%lu lsr=%lu dlsr=%lu )\n",
             (unsigned long)ntohl(r->r.rr.rr[i].ssrc),
             r->r.rr.rr[i].fraction / 256.,
-            (unsigned long)ntohl(r->r.rr.rr[i].lost),
+            (long)RTCP_GET_LOST(&r->r.rr.rr[i]),
             (unsigned long)ntohl(r->r.rr.rr[i].last_seq),
             (unsigned long)ntohl(r->r.rr.rr[i].jitter),
             (unsigned long)ntohl(r->r.rr.rr[i].lsr),
