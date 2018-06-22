@@ -82,9 +82,7 @@ struct msghdr {
 
 #define  ITIMER_REAL     0       /* Decrements in real time */
 
-extern int winfd_dummy;
 extern int sendmsg(int s, const struct msghdr *msg, int flags);
-
 
 /* declare the missing functions */
 
