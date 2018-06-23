@@ -58,7 +58,6 @@ int RD_header(FILE *in, struct sockaddr_in *sin, int verbose)
   if (strncmp(line, magic, strlen(magic)) != 0) return -1;
   if (fread((char *)&hdr, sizeof(hdr), 1, in) == 0) return -1;
   hdr.start.tv_sec = ntohl(hdr.start.tv_sec);
-  hdr.port         = ntohs(hdr.port);
   if (verbose) {
     struct tm *tm;
     struct in_addr in;
