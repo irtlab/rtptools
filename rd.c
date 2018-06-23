@@ -67,11 +67,11 @@ int RD_header(FILE *in, struct sockaddr_in *sin, int verbose)
     tm = localtime(&tt);
     strftime(line, sizeof(line), "%C", tm);
     printf("Start:  %s\n", line);
-    printf("Source: %s (%d)\n", inet_ntoa(in), hdr.port);
+    printf("Source: %s (%d)\n", inet_ntoa(in), ntohs(hdr.port));
   }
   if (sin && sin->sin_addr.s_addr == 0) {
     sin->sin_addr.s_addr = hdr.source;
-    sin->sin_port        = htons(hdr.port);
+    sin->sin_port        = hdr.port;
   }
   return 0;
 } /* RD_header */
