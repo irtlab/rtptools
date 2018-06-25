@@ -578,7 +578,7 @@ void packet_handler(FILE *out, t_format format, int trunc,
     case F_hex:
     case F_ascii:
       if (ctrl == 0) {
-        fprintf(out, "%8ld.%06ld %s len=%d from=%s:%u ",
+        fprintf(out, "%ld.%06ld %s len=%d from=%s:%u ",
                 now.tv_sec, now.tv_usec, parse_type(ctrl, packet->p.data),
                 len, inet_ntoa(sin.sin_addr), ntohs(sin.sin_port));
         parse_data(out, packet->p.data, len);
@@ -591,7 +591,7 @@ void packet_handler(FILE *out, t_format format, int trunc,
       }
     case F_rtcp:
       if (ctrl == 1) {
-        fprintf(out, "%8ld.%06ld %s len=%d from=%s:%u ",
+        fprintf(out, "%ld.%06ld %s len=%d from=%s:%u ",
                 now.tv_sec, now.tv_usec, parse_type(ctrl, packet->p.data),
                 len, inet_ntoa(sin.sin_addr), ntohs(sin.sin_port));
         parse_control(out, packet->p.data, len);
@@ -679,7 +679,11 @@ int main(int argc, char *argv[])
 
     /* bytes to show for F_hex or F_dump */
     case 'x':
-      trunc = atoi(optarg);
+      if (0 == (trunc = atoi(optarg))) {
+	  warnx("Invalid -x value");
+	  usage(argv[0]);
+	  exit(1);
+      }
       break;
 
     case '?':
@@ -691,11 +695,8 @@ int main(int argc, char *argv[])
   }
 
 #if defined(WIN32)
-  /*
-   * If using dump or binary format, make stdout and stdin use binary
-   * format on Win32, to assure that files generated can be read on both
-   * Unix and Windows systems.
-   */
+  /* On Windows, make sure stdout and stdin use the binary format
+   * if using F_dump or F_header. */
   if (format == F_dump || format == F_header) {
     if (out == stdout) {
       setmode(fileno(stdout), O_BINARY);
