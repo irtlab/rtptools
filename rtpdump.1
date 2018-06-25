@@ -26,7 +26,7 @@
 .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
-.Dd April 2, 2018
+.Dd June 25, 2018
 .Dt RTPDUMP 1
 .Os
 .Sh NAME
@@ -93,14 +93,14 @@ This is followed by one
 header and one
 .Vt RD_packet_t
 structure for each received packet.
-All fields are in network byte order.
-The RTP and RTCP packets are recorded as-is.
+All fields are stored in the network byte order.
+This metadata is followed by the actual RTP or RTCP packet, recorded as-is.
 The structures are as follows:
 .Bd -literal
 typedef struct {
-  struct timeval start; /* start of recording (GMT) */
-  uint32_t source;        /* network source (multicast) */
-  uint16_t port;          /* UDP port */
+  struct timeval start;  /* start of recording (GMT) */
+  uint32_t source;       /* network source (multicast) */
+  uint16_t port;         /* UDP port */
 } RD_hdr_t;
 
 typedef struct {
@@ -124,7 +124,56 @@ The
 format, which is the default, saves text parsed packets,
 suitable for
 .Xr rtpsend 1 .
-See below for an example.
+Each entry starts with a time value, in seconds, relative to the beginning.
+The time value appears at the beginning of a line, without white space.
+Within an RTP or RTCP packet description, parameters may appear in any order,
+without white space around the equal sign.
+Lines are continued with initial white space on the next line.
+Comment lines start with
+.Sq # .
+Strings are enclosed in quotation marks.
+The actual RTP and RTCP entries look like this:
+.Bd -literal
+<time> RTP
+	v=<version>
+	p=<padding>
+	x=<extension>
+	m=<marker>
+	pt=<payload type>
+	ts=<time stamp>
+	seq=<sequence number>
+	ssrc=<SSRC>
+	cc=<CSRC count>
+	csrc=<CSRC>
+	data=<hex payload>
+	ext_type=<type of extension>
+	ext_len=<length of extension header>
+	ext_data=<hex extension data>
+	len=<packet size in bytes (including header)>
+.Ed
+.Bd -literal
+<time> RTCP
+	(SDES v=<version> (src=<source> cname="..." name="...") (...))
+	(SR v=<version>
+		ssrc=<SSRC of data source>
+		p=<padding>
+		count=<number of sources>
+		len=<length>
+		ntp=<NTP timestamp>
+		psent=<packet sent>
+		osent=<octets sent>
+		(ssrc=<SSRC of source>
+			fraction=<loss fraction>
+			lost=<number lost>
+			last_seq=<last sequence number>
+			jit=<jitter>
+			lsr=<last SR received>
+			dlsr=<delay since last SR>
+		)
+	)
+.Ed
+.\" FIXME: describe the individual fields
+.Pp
 The
 .Cm hex
 format is like
@@ -154,7 +203,7 @@ is the RTP sequence number (only used for RTP packets).
 .It Fl f Ar infile
 Read packets from
 .Ar infile
-instead of from the network or from standard input.
+instead of the network or standard input.
 The file must have been recorded using the
 .Cm dump
 format.
@@ -170,7 +219,7 @@ Only listen for the first
 .It Fl x Ar bytes
 Process only the first number of
 .Ar bytes
-of the payload.
+of each packet's payload.
 This is only applicable for the
 .Cm dump
 and
