@@ -40,8 +40,13 @@
 .Oo Ar address Oc Ns / Ns Ar port Ns Op / Ns Ar ttl
 .Sh DESCRIPTION
 .Nm
-reads a stream of RTP and RTCP packets in a format recored with
-.Dq rtpdump -F ascii
+reads a stream of RTP and RTCP packets in a textual format produced by
+.Xr rtpdump 1 Ns 's
+.Cm ascii
+or
+.Cm hex
+or
+.Cm rtcp
 from standard input and resends the traffic to the given
 .Ar address Ns / Ns Ar port ,
 optionally with a given value of
@@ -51,6 +56,8 @@ The
 defaults to
 .Dq localhost .
 The port number must be an even number.
+The input file can also be written manualy,
+allowing for hand-crafted packets.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
