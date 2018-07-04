@@ -49,12 +49,14 @@
 
 #include "rtp.h"
 #include "vat.h"
+#include "payload.h"
 #include "rtpdump.h"
 #include "sysdep.h"
 
 #define RTPFILE_VERSION "1.0"
 
 extern int hpt(char*, struct sockaddr_in*, unsigned char*);
+extern struct pt payload[];
 
 typedef uint32_t member_t;
 
@@ -71,52 +73,6 @@ typedef enum {
 	F_ascii
 } t_format;
 
-/*
- * payload type map, see
- * http://www.iana.org/assignments/rtp-parameters
- */
-static struct {
-	const char*	enc;  /* encoding name */
-	int		rate; /* sampling rate (audio) or clock rate (video) */
-	int		ch;   /* audio channels; 0 for video */
-} pt_map[] = {
-	{ "PCMU",	 8000,	1 },
-	{ "reserved",	    0,	0 },
-	{ "reserved",	    0,	0 },
-	{ "GSM ",	 8000,	1 },
-	{ "G723",	 8000,	1 },
-	{ "DVI4",	 8000,	1 },
-	{ "DVI4",	16000,	1 },
-	{ "LPC ",	 8000,	1 },
-	{ "PCMA",	 8000,	1 },
-	{ "G722",	 8000,	1 },
-	{ "L16 ",	44100,	2 },
-	{ "L16 ",	44100,	1 },
-	{ "QCELP",	 8000,	1 },
-	{ "CN  ",	 8000,	0 },
-	{ "MPA ",	90000,	0 },
-	{ "G728",	 8000,	1 },
-	{ "DVI4",	11025,	1 },
-	{ "DVI4",	22050,	1 },
-	{ "G729",	 8000,	1 },
-	{ "reserved",	    0,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "CelB",	90000,	0 },
-	{ "JPEG",	90000,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "nv  ",	90000,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "unassigned",	    0,	0 },
-	{ "H261",	90000,	0 },
-	{ "MPV ",	90000,	0 },
-	{ "MP2T",	90000,	0 },
-	{ "H263",	90000,	0 },
-	{ NULL,		    0,	0 }
-};
 
 int dyn_payload_rtpevent = 101; /* Default payload type for RTPEvent packets */
 
@@ -247,7 +203,7 @@ static void rtpdump_header(FILE *out, struct sockaddr_in *sin,
   RD_hdr_t hdr;
 
   fprintf(out, "#!rtpplay%s %s/%d\n", RTPFILE_VERSION,
-    inet_ntoa(sin->sin_addr), sin->sin_port);
+    inet_ntoa(sin->sin_addr), ntohs(sin->sin_port));
   hdr.start.tv_sec  = htonl(start->tv_sec);
   hdr.start.tv_usec = htonl(start->tv_usec);
   hdr.source = sin->sin_addr.s_addr;
@@ -330,7 +286,7 @@ static int parse_data(FILE *out, char *buf, int len)
     fprintf(out,
     "v=%d p=%d x=%d cc=%d m=%d pt=%d (%s,%d,%d) seq=%u ts=%lu ssrc=0x%lx ",
       r->version, r->p, r->x, r->cc, r->m,
-      r->pt, pt_map[r->pt].enc, pt_map[r->pt].ch, pt_map[r->pt].rate,
+      r->pt, payload[r->pt].enc, payload[r->pt].ch, payload[r->pt].rate,
       ntohs(r->seq),
       (unsigned long)ntohl(r->ts),
       (unsigned long)ntohl(r->ssrc));
@@ -509,10 +465,10 @@ static int parse_control(FILE *out, char *buf, int len)
           (unsigned long)ntohl(r->r.sr.psent),
           (unsigned long)ntohl(r->r.sr.osent));
         for (i = 0; i < r->common.count; i++) {
-          fprintf(out, "  (ssrc=0x%lx fraction=%g lost=%lu last_seq=%lu jit=%lu lsr=%lu dlsr=%lu )\n",
+          fprintf(out, "  (ssrc=0x%lx fraction=%g lost=%ld last_seq=%lu jit=%lu lsr=%lu dlsr=%lu )\n",
            (unsigned long)ntohl(r->r.sr.rr[i].ssrc),
            r->r.sr.rr[i].fraction / 256.,
-           (unsigned long)ntohl(r->r.sr.rr[i].lost), /* XXX I'm pretty sure this is wrong */
+           (long)RTCP_GET_LOST(&r->r.sr.rr[i]),
            (unsigned long)ntohl(r->r.sr.rr[i].last_seq),
            (unsigned long)ntohl(r->r.sr.rr[i].jitter),
            (unsigned long)ntohl(r->r.sr.rr[i].lsr),
@@ -526,10 +482,10 @@ static int parse_control(FILE *out, char *buf, int len)
           (unsigned long)ntohl(r->r.rr.ssrc), r->common.p, r->common.count,
           ntohs(r->common.length));
         for (i = 0; i < r->common.count; i++) {
-          fprintf(out, "  (ssrc=0x%lx fraction=%g lost=%lu last_seq=%lu jit=%lu lsr=%lu dlsr=%lu )\n",
+          fprintf(out, "  (ssrc=0x%lx fraction=%g lost=%ld last_seq=%lu jit=%lu lsr=%lu dlsr=%lu )\n",
             (unsigned long)ntohl(r->r.rr.rr[i].ssrc),
             r->r.rr.rr[i].fraction / 256.,
-            (unsigned long)ntohl(r->r.rr.rr[i].lost),
+            (long)RTCP_GET_LOST(&r->r.rr.rr[i]),
             (unsigned long)ntohl(r->r.rr.rr[i].last_seq),
             (unsigned long)ntohl(r->r.rr.rr[i].jitter),
             (unsigned long)ntohl(r->r.rr.rr[i].lsr),
@@ -648,7 +604,7 @@ void packet_handler(FILE *out, t_format format, int trunc,
     case F_hex:
     case F_ascii:
       if (ctrl == 0) {
-        fprintf(out, "%8ld.%06ld %s len=%d from=%s:%u ",
+        fprintf(out, "%ld.%06ld %s len=%d from=%s:%u ",
                 now.tv_sec, now.tv_usec, parse_type(ctrl, packet->p.data),
                 len, inet_ntoa(sin.sin_addr), ntohs(sin.sin_port));
         parse_data(out, packet->p.data, len);
@@ -661,7 +617,7 @@ void packet_handler(FILE *out, t_format format, int trunc,
       }
     case F_rtcp:
       if (ctrl == 1) {
-        fprintf(out, "%8ld.%06ld %s len=%d from=%s:%u ",
+        fprintf(out, "%ld.%06ld %s len=%d from=%s:%u ",
                 now.tv_sec, now.tv_usec, parse_type(ctrl, packet->p.data),
                 len, inet_ntoa(sin.sin_addr), ntohs(sin.sin_port));
         parse_control(out, packet->p.data, len);
@@ -749,7 +705,11 @@ int main(int argc, char *argv[])
 
     /* bytes to show for F_hex or F_dump */
     case 'x':
-      trunc = atoi(optarg);
+      if (0 == (trunc = atoi(optarg))) {
+	  warnx("Invalid -x value");
+	  usage(argv[0]);
+	  exit(1);
+      }
       break;
 
       /* Dynamic Payload Type for RTPEVENT packets */
@@ -766,11 +726,8 @@ int main(int argc, char *argv[])
   }
 
 #if defined(WIN32)
-  /*
-   * If using dump or binary format, make stdout and stdin use binary
-   * format on Win32, to assure that files generated can be read on both
-   * Unix and Windows systems.
-   */
+  /* On Windows, make sure stdout and stdin use the binary format
+   * if using F_dump or F_header. */
   if (format == F_dump || format == F_header) {
     if (out == stdout) {
       setmode(fileno(stdout), O_BINARY);

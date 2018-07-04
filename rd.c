@@ -58,7 +58,6 @@ int RD_header(FILE *in, struct sockaddr_in *sin, int verbose)
   if (strncmp(line, magic, strlen(magic)) != 0) return -1;
   if (fread((char *)&hdr, sizeof(hdr), 1, in) == 0) return -1;
   hdr.start.tv_sec = ntohl(hdr.start.tv_sec);
-  hdr.port         = ntohs(hdr.port);
   if (verbose) {
     struct tm *tm;
     struct in_addr in;
@@ -68,11 +67,11 @@ int RD_header(FILE *in, struct sockaddr_in *sin, int verbose)
     tm = localtime(&tt);
     strftime(line, sizeof(line), "%C", tm);
     printf("Start:  %s\n", line);
-    printf("Source: %s (%d)\n", inet_ntoa(in), hdr.port);
+    printf("Source: %s (%d)\n", inet_ntoa(in), ntohs(hdr.port));
   }
   if (sin && sin->sin_addr.s_addr == 0) {
     sin->sin_addr.s_addr = hdr.source;
-    sin->sin_port        = htons(hdr.port);
+    sin->sin_port        = hdr.port;
   }
   return 0;
 } /* RD_header */

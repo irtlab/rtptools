@@ -41,15 +41,15 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "config.h"
 #endif
+
+#include "sysdep.h"
 
 #include "rtp.h"
 #include "rtpdump.h"
 #include "notify.h"
 #include "multimer.h"
 #include "vat.h"
-#include "sysdep.h"
 
 extern int hpt(char*, struct sockaddr_in*, unsigned char*);
 
@@ -306,7 +306,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
       msg.msg_iovlen = 2;
       for (i = 0; i < hostc; i++) {
         if (side[i][proto].sock != sock) {
-          msg.msg_name = (caddr_t ) &side[i][proto].sin;
+          msg.msg_name = (char*) &side[i][proto].sin;
           msg.msg_namelen = sizeof(side[i][proto].sin);
 #if HAVE_MSGCONTROL
           msg.msg_control = 0;
@@ -343,7 +343,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
       rtcp_msg->common.p=0;
       rtcp_msg->common.count=0;
       rtcp_msg->common.pt=RTCP_RR;
-      rtcp_msg->r.rr.ssrc = random();
+      rtcp_msg->r.rr.ssrc = rand();
       rtcp_msg->common.length=(8 >> 2) - 1;
 
       ctl_msg=(struct sdes_msg *)&rtcp_msg->r.rr.rr[0];

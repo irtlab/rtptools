@@ -30,8 +30,6 @@
 
 #include "sysdep.h"
 
-int winfd_dummy = -1;       /* for select */
-
 #if defined(WIN32)
 void startupSocket(void)
 {

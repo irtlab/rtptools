@@ -368,7 +368,7 @@ static int rtcp_rr(node_t *list, char *packet)
       else if (strcmp(n->type, "fraction") == 0)
         rr->fraction = (n->num)*256;
       else if (strcmp(n->type, "lost") == 0)   /* PP: alignment OK? */
-        rr->lost = htonl(n->num);
+        RTCP_SET_LOST(rr, n->num);
       else if (strcmp(n->type, "last_seq") == 0)
         rr->last_seq = htonl(n->num);
       else if (strcmp(n->type, "jit") == 0)
@@ -772,7 +772,7 @@ static int generate(char *text, char *data, double *time, int *type)
 static double gettimeofday_d(void)
 {
   struct timeval tv;
-  gettimeofday(&tv, (struct timezone *)0);
+  gettimeofday(&tv, NULL);
   return tv.tv_sec + tv.tv_usec / 1e6;
 } /* gettimeofday_d */
 
@@ -984,27 +984,6 @@ int main(int argc, char *argv[])
       exit(1);
     }
   }
-
-#if defined(WIN32)
-  /*
-   * We have to set the socket array when we use 'select' in NT,
-   * otherwise the 'select' function in NT will consider all the
-   * three fd_sets are NULL and return an error.  Error code
-   * WSAEINVAL means The timeout value is not valid, or all three
-   * descriptor parameters were NULL but the timeout value is valid.
-   * After setting Writefds, the program runs ok.
-   */
-//  notify_set_socket(sock[i], 1);
-  /*
-   * Modified by Wenyu and Akira 12/27/01
-   * setting Writefds was causing
-   *   1)consuming CPU 100% (behave polling)
-   *   2)slow
-   *   3)large jitter
-   * therefore, we changed it to set dummy fd to Readfds.
-   */
-  notify_set_socket(winfd_dummy, 0);
-#endif
 
   send_handler((Notify_client)in);
   notify_start();

@@ -31,73 +31,40 @@
 #ifndef SYSDEP_H
 #define SYSDEP_H
 
+/* In this file, we basically decide whether we are on Windows or not.
+ * On Windows, define a bunch of stuff that Windows needs defined
+ * (TODO: it could probably be cleand up a bit); otherwise,
+ * simply include the config.h produced by configure. */
+
 #if defined(WIN32) || defined(__WIN32__)
+
+#define HAVE_ERR		0
+#define HAVE_GETOPT		0
+#define HAVE_GETTIMEOFDAY	0
+#define HAVE_HSEARCH		0
+#define HAVE_PROGNAME		0
+#define HAVE_STRTONUM		0
+#define HAVE_LNSL		0
+#define HAVE_LSOCKET		0
+#define HAVE_BIGENDIAN		0
+#define HAVE_MSGCONTROL		0
+#define RTP_BIG_ENDIAN		0
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
 #include <stdio.h>
 #include <time.h>
+#include <stdint.h>
 
-#define HAVE_ERR 0
-#define RTP_BIG_ENDIAN 0
-
-/* Determine if the C(++) compiler requires complete function prototype  */
-#ifndef __P
-#if defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
-#define __P(x) x
-#else
-#define __P(x) ()
-#endif
-#endif
-
-#ifdef __BORLANDC__
-#include <io.h>
-#define strcasecmp stricmp
-#define strncasecmp strnicmp
-#endif /* __BORLANDC__ */
-
-#ifdef _MSC_VER
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
-#define open _open
-#define write _write
-#define close _close
-#define ftime _ftime
-#define timeb _timeb
-#endif /* _MSC_VER */
-
-#ifndef SIGBUS
-#define SIGBUS SIGINT
-#endif
 
 #ifndef SIGHUP
 #define SIGHUP SIGINT
 #endif
 
-#ifndef SIGPIPE
-#define SIGPIPE SIGINT
-#endif
-
-#ifndef EADDRNOTAVAIL
-#define EADDRNOTAVAIL WSAEADDRNOTAVAIL
-#endif
-
-typedef UINT32  in_addr_t;
-typedef SSIZE_T ssize_t;
-
-typedef  INT32 pid_t;
-typedef UINT32 gid_t;
-typedef UINT32 uid_t;
-
-typedef char *   caddr_t;        /* core address */
-typedef long  fd_mask;
-#define NBBY  8   /* number of bits in a byte */
-#define NFDBITS (sizeof(fd_mask) * NBBY)  /* bits per mask */
-
-#ifndef howmany
-#define howmany(x, y) (((x) + ((y) - 1)) / (y))
-#endif
+typedef uint32_t      in_addr_t;
 
 struct iovec {
     void  *iov_base;    /* Starting address */
@@ -105,117 +72,46 @@ struct iovec {
 };
 
 struct msghdr {
-        caddr_t msg_name;               /* optional address */
+        char*   msg_name;               /* optional address */
         int     msg_namelen;            /* size of address */
         struct  iovec *msg_iov;         /* scatter/gather array */
         int     msg_iovlen;             /* # elements in msg_iov */
-        caddr_t msg_accrights;          /* access rights sent/received */
+        char*   msg_accrights;          /* access rights sent/received */
         int     msg_accrightslen;
-};
-
-struct passwd {
-        char    *pw_name;
-        char    *pw_passwd;
-        uid_t   pw_uid;
-        gid_t   pw_gid;
-        char    *pw_age;
-        char    *pw_comment;
-        char    *pw_gecos;
-        char    *pw_dir;
-        char    *pw_shell;
 };
 
 #define  ITIMER_REAL     0       /* Decrements in real time */
 
-#ifndef _TIMESPEC_T
-#define _TIMESPEC_T
-typedef struct  timespec {              /* definition per POSIX.4 */
-        time_t          tv_sec;         /* seconds */
-        long            tv_nsec;        /* and nanoseconds */
-} timespec_t;
-#endif  /* _TIMESPEC_T */
-
-struct  itimerval {
-        struct  timeval it_interval;    /* timer interval */
-        struct  timeval it_value;       /* current value */
-};
-
-#ifndef timerisset
-#define timerisset(tvp)        ((tvp)->tv_sec || (tvp)->tv_usec)
-#endif
-
-#ifndef timerclear
-#define timerclear(tvp)        ((tvp)->tv_sec = (tvp)->tv_usec = 0)
-#endif
-
-#ifndef timercmp
-#define timercmp(a, b, CMP)                                                  \
-  (((a)->tv_sec == (b)->tv_sec) ?                                             \
-   ((a)->tv_usec CMP (b)->tv_usec) :                                          \
-   ((a)->tv_sec CMP (b)->tv_sec))
-#endif
-
-#ifndef timeradd
-#define timeradd(a, b, result)                                               \
-  do {                                                                        \
-    (result)->tv_sec = (a)->tv_sec + (b)->tv_sec;                             \
-    (result)->tv_usec = (a)->tv_usec + (b)->tv_usec;                          \
-    if ((result)->tv_usec >= 1000000)                                         \
-      {                                                                       \
-        ++(result)->tv_sec;                                                   \
-        (result)->tv_usec -= 1000000;                                         \
-      }                                                                       \
-  } while (0)
-#endif
-
-#ifndef timersub
-#define timersub(a, b, result)                                               \
-  do {                                                                        \
-    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;                             \
-    (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;                          \
-    if ((result)->tv_usec < 0) {                                              \
-      --(result)->tv_sec;                                                     \
-      (result)->tv_usec += 1000000;                                           \
-    }                                                                         \
-  } while (0)
-#endif
-
-#ifndef ETIME
-#define ETIME 1
-#endif
-
-#ifndef SIGKILL
-#define SIGKILL SIGTERM
-#endif
-
-#define fork() 0
-#define setsid() {}
-
-#ifndef FILE_SOCKET
-#define FILE_SOCKET int
-#endif
-
-#ifndef fdopen_socket
-#define fdopen_socket(f, g) &f
-#endif
-
-#ifndef fclose_socket
-#define fclose_socket(f) closesocket(*f)
-#endif
-
-extern int winfd_dummy;
-extern char getc_socket(FILE_SOCKET *f);
 extern int sendmsg(int s, const struct msghdr *msg, int flags);
+
+/* declare the missing functions */
+
+extern void		err(int, const char *, ...);
+extern void		errx(int, const char *, ...);
+extern void		warn(const char *, ...);
+extern void		warnx(const char *, ...);
+
+extern char*		optarg;
+extern int		opterr;
+extern int		optind;
+extern int		optopt;
+extern int		optreset;
+extern int		getopt(int, char* const*, const char*);
+
+extern int		gettimeofday(struct timeval*, void*);
+
+extern const char*	getprogname(void);
+extern void		setprogname(const char *);
 
 #else /* not WIN32 */
 
-/* Windows needs to call this function on <winsock2.h>.
- Otherwise the first call of socket() will fail
- "sock[i] = socket(PF_INET, SOCK_DGRAM, 0);"
- with "socket: No error". Tried on Win10. */
-#ifndef startupSocket
+#include "config.h"
+
+/* Windows needs to call this function as the first thing
+ * to init its socket stack as described in <winsock2.h>.
+ * Use it uniformly in the code, but define it away if
+ * we are not on Windows. */
 #define startupSocket()
-#endif
 
 #endif
 

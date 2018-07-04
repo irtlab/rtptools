@@ -26,7 +26,7 @@
 .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
-.Dd April 2, 2018
+.Dd June 25, 2018
 .Dt RTPDUMP 1
 .Os
 .Sh NAME
@@ -94,14 +94,14 @@ This is followed by one
 header and one
 .Vt RD_packet_t
 structure for each received packet.
-All fields are in network byte order.
-The RTP and RTCP packets are recorded as-is.
+All fields are stored in the network byte order.
+This metadata is followed by the actual RTP or RTCP packet, recorded as-is.
 The structures are as follows:
 .Bd -literal
 typedef struct {
-  struct timeval start; /* start of recording (GMT) */
-  uint32_t source;        /* network source (multicast) */
-  uint16_t port;          /* UDP port */
+  struct timeval start;  /* start of recording (GMT) */
+  uint32_t source;       /* network source (multicast) */
+  uint16_t port;         /* UDP port */
 } RD_hdr_t;
 
 typedef struct {
@@ -125,7 +125,56 @@ The
 format, which is the default, saves text parsed packets,
 suitable for
 .Xr rtpsend 1 .
-See below for an example.
+Each entry starts with a time value, in seconds, relative to the beginning.
+The time value appears at the beginning of a line, without white space.
+Within an RTP or RTCP packet description, parameters may appear in any order,
+without white space around the equal sign.
+Lines are continued with initial white space on the next line.
+Comment lines start with
+.Sq # .
+Strings are enclosed in quotation marks.
+The actual RTP and RTCP entries look like this:
+.Bd -literal
+<time> RTP
+	v=<version>
+	p=<padding>
+	x=<extension>
+	m=<marker>
+	pt=<payload type>
+	ts=<time stamp>
+	seq=<sequence number>
+	ssrc=<SSRC>
+	cc=<CSRC count>
+	csrc=<CSRC>
+	data=<hex payload>
+	ext_type=<type of extension>
+	ext_len=<length of extension header>
+	ext_data=<hex extension data>
+	len=<packet size in bytes (including header)>
+.Ed
+.Bd -literal
+<time> RTCP
+	(SDES v=<version> (src=<source> cname="..." name="...") (...))
+	(SR v=<version>
+		ssrc=<SSRC of data source>
+		p=<padding>
+		count=<number of sources>
+		len=<length>
+		ntp=<NTP timestamp>
+		psent=<packet sent>
+		osent=<octets sent>
+		(ssrc=<SSRC of source>
+			fraction=<loss fraction>
+			lost=<number lost>
+			last_seq=<last sequence number>
+			jit=<jitter>
+			lsr=<last SR received>
+			dlsr=<delay since last SR>
+		)
+	)
+.Ed
+.\" FIXME: describe the individual fields
+.Pp
 The
 .Cm hex
 format is like
@@ -155,7 +204,7 @@ is the RTP sequence number (only used for RTP packets).
 .It Fl f Ar infile
 Read packets from
 .Ar infile
-instead of from the network or from standard input.
+instead of the network or standard input.
 The file must have been recorded using the
 .Cm dump
 format.
@@ -171,7 +220,7 @@ Only listen for the first
 .It Fl x Ar bytes
 Process only the first number of
 .Ar bytes
-of the payload.
+of each packet's payload.
 This is only applicable for the
 .Cm dump
 and
@@ -184,20 +233,31 @@ as the payload id for RTP Events
 .El
 .Sh EXAMPLES
 .Bd -literal
-$ rtpdump -F ascii /1234
-844525628.240592 RTP len=176 from=131.136.234.103:46196 v=2 p=0 x=0 cc=0 m=0 pt=5 (IDVI,1,8000) seq=28178 ts=954052737 ssrc=0x124e2b58
-
+$ rtpdump -F ascii < bark.rtp
+44.020000 RTP len=172 from=0.0.0.0:0 v=2 p=0 x=0 cc=0 m=1 pt=0 (PCMU,1,8000) seq=54553 ts=3988999488 ssrc=0x59c72
+44.030000 RTCP len=72 from=0.0.0.0:0
+ (SR ssrc=0x59c72 p=0 count=0 len=6
+  ntp=3167928311.3622222025 ts=3988999508 psent=1 osent=160
+ )
+ (SDES p=0 count=1 len=10
+  (src=0x59c72 CNAME="good_dog@columbia.edu" NAME="nice_dog" )
+ )
+44.050000 RTP len=172 from=0.0.0.0:0 v=2 p=0 x=0 cc=0 m=0 pt=0 (PCMU,1,8000) seq=54554 ts=3988999648 ssrc=0x59c72
+44.070000 RTP len=172 from=0.0.0.0:0 v=2 p=0 x=0 cc=0 m=0 pt=0 (PCMU,1,8000) seq=54555 ts=3988999808 ssrc=0x59c72
+[...]
+44.380000 RTP len=173 from=0.0.0.0:0 v=2 p=0 x=0 cc=0 m=0 pt=0 (PCMU,1,8000) seq=54567 ts=3989001728 ssrc=0x59c72
+.Ed
+.Bd -literal
 $ rtpdump -F rtcp /1234
-844525628.243123 RTCP len=128 from=139.88.27.43:53154
- (RR ssrc=0x125bd36f p=0 count=1 len=7
-(ssrc=bc64b658 fraction=0.503906 lost=4291428375 last_seq=308007791
-  jit=17987961 lsr=2003335488 dlsr=825440558)
+1529922419.410173 RTCP len=72 from=127.0.0.1:38874
+ (SR ssrc=0x59c72 p=0 count=0 len=6
+  ntp=3167928311.3622222025 ts=3988999508 psent=1 osent=160
  )
- (SDES p=0 count=1 len=23
-  (src=0x125bd36f CNAME="yywhy@139.88.27.43" NAME="Michael Baldizzi
-  (NASA LeRC)" TOOL="vat-4.0a8" EMAIL="mbaldizzi@lerc.nasa.gov" )
+ (SDES p=0 count=1 len=10
+  (src=0x59c72 CNAME="good_dog@columbia.edu" NAME="nice_dog" )
  )
-
+.Ed
+.Bd -literal
 $ rtpdump -F short /1234
 -1511433758.442892 3988999488 54553
 1511433758.480881 3988999648 54554
@@ -214,6 +274,8 @@ $ rtpdump -F short /1234
 was written by
 .An Henning Schulzrinne Aq Mt hgs@cs.columbia.edu ,
 with enhancements by
-.An Ping Pan
+.An Ping Pan ,
+.An Akira Tsukamoto Aq Mt akira.tsukamoto@gmail.com ,
+.An Jan Stary Aq Mt hans@stare.cz ,
 and
-.An Akira Tsukamoto Aq Mt akira.tsukamoto@gmail.com .
+.An Jan Janak Aq Mt janakj@cs.columbia.edu .

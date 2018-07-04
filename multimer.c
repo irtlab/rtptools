@@ -72,7 +72,7 @@ void timeradd(struct timeval *a, struct timeval *b,
   struct timeval *sum)
 {
   sum->tv_usec = a->tv_usec + b->tv_usec;
-  if (sum->tv_usec >= 1000000L) {       /* > to >=  by Akira 12/29/01 */
+  if (sum->tv_usec >= 1000000L) {
     sum->tv_sec = a->tv_sec + b->tv_sec + 1;
     sum->tv_usec -= 1000000L;
   }
@@ -153,7 +153,7 @@ struct timeval *timer_set(struct timeval *interval,
 
   /* calculate expiration time */
   if (relative) {
-    (void) gettimeofday(&(tp->time), (struct timezone *)0);
+    (void) gettimeofday(&(tp->time), NULL);
     timeradd(&(tp->time), interval, &(tp->time));
     assert(tp->time.tv_usec < 1000000);
   }
@@ -176,7 +176,7 @@ struct timeval *timer_set(struct timeval *interval,
   timer_check(); /*DEBUG*/
   return &(tp->interval);
 } /* timer_set */
-
+
 /*
 * This routine returns a timeout value suitable for use in a select() call.
 * Before returning, all timer events that have expired are removed from the
@@ -199,7 +199,7 @@ struct timeval *timer_get(struct timeval *timeout)
     if (!timerQ) return (struct timeval *)0;
 
     /* check head of timer queue to see if timer has expired */
-    (void) gettimeofday(&now, (struct timezone *)0);
+    (void) gettimeofday(&now, NULL);
     if (timerless(&now, &timerQ->time)) { /* unexpired, calc timeout */
       timeout->tv_sec  = timerQ->time.tv_sec  - now.tv_sec;
       timeout->tv_usec = timerQ->time.tv_usec - now.tv_usec;

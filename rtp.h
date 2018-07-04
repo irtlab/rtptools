@@ -39,9 +39,6 @@
  */
 #define RTP_VERSION    2
 
-#define RTP_SEQ_MOD (1<<16)
-#define RTP_MAX_SDES 255      /* maximum text length for SDES */
-
 typedef enum {
     RTCP_SR   = 200,
     RTCP_RR   = 201,
@@ -112,24 +109,29 @@ typedef struct {
 } rtcp_common_t;
 
 /*
- * Big-endian mask for version, padding bit and packet type pair
- * FIXME?
- */
-#define RTCP_VALID_MASK (0xc000 | 0x2000 | 0xfe)
-#define RTCP_VALID_VALUE ((RTP_VERSION << 14) | RTCP_SR)
-
-/*
  * Reception report block
  */
 typedef struct {
     uint32_t ssrc;             /* data source being reported */
     unsigned int fraction:8;  /* fraction lost since last SR/RR */
-    int lost:24;              /* cumul. no. pkts lost (signed!) */
+    unsigned int lost_sb:1;    /* cumul. no. pkts lost: sign */
+    unsigned int lost_b2:7;    /* cumul. no. pkts lost: MSB */
+    unsigned int lost_b1:8;    /* cumul. no. pkts lost: byte 1 */
+    unsigned int lost_b0:8;    /* cumul. no. pkts lost: LSB */
     uint32_t last_seq;         /* extended last seq. no. received */
     uint32_t jitter;           /* interarrival jitter */
     uint32_t lsr;              /* last SR packet from this source */
     uint32_t dlsr;             /* delay since last SR packet */
 } rtcp_rr_t;
+
+#define _BYTE(v) ((v) & 0xff)
+#define RTCP_GET_LOST(rp) ((rp)->lost_sb ? (-1) : (1) * (((rp)->lost_b2 << 16) | ((rp)->lost_b1 << 8) | (rp)->lost_b0))
+#define RTCP_SET_LOST(rp, v) do { \
+    (rp)->lost_sb = (v) < 0 ? (1) : (0); \
+    (rp)->lost_b2 = _BYTE((v) >> 16); \
+    (rp)->lost_b1 = _BYTE((v) >> 8); \
+    (rp)->lost_b0 = _BYTE((v)); \
+  } while (0)
 
 /*
  * SDES item

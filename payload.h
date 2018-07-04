@@ -28,19 +28,11 @@
  * SUCH DAMAGE.
  */
 
-#ifndef WINSOCKLIB_H_
-#define WINSOCKLIB_H_
+#include <stdint.h>
+#include <stdio.h>
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
-#ifdef WIN32
-extern void startupSocket(void);
-#endif
-
-#ifdef  __cplusplus
-}
-#endif
-
-#endif /* WINSOCKLIB_H_ */
+struct pt {
+	const char*	enc;  /* encoding name */
+	uint32_t	rate; /* sampling rate (audio) or clock rate (video) */
+	uint8_t		ch;   /* audio channels; 0 for video */
+};

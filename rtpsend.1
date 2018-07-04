@@ -26,7 +26,7 @@
 .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
-.Dd April 2, 2018
+.Dd June 25, 2018
 .Dt RTPSEND 1
 .Os
 .Sh NAME
@@ -40,75 +40,24 @@
 .Oo Ar address Oc Ns / Ns Ar port Ns Op / Ns Ar ttl
 .Sh DESCRIPTION
 .Nm
-sends a stream of RTP and RTCP packets with configurable parameters.
-The packets are sent to the given
+reads a stream of RTP and RTCP packets in a textual format produced by
+.Xr rtpdump 1 Ns 's
+.Cm ascii
+or
+.Cm hex
+or
+.Cm rtcp
+from standard input and resends the traffic to the given
 .Ar address Ns / Ns Ar port ,
 optionally with a given value of
 .Ar ttl .
-This is intended to test the RTP features of the receiving end.
 The
 .Ar address
 defaults to
 .Dq localhost .
 The port number must be an even number.
-.Pp
-By default,
-.Nm
-reads the packets from standard input.
-The RTP or RTCP headers are expected in a format written by
-.Xr rtpdump 1
-.Fl F Cm ascii .
-.Pp
-Within the input, each entry starts with a time value, in seconds,
-relative to the beginning.
-The time value must appear at the beginning of a line, without white space.
-Within an RTP or RTCP packet description, parameters may appear in any order,
-without white space around the equal sign.
-Lines are continued with initial white space on the next line.
-Comment lines start with
-.Sq # .
-Strings are enclosed in quotation marks.
-RTP and RTCP entries look like this:
-.Bd -literal
-<time> RTP
-   v=<version>
-   p=<padding>
-   x=<extension>
-   m=<marker>
-   pt=<payload type>
-   ts=<time stamp>
-   seq=<sequence number>
-   ssrc=<SSRC>
-   cc=<CSRC count>
-   csrc=<CSRC>
-   data=<hex payload>
-   ext_type=<type of extension>
-   ext_len=<length of extension header>
-   ext_data=<hex extension data>
-   len=<packet size in bytes(including header)>
-
-<time> RTCP (SDES v=<version>
-              (src=<source> cname="..." name="...")
-              (src=<source> ...)
-            )
-            (SR v=<version>
-              ssrc=<SSRC of data source>
-              p=<padding>
-              count=<number of sources>
-              len=<length>
-              ntp=<NTP timestamp>
-              psent=<packet sent>
-              osent=<octets sent>
-                (ssrc=<SSRC of source>
-                 fraction=<loss fraction>
-                 lost=<number lost>
-                 last_seq=<last sequence number>
-                 jit=<jitter>
-                 lsr=<last SR received>
-                 dlsr=<delay since last SR>
-                )
-            )
-.Ed
+The input file can also be written manualy,
+allowing for hand-crafted packets.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
@@ -144,6 +93,8 @@ chooses a random port.
 was written by
 .An Henning Schulzrinne Aq Mt hgs@cs.columbia.edu ,
 with enhancements by
-.An Ping Pan
+.An Ping Pan ,
+.An Akira Tsukamoto Aq Mt akira.tsukamoto@gmail.com ,
+.An Jan Stary Aq Mt hans@stare.cz ,
 and
-.An Akira Tsukamoto Aq Mt akira.tsukamoto@gmail.com .
+.An Jan Janak Aq Mt janakj@cs.columbia.edu .
