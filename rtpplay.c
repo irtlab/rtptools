@@ -45,12 +45,6 @@
 #include <netdb.h>
 #endif
 
-#if HAVE_HSEARCH
-#include <search.h>
-#else
-#include "compat-hsearch.h"
-#endif
-
 #include "sysdep.h"
 #include "notify.h"
 #include "rtp.h"

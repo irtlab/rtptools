@@ -69,7 +69,6 @@ CFLAGS="-g -W -Wall -Wstrict-prototypes -Wno-unused-parameter -Wwrite-strings"
 # be regarded as successful).
 
 HAVE_ERR=0
-HAVE_HSEARCH=0
 HAVE_PROGNAME=0
 HAVE_STRTONUM=0
 

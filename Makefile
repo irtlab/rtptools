@@ -59,7 +59,6 @@ HAVE_SRCS = \
 	have-getopt.c		\
 	have-gethostbyname.c	\
 	have-gettimeofday.c	\
-	have-hsearch.c		\
 	have-progname.c		\
 	have-strtonum.c		\
 	have-msgcontrol.c
@@ -68,8 +67,6 @@ COMPAT_SRCS = \
 	compat-err.c		\
 	compat-getopt.c		\
 	compat-gettimeofday.c	\
-	compat-hsearch.c	\
-	compat-hsearch.h	\
 	compat-progname.c	\
 	compat-strtonum.c
 
@@ -77,7 +74,6 @@ COMPAT_OBJS = \
 	compat-err.o		\
 	compat-getopt.o		\
 	compat-gettimeofday.o	\
-	compat-hsearch.o	\
 	compat-progname.o	\
 	compat-strtonum.o
 
