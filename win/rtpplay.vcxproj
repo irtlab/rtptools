@@ -92,7 +92,6 @@
     <ClCompile Include="../compat-err.c" />
     <ClCompile Include="../compat-getopt.c" />
     <ClCompile Include="../compat-gettimeofday.c" />
-    <ClCompile Include="../compat-hsearch.c" />
     <ClCompile Include="../compat-progname.c" />
     <ClCompile Include="../multimer.c" />
     <ClCompile Include="../notify.c" />

@@ -41,7 +41,6 @@
 #define HAVE_ERR		0
 #define HAVE_GETOPT		0
 #define HAVE_GETTIMEOFDAY	0
-#define HAVE_HSEARCH		0
 #define HAVE_PROGNAME		0
 #define HAVE_STRTONUM		0
 #define HAVE_LNSL		0

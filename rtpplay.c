@@ -45,12 +45,6 @@
 #include <netdb.h>
 #endif
 
-#if HAVE_HSEARCH
-#include <search.h>
-#else
-#include "compat-hsearch.h"
-#endif
-
 #include "sysdep.h"
 #include "notify.h"
 #include "rtp.h"
@@ -71,6 +65,38 @@ static FILE *in;               /* input file */
 static int sock[2];            /* output sockets */
 static int first = -1;         /* time offset of first packet */
 static RD_buffer_t buffer[READAHEAD];
+
+struct rtts {
+	struct timeval	rt; /* real time */
+	unsigned long	ts; /* timestamp */
+};
+
+struct ssrc {
+	uint32_t	ssrc;
+	struct rtts	rtts;
+	struct ssrc*	next;
+} *list = NULL;
+
+static struct ssrc*
+find(uint32_t ssrc)
+{
+	struct ssrc* this = NULL;
+	for (this = list; this; this = this->next)
+		if (ssrc == this->ssrc)
+			return this;
+	return NULL;
+}
+
+static void
+insert(struct ssrc* ssrc)
+{
+	if (ssrc == NULL)
+		return;
+	if (list)
+		ssrc->next = list;
+	else
+		list = ssrc;
+}
 
 static void usage(char *argv0)
 {
@@ -112,13 +138,8 @@ static Notify_value play_handler(Notify_client client)
   static struct timeval start;  /* generation time of first played back p. */
   struct timeval now;           /* current time */
   struct timeval next;          /* next packet generation time */
-  ENTRY *e;                     /* hash table entry */
-  struct rt_ts {
-    struct timeval rt;          /* real-time */
-    unsigned long ts;           /* timestamp */
-  };
-  struct rt_ts *t = 0;
-  char ssrc[12];
+  struct ssrc* ssrc = NULL;
+  struct rtts t;
   uint32_t ts  = 0;
   uint8_t  pt  = 0;
   rtp_hdr_t *r;
@@ -179,48 +200,41 @@ static Notify_value play_handler(Notify_client client)
   }
   buffer[rp].p.hdr.offset -= first;
 
-  /* RTP played according to timestamp. */
   if (buffer[rp].p.hdr.plen && r->version == 2 && !wallclock) {
-    ENTRY item;
-
     ts  = ntohl(r->ts);
     pt  = r->pt;
-    sprintf(ssrc, "%lx", (unsigned long)ntohl(r->ssrc));
+    if ((ssrc = find(ntohl(r->ssrc)))) {
+    /* found in the list of sources: compute playout instant */
+	double d;
+	t = ssrc->rtts;
+	d = payload[pt].rate ? ((1.0)*(int)(ts - t.ts)) / payload[pt].rate : 0;
+	next.tv_sec  = t.rt.tv_sec  + (int)d;
+	next.tv_usec = t.rt.tv_usec + (d - (int)d) * 1000000;
+	if (verbose) {
+	  printf(". %1.3f t=%6lu pt=%u ts=%lu,%lu rp=%2d b=%d d=%f\n",
+		tdbl(&next),
+		(unsigned long)buffer[rp].p.hdr.offset, (unsigned int)r->pt,
+		(unsigned long)ts, (unsigned long)t.ts, rp, b, d);
+	}
 
-    /* find hash entry */
-    item.key  = ssrc;
-    item.data = 0;
-    e = hsearch(item, FIND);
-
-    /* If found in list of sources, compute playout instant. */
-    if (e) {
-      double d;
-
-      t = (struct rt_ts *)e->data;
-      d = payload[pt].rate ? ((1.0) * (int)(ts - t->ts)) / payload[pt].rate : 0;
+    /*
       next.tv_sec  = t->rt.tv_sec  + (int)d;
       next.tv_usec = t->rt.tv_usec + (d - (int)d) * 1000000;
-      if (verbose)
-        printf(". %1.3f t=%6lu pt=%u ts=%lu,%lu rp=%2d b=%d d=%f\n", tdbl(&next),
-        (unsigned long)buffer[rp].p.hdr.offset, (unsigned int)r->pt,
-        (unsigned long)ts, (unsigned long)t->ts,
-        rp, b, d);
-    } else { /* If not on source list, insert and play based on wallclock. */
-      item.key  = malloc(strlen(ssrc)+1);
-      strcpy(item.key, ssrc);
-      t = (struct rt_ts *)malloc(sizeof(struct rt_ts));
-      item.data = (void *)t;
-      next.tv_sec  = start.tv_sec  + buffer[rp].p.hdr.offset/1000;
-      next.tv_usec = start.tv_usec + (buffer[rp].p.hdr.offset%1000) * 1000;
-      e = hsearch(item, ENTER);
+	*/
+
+    } else {
+	/* not on source list: insert and play based on wallclock. */
+	next.tv_sec  = start.tv_sec  +  buffer[rp].p.hdr.offset / 1000;
+	next.tv_usec = start.tv_usec + (buffer[rp].p.hdr.offset % 1000) * 1000;
+	ssrc = calloc(1, sizeof(struct ssrc));
+	ssrc->ssrc = ntohl(r->ssrc);
+	insert(ssrc);
     }
   }
-  /* RTCP or vat or playing back by wallclock. */
   else {
-    /* compute next playout time */
+  /* RTCP or vat or playing back by wallclock: compute next playout time */
     next.tv_sec  = start.tv_sec  + buffer[rp].p.hdr.offset/1000;
     next.tv_usec = start.tv_usec + (buffer[rp].p.hdr.offset%1000) * 1000;
-    ssrc[0] = '\0';
   }
 
   if (next.tv_usec >= 1000000) {
@@ -228,10 +242,9 @@ static Notify_value play_handler(Notify_client client)
     next.tv_sec  += 1;
   }
 
-  /* Save correct value in record (for timestamp-based playback). */
-  if (t) {
-    t->rt = next;
-    t->ts = ts;
+  if (ssrc) {
+    ssrc->rtts.rt = next;
+    ssrc->rtts.ts = ts;
   }
 
   timer_set(&next, play_handler, (Notify_client)rp, 0);
@@ -364,10 +377,8 @@ int main(int argc, char *argv[])
 
   /* initialize event queue */
   first = -1;
-  hcreate(100); /* create hash table for SSRC entries */
   for (i = 0; i < READAHEAD; i++) play_handler(-1);
   notify_start();
-  hdestroy();
 
   return 0;
 } /* main */

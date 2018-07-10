@@ -1,4 +1,3 @@
-hsearch.o: hsearch.c sysdep.h hsearch.h
 multimer.o: multimer.c multimer.h notify.h sysdep.h
 notify.o: notify.c sysdep.h notify.h multimer.h
 payload.o: payload.c payload.h
@@ -13,6 +12,5 @@ rtptrans.o: rtptrans.c rtp.h sysdep.h rtpdump.h notify.h multimer.h vat.h
 compat-err.o: compat-err.c
 compat-getopt.o: compat-getopt.c
 compat-gettimeofday.o: compat-gettimeofday.c
-compat-hsearch.o: compat-hsearch.c compat-hsearch.h
 compat-progname.o: compat-progname.c
 compat-strtonum.o: compat-strtonum.c
