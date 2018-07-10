@@ -801,7 +801,7 @@ static Notify_value send_handler(Notify_client client)
     double time;
     int type;
     char data[1500];
-  } packet = { 0, -1, 0};
+  } packet = { .length = 0, .time = -1, .type = 0};
   FILE *in = (FILE *)client;
   static char line[MAX_TEXT_LINE];       /* last line read (may be next packet) */
   char text[MAX_TEXT_LINE];              /* current line from the file, including cont. lines */
