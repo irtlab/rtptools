@@ -622,7 +622,7 @@ int main(int argc, char *argv[])
   struct timeval start;
   struct timeval timeout;   /* timeout to limit recording */
   double dstart;            /* time as double */
-  int duration = 1000000;   /* maximum duration in seconds */
+  float duration = 1000000; /* maximum duration in seconds */
   int trunc    = 1000000;   /* bytes to show for F_hex and F_dump */
   enum {FromFile, FromNetwork} source;
   int sock[2];
@@ -705,8 +705,8 @@ int main(int argc, char *argv[])
 #endif
 
   /* set maximum time to gather packets */
-  timeout.tv_usec = 0;
   timeout.tv_sec  = duration;
+  timeout.tv_usec = (duration - (float)timeout.tv_sec) * 1000000.0;
 
   /* if no optional arguments, we are reading from a file */
   if (optind == argc) {
