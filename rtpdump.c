@@ -205,6 +205,7 @@ static void rtpdump_header(FILE *out, struct sockaddr_in *sin,
   hdr.start.tv_usec = htonl(start->tv_usec);
   hdr.source = sin->sin_addr.s_addr;
   hdr.port   = sin->sin_port;
+  hdr.padding = 0; /* value will be compiler dependent unless clear it */
   if (fwrite((char *)&hdr, sizeof(hdr), 1, out) < 1) {
     perror("fwrite");
     exit(1);
