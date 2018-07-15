@@ -741,13 +741,13 @@ static int rtp(char *text, char *packet)
 * Generate a packet based on description in 'text'. Return length.
 * Set generation time.
 */
-static int generate(char *text, char *data, double *time, int *type)
+static int generate(char *text, char *data, struct timeval *time, int *type)
 {
   int length;
   char type_name[100];
 
   if (verbose) printf("%s", text);
-  if (sscanf(text, "%lf %s", time, type_name) < 2) {
+  if (sscanf(text, "%ld.%ld %s", &(time->tv_sec), &(time->tv_usec), type_name) < 3) {
     fprintf(stderr, "Line {%s} is invalid.\n", text);
     exit(2);
   }
@@ -798,18 +798,21 @@ static Notify_value send_handler(Notify_client client)
 {
   static struct {
     int length;
-    double time;
+    struct timeval time;
     int type;
     char data[1500];
-  } packet = { .length = 0, .time = -1, .type = 0};
+  } packet;
   FILE *in = (FILE *)client;
   static char line[MAX_TEXT_LINE];       /* last line read (may be next packet) */
   char text[MAX_TEXT_LINE];              /* current line from the file, including cont. lines */
   static int isfirstpacket = 1; /* is this the first packet? */
-  double this;                  /* time this packet is being sent */
-  static double basetime;       /* base time (first packet) */
+  struct timeval this_tv;       /* time this packet is being sent */
+  static struct timeval basetime;        /* base time (first packet) */
   struct timeval next_tv;       /* time for next packet */
+  struct timeval past_tv;       /* to determine the time to sent is in past */
   char *s;
+
+  gettimeofday(&this_tv, NULL);
 
   /* send any pending packet */
   if (packet.length && send(sock[packet.type], packet.data, packet.length, 0) < 0) {
@@ -841,22 +844,24 @@ static Notify_value send_handler(Notify_client client)
       s += strlen(line);
     }
   }
-  this = packet.time;
+
   packet.length = generate(text, packet.data, &packet.time, &packet.type);
   /* very first packet: send immediately */
   if (isfirstpacket) {
     isfirstpacket = 0;
-    this = packet.time;
-    basetime = gettimeofday_d() - this;
-  }
-  else if (this > packet.time) {
-    fprintf(stderr, "Non-monotonic time %f - sent immediately.\n", packet.time);
-    this = packet.time;
-    basetime = gettimeofday_d() - this;
+    timersub(&this_tv, &packet.time, &basetime);
   }
 
   /* compute and set next playout time */
-  next_tv = d2tv(basetime + packet.time);
+  timeradd(&basetime, &packet.time, &next_tv);
+
+  timersub(&next_tv, &this_tv, &past_tv);
+  if (past_tv.tv_sec < 0) {
+    fprintf(stderr, "Non-monotonic time %ld.%ld - sent immediately.\n", 
+            packet.time.tv_sec, packet.time.tv_usec);
+    next_tv = this_tv;
+  }
+
   timer_set(&next_tv, send_handler, (Notify_client)in, 0);
   return NOTIFY_DONE;
 } /* send_handler */
