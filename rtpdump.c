@@ -118,11 +118,7 @@ static int open_network(char *host, int data, int sock[], struct
   struct ip_mreq mreq;      /* multicast group */
   int i;
   int nfds = 0;
-
-  if (hpt(host, sin, NULL) == -1) {
-    usage("");
-    exit(1);
-  }
+ 
   /* multicast */
   if (host) {
     mreq.imr_multiaddr = sin->sin_addr;
@@ -622,7 +618,7 @@ int main(int argc, char *argv[])
     {0,0}
   };
   t_format format = F_ascii;
-  struct sockaddr_in sin;
+  struct sockaddr_in sin, rtp;
   struct timeval start;
   struct timeval timeout;   /* timeout to limit recording */
   double dstart;            /* time as double */
@@ -723,6 +719,11 @@ int main(int argc, char *argv[])
   }
   else {
     source = FromNetwork;
+    if (hpt(argv[optind], &sin, NULL) == -1) {
+      usage(argv[0]);
+      exit(1);
+    }
+    rtp = sin;
     nfds = open_network(argv[optind], format != F_rtcp, sock, &sin);
     gettimeofday(&start, 0);
     dstart = tdbl(&start);
@@ -730,7 +731,7 @@ int main(int argc, char *argv[])
 
   /* write header for dump file */
   if (format == F_dump || format == F_header)
-    rtpdump_header(out, &sin, &start);
+    rtpdump_header(out, &rtp, &start);
 
   /* signal handler */
   signal(SIGINT, done);
