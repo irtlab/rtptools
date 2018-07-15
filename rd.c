@@ -47,7 +47,7 @@
 /*
 * Read header. Return -1 if not valid, 0 if ok.
 */
-int RD_header(FILE *in, struct sockaddr_in *sin, int verbose)
+int RD_header(FILE *in, struct sockaddr_in *sin, struct timeval *start, int verbose)
 {
   RD_hdr_t hdr;
   time_t tt;
@@ -57,7 +57,8 @@ int RD_header(FILE *in, struct sockaddr_in *sin, int verbose)
   sprintf(magic, "#!rtpplay%s ", RTPFILE_VERSION);
   if (strncmp(line, magic, strlen(magic)) != 0) return -1;
   if (fread((char *)&hdr, sizeof(hdr), 1, in) == 0) return -1;
-  hdr.start.tv_sec = ntohl(hdr.start.tv_sec);
+  start->tv_sec  = ntohl(hdr.start.tv_sec);
+  start->tv_usec = ntohl(hdr.start.tv_usec);
   if (verbose) {
     struct tm *tm;
     struct in_addr in;

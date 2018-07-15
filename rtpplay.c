@@ -258,6 +258,7 @@ int main(int argc, char *argv[])
   unsigned char ttl = 1;
   static struct sockaddr_in sin;
   static struct sockaddr_in from;
+  struct timeval start;
   int sourceport = 0;  /* source port */
   int on = 1;          /* flag */
   int i;
@@ -322,7 +323,7 @@ int main(int argc, char *argv[])
   }
 
   /* read header of input file */
-  if (RD_header(in, &sin, verbose) < 0) {
+  if (RD_header(in, &sin, &start, verbose) < 0) {
     fprintf(stderr, "Invalid header\n");
     exit(1);
   }
