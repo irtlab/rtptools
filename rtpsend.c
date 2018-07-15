@@ -765,29 +765,6 @@ static int generate(char *text, char *data, struct timeval *time, int *type)
   return length;
 } /* generate */
 
-
-/*
-* Get time of day as double.
-*/
-static double gettimeofday_d(void)
-{
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-  return tv.tv_sec + tv.tv_usec / 1e6;
-} /* gettimeofday_d */
-
-
-/*
-* Convert a time in double to a timeval.
-*/
-static struct timeval d2tv(double t)
-{
-  struct timeval tv;
-  tv.tv_sec  = t;
-  tv.tv_usec = (t - tv.tv_sec) * 1e6;
-  return tv;
-} /* d2tv */
-
 #define MAX_TEXT_LINE 4096
 
 /*
