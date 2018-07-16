@@ -103,7 +103,6 @@ DISTFILES = \
 	$(COMPAT_SRCS)
 
 # FIXME INSTALL
-# FIXME rtptools.spec
 
 include Makefile.local
 
@@ -186,7 +185,10 @@ distcheck: dist
 
 rpm: $(TARBALL) rtptools.spec
 	rm -rf .rpmbuild
-	mkdir -p .rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+	mkdir -p .rpmbuild/RPMS
+	mkdir -p .rpmbuild/SOURCES
+	mkdir -p .rpmbuild/SPECS
+	mkdir -p .rpmbuild/SRPMS
 	cp $(TARBALL) .rpmbuild/SOURCES/
 	sed s/VERSION/$(VERSION)/g  rtptools.spec > rtptools-$(VERSION).spec
 	mv rtptools-$(VERSION).spec .rpmbuild/SPECS/
