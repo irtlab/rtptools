@@ -182,6 +182,15 @@ distcheck: dist
 	rm -rf rtptools-$(VERSION) && tar xzf $(TARBALL)
 	( cd rtptools-$(VERSION) && ./configure && make all )
 
+rpm: $(TARBALL) rtptools.spec
+	rm -rf .rpmbuild
+	mkdir -p .rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+	cp $(TARBALL) .rpmbuild/SOURCES/
+	sed s/VERSION/$(VERSION)/g  rtptools.spec > rtptools-$(VERSION).spec
+	mv rtptools-$(VERSION).spec .rpmbuild/SPECS/
+	rpmbuild --define "_topdir `pwd`/.rpmbuild" \
+		-ba .rpmbuild/SPECS/rtptools-$(VERSION).spec
+
 .SUFFIXES: .c .o
 .SUFFIXES: .1 .1.html
 
