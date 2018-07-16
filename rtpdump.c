@@ -648,7 +648,7 @@ int main(int argc, char *argv[])
         }
       }
       if (format == F_invalid) {
-        usage(argv[1]);
+        usage(argv[0]);
         exit(1);
       }
       break;
