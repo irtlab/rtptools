@@ -75,10 +75,10 @@ Send packets from the specified
 .Ar port .
 By default, packets are sent from a random port.
 .It Fl T
-Time the outgoing RTP packets according to the original arrival time.
-By default, the RTP timestamps are used for timing instead.
-This smooths jitter and restores the packet sequence.
-RTCP packets are always sent with their original arrival timing,
+Time the outgoing RTP packets according to the arrival time.
+By default, the RTP timestamps are used for timing instead,
+which smooths jitter and restores the original packet sequence.
+RTCP packets are always sent with their arrival timing,
 which may change the relative order of RTP and RTCP packets.
 .It Fl v
 Print the packets to standard output as they are sent out.
