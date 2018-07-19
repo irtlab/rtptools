@@ -123,6 +123,7 @@ distclean: clean
 check: $(PROG) bark.rtp
 	./rtpdump < bark.rtp > /dev/null
 	./rtpdump -F dump < bark.rtp > dump.rtp
+	diff bark.rtp dump.rtp
 	./rtpdump -F payload < bark.rtp > bark.raw
 	./rtpdump -F payload < dump.rtp > dump.raw
 	diff bark.raw dump.raw
