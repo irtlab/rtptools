@@ -43,16 +43,7 @@ HAVE_GETOPT=
 HAVE_GETIMEOFDAY=
 HAVE_PROGNAME=
 HAVE_STRTONUM=
-
-#HAVE_NTOHL=
-#HAVE_PATH_MAX=
-#HAVE_REALLOCARRAY=
-#HAVE_RECALLOCARRAY=
-#HAVE_STRCASESTR=
-#HAVE_STRINGLIST=
-#HAVE_STRLCAT=
-#HAVE_STRLCPY=
-#HAVE_STRNDUP=
+HAVE_TIMER=
 
 HAVE_LNSL=
 HAVE_LSOCKET=
@@ -147,16 +138,7 @@ runtest getopt		GETOPT		|| true
 runtest gettimeofday	GETTIMEOFDAY	|| true
 runtest progname	PROGNAME	|| true
 runtest strtonum	STRTONUM	|| true
-
-#runtest ntohl		NTOHL		|| true
-#runtest PATH_MAX	PATH_MAX	|| true
-#runtest reallocarray	REALLOCARRAY	|| true
-#runtest recallocarray	RECALLOCARRAY	|| true
-#runtest strcasestr	STRCASESTR	|| true
-#runtest stringlist	STRINGLIST	|| true
-#runtest strlcat		STRLCAT		|| true
-#runtest strlcpy		STRLCPY		|| true
-#runtest strndup		STRNDUP		|| true
+runtest timer		TIMER		|| true
 
 # structures
 runtest bigendian	BIGENDIAN	|| true
@@ -185,36 +167,21 @@ cat << __HEREDOC__
 
 __HEREDOC__
 
-#[ ${HAVE_REALLOCARRAY} -eq 0 -o ${HAVE_RECALLOCARRAY} -eq 0 -o \
-  #${HAVE_STRLCAT} -eq 0 -o ${HAVE_STRLCPY} -eq 0 -o \
-  #${HAVE_STRNDUP} -eq 0 ] \
-	#&& echo "#include <sys/types.h>"
-
-#echo
-#[ ${HAVE_PATH_MAX} -eq 0 ] && echo "#define PATH_MAX 4096"
-
 cat << __HEREDOC__
 #define HAVE_ERR ${HAVE_ERR}
 #define HAVE_GETOPT ${HAVE_GETOPT}
 #define HAVE_GETTIMEOFDAY ${HAVE_GETTIMEOFDAY}
 #define HAVE_PROGNAME ${HAVE_PROGNAME}
 #define HAVE_STRTONUM ${HAVE_STRTONUM}
-
-/*
-#define HAVE_NTOHL ${HAVE_NTOHL}
-#define HAVE_REALLOCARRAY ${HAVE_REALLOCARRAY}
-#define HAVE_RECALLOCARRAY ${HAVE_RECALLOCARRAY}
-#define HAVE_STRCASESTR ${HAVE_STRCASESTR}
-#define HAVE_STRINGLIST ${HAVE_STRINGLIST}
-#define HAVE_STRLCAT ${HAVE_STRLCAT}
-#define HAVE_STRLCPY ${HAVE_STRLCPY}
-#define HAVE_STRNDUP ${HAVE_STRNDUP}
-*/
+#define HAVE_TIMER ${HAVE_TIMER}
 
 #define RTP_BIG_ENDIAN ${HAVE_BIGENDIAN}
 #define HAVE_MSGCONTROL ${HAVE_MSGCONTROL}
 
 __HEREDOC__
+
+[ ${HAVE_TIMER} -eq 0 ] && echo "#include <sys/time.h>"
+
 
 if [ ${HAVE_ERR} -eq 0 ]; then
 	echo "extern	void	  err(int, const char *, ...);"
@@ -228,26 +195,14 @@ if [ ${HAVE_PROGNAME} -eq 0 ]; then
 	echo "extern	void	  setprogname(const char *);"
 fi
 
-[ ${HAVE_STRTONUM} -eq 0 ] && \
+if [ ${HAVE_STRTONUM} -eq 0 ]; then \
 	echo "extern	long long strtonum(const char *, long long, long long, const char **);"
+fi
 
-#[ ${HAVE_REALLOCARRAY} -eq 0 ] && \
-	#echo "extern	void	 *reallocarray(void *, size_t, size_t);"
-#
-#[ ${HAVE_RECALLOCARRAY} -eq 0 ] && \
-	#echo "extern	void	 *recallocarray(void *, size_t, size_t, size_t);"
-#
-#[ ${HAVE_STRCASESTR} -eq 0 ] && \
-	#echo "extern	char	 *strcasestr(const char *, const char *);"
-#
-#[ ${HAVE_STRLCAT} -eq 0 ] && \
-	#echo "extern	size_t	  strlcat(char *, const char *, size_t);"
-#
-#[ ${HAVE_STRLCPY} -eq 0 ] && \
-	#echo "extern	size_t	  strlcpy(char *, const char *, size_t);"
-#
-#[ ${HAVE_STRNDUP} -eq 0 ] && \
-	#echo "extern	char	 *strndup(const char *, size_t);"
+if [ ${HAVE_TIMER} -eq 0 ]; then
+	echo "extern	void timersub(struct timeval *, struct timeval *, struct timeval *);"
+	echo "extern	void timeradd(struct timeval *, struct timeval *, struct timeval *);"
+fi
 
 echo "config.h: written" 1>&2
 echo "config.h: written" 1>&3

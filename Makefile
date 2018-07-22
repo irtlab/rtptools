@@ -61,6 +61,7 @@ HAVE_SRCS = \
 	have-gettimeofday.c	\
 	have-progname.c		\
 	have-strtonum.c		\
+	have-timer.c		\
 	have-msgcontrol.c
 
 COMPAT_SRCS = \
@@ -68,14 +69,16 @@ COMPAT_SRCS = \
 	compat-getopt.c		\
 	compat-gettimeofday.c	\
 	compat-progname.c	\
-	compat-strtonum.c
+	compat-strtonum.c	\
+	compat-timer.c
 
 COMPAT_OBJS = \
 	compat-err.o		\
 	compat-getopt.o		\
 	compat-gettimeofday.o	\
 	compat-progname.o	\
-	compat-strtonum.o
+	compat-strtonum.o	\
+	compat-timer.o
 
 OBJS =	$(rtpdump_OBJS) $(rtpplay_OBJS) $(rtpsend_OBJS) $(rtptrans_OBJS)
 OBJS +=	$(COMPAT_OBJS)

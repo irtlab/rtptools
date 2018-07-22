@@ -14,3 +14,4 @@ compat-getopt.o: compat-getopt.c
 compat-gettimeofday.o: compat-gettimeofday.c
 compat-progname.o: compat-progname.c
 compat-strtonum.o: compat-strtonum.c
+compat-timer.o: compat-timer.c
