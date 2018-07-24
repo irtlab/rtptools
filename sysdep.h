@@ -100,8 +100,6 @@ extern int		getopt(int, char* const*, const char*);
 
 extern long long strtonum(const char *, long long, long long, const char **);
 extern int	 gettimeofday(struct timeval*, void*);
-extern void	 timersub(struct timeval *, struct timeval *, struct timeval *);
-extern void	 timeradd(struct timeval *, struct timeval *, struct timeval *);
 
 extern const char*	getprogname(void);
 extern void		setprogname(const char *);
