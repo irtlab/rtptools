@@ -92,6 +92,7 @@
     <ClCompile Include="../compat-getopt.c" />
     <ClCompile Include="../compat-gettimeofday.c" />
     <ClCompile Include="../compat-progname.c" />
+    <ClCompile Include="../compat-timer.c" />
     <ClCompile Include="../multimer.c" />
     <ClCompile Include="../notify.c" />
     <ClCompile Include="../rtpsend.c" />
