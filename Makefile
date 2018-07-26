@@ -123,12 +123,13 @@ distclean: clean
 check: $(PROG) bark.rtp
 	./rtpdump < bark.rtp > /dev/null
 	./rtpdump -F dump < bark.rtp > dump.rtp
-	diff bark.rtp dump.rtp
+	./rtpdump -F dump < dump.rtp > cast.rtp
+	diff dump.rtp cast.rtp
 	./rtpdump -F payload < bark.rtp > bark.raw
 	./rtpdump -F payload < dump.rtp > dump.raw
 	diff bark.raw dump.raw
 	which play > /dev/null && play -c 1 -r 8000 -e u-law bark.raw || true
-	rm -f dump.rtp dump.raw bark.raw
+	rm -f dump.rtp cast.rtp dump.raw bark.raw
 
 install: $(PROG) $(MAN1)
 	install -d $(BINDIR)      && install -m 0755 $(PROG) $(BINDIR)
