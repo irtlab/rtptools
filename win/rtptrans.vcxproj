@@ -95,7 +95,7 @@
     <ClCompile Include="../multimer.c" />
     <ClCompile Include="../notify.c" />
     <ClCompile Include="../rtptrans.c" />
-    <ClCompile Include="../win/winsocklib.c" />
+    <ClCompile Include="../winsocklib.c" />
     <ClInclude Include="../sysdep.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

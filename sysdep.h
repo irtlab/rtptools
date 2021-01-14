@@ -82,6 +82,7 @@ struct msghdr {
 #define  ITIMER_REAL     0       /* Decrements in real time */
 
 extern int sendmsg(int s, const struct msghdr *msg, int flags);
+extern void startupSocket(void);
 
 /* declare the missing functions */
 

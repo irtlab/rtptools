@@ -32,7 +32,7 @@ echo "config.log: writing..."
 
 SOURCEDIR=`dirname "$0"`
 
-CC=`printf "all:\\n\\t@echo \\\$(CC)\\n" | env -i make -sf -`
+CC=`printf "all:\\n\\t@echo \\\$(CC)\\n" | make -sf -`
 CFLAGS="-g -W -Wall -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings"
 CFLAGS="${CFLAGS} -Wno-unused-parameter"
 LDFLAGS=
@@ -165,6 +165,7 @@ runtest msgcontrol	MSGCONTROL	|| true
 # extra libs needed
 runtest gethostbyname	LNSL	-lnsl	|| true
 runtest socket		LSOCKET	-lsocket|| true
+runtest windows	WINDOWS	|| true
 
 # --- write config.h ---
 
@@ -261,6 +262,7 @@ exec > Makefile.local
 
 [ ${HAVE_LNSL}    -eq 1 ] && LDADD="${LDADD} -lnsl"
 [ ${HAVE_LSOCKET} -eq 1 ] && LDADD="${LDADD} -lsocket"
+[ ${HAVE_WINDOWS} -eq 1 ] && LDADD="${LDADD} -lws2_32"
 
 cat << __HEREDOC__
 CC		= ${CC}

@@ -1,4 +1,7 @@
 *.o
+/*.exe
+/config.*
+/Makefile.local
 /rpmbuild
 /rtpdump
 /rtpplay
