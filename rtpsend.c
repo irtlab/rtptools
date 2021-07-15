@@ -835,7 +835,7 @@ static Notify_value send_handler(Notify_client client)
   timersub(&next_tv, &this_tv, &past_tv);
   if (past_tv.tv_sec < 0) {
     fprintf(stderr, "Non-monotonic time %ld.%ld - sent immediately.\n", 
-            packet.time.tv_sec, packet.time.tv_usec);
+            packet.time.tv_sec, (long)packet.time.tv_usec);
     next_tv = this_tv;
   }
 

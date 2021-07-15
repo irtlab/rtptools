@@ -318,12 +318,12 @@ static void parse_short(FILE *out, struct timeval now, char *buf, int len)
   if (r->version == 0) {
     vat_hdr_t *v = (vat_hdr_t *)buf;
     fprintf(out, "%ld.%06ld %lu\n",
-      (v->flags ? -now.tv_sec : now.tv_sec), now.tv_usec,
+      (v->flags ? -now.tv_sec : now.tv_sec), (long)now.tv_usec,
       (unsigned long)ntohl(v->ts));
   }
   else if (r->version == 2) {
     fprintf(out, "%ld.%06ld %lu %u\n",
-      (r->m ? -now.tv_sec : now.tv_sec), now.tv_usec,
+      (r->m ? -now.tv_sec : now.tv_sec), (long)now.tv_usec,
       (unsigned long)ntohl(r->ts), ntohs(r->seq));
   }
   else {
@@ -577,7 +577,7 @@ static void packet_handler(FILE *out, t_format format, int trunc,
     case F_ascii:
       if (ctrl == 0) {
         fprintf(out, "%ld.%06ld %s len=%d from=%s:%u ",
-                now.tv_sec, now.tv_usec, parse_type(ctrl, packet->p.data),
+                now.tv_sec, (long)now.tv_usec, parse_type(ctrl, packet->p.data),
                 len, inet_ntoa(sin.sin_addr), ntohs(sin.sin_port));
         parse_data(out, packet->p.data, len);
         if (format == F_hex) {
@@ -590,7 +590,7 @@ static void packet_handler(FILE *out, t_format format, int trunc,
     case F_rtcp:
       if (ctrl == 1) {
         fprintf(out, "%ld.%06ld %s len=%d from=%s:%u ",
-                now.tv_sec, now.tv_usec, parse_type(ctrl, packet->p.data),
+                now.tv_sec, (long)now.tv_usec, parse_type(ctrl, packet->p.data),
                 len, inet_ntoa(sin.sin_addr), ntohs(sin.sin_port));
         parse_control(out, packet->p.data, len);
       }

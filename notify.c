@@ -185,7 +185,7 @@ Notify_error notify_start(void)
     /* For not to catch signal as an error
      * EINTR added by Akira T. 12/11/01 */
     if (found < 0 && errno != EINTR) {
-      fprintf(stderr, "Timeout: %lu.%06lu\n", timeout.tv_sec, timeout.tv_usec);
+      fprintf(stderr, "Timeout: %lu.%06lu\n", timeout.tv_sec, (long)timeout.tv_usec);
       return -1;
     }
 #endif
