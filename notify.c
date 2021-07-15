@@ -67,7 +67,7 @@ static event_t *search(
 /* Clear all three "fd-set"s.
  * This is called only once in the first call for initilaization.
  */
-void check_clr_fd(void)
+static void check_clr_fd(void)
 {
   static int cleared = -1;
 

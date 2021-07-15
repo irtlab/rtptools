@@ -402,7 +402,7 @@ static int rtcp_rr(node_t *list, char *packet)
  * 2^32/10^6 = 4096 + 256 - 1825/32 which results in a max conversion
  * error of 3 * 10^-7 and an average error of half that.
  */
-u_int usec2ntp(u_int usec)
+static u_int usec2ntp(u_int usec)
 {
   u_int t = (usec * 1825) >> 5;
   return ((usec << 12) + (usec << 8) - t);

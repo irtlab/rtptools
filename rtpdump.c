@@ -335,7 +335,7 @@ static void parse_short(FILE *out, struct timeval now, char *buf, int len)
 /*
 * Show SDES information for one member.
 */
-void member_sdes(FILE *out, member_t m, rtcp_sdes_type_t t, char *b, int len)
+static void member_sdes(FILE *out, member_t m, rtcp_sdes_type_t t, char *b, int len)
 {
   static struct {
     rtcp_sdes_type_t t;
@@ -523,7 +523,7 @@ static int parse_control(FILE *out, char *buf, int len)
 /*
 * Process one packet and write it to file 'out' using format 'format'.
 */
-void packet_handler(FILE *out, t_format format, int trunc,
+static void packet_handler(FILE *out, t_format format, int trunc,
   double dstart, struct timeval now, int ctrl,
   struct sockaddr_in sin, int len, RD_buffer_t *packet)
 {
