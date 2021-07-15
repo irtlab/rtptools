@@ -40,6 +40,7 @@
 #include <sys/select.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <err.h>
 #endif
 
 #include <signal.h>
