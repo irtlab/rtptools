@@ -285,7 +285,7 @@ static int parse_data(FILE *out, char *buf, int len)
       (unsigned long)ntohl(r->ts),
       (unsigned long)ntohl(r->ssrc));
     for (i = 0; i < r->cc; i++) {
-      fprintf(out, "csrc[%d]=0x%0lx ", i, r->csrc[i]);
+      fprintf(out, "csrc[%d]=0x%0lx ", i, (long)r->csrc[i]);
     }
     if (r->x) {  /* header extension */
       ext = (rtp_hdr_ext_t *)((char *)buf + hlen);
@@ -392,7 +392,7 @@ static char *rtp_read_sdes(FILE *out, char *b, int len)
   }
   b = (char *)rsp + 1;
   /* skip padding */
-  return b + ((4 - ((int)b & 0x3)) & 0x3);
+  return b + ((4 - ((intptr_t)b & 0x3)) & 0x3);
 } /* rtp_read_sdes */
 
 
