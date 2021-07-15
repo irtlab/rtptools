@@ -745,12 +745,17 @@ static int generate(char *text, char *data, struct timeval *time, int *type)
 {
   int length;
   char type_name[100];
+  /* suseconds_t is int on some platforms, long on others, so it can't portably
+     be directly used in sscanf.  sscanf into a long and assign (which implicitly
+     casts) */
+  long tv_usec;
 
   if (verbose) printf("%s", text);
-  if (sscanf(text, "%ld.%ld %s", &(time->tv_sec), &(time->tv_usec), type_name) < 3) {
+  if (sscanf(text, "%ld.%ld %s", &(time->tv_sec), &tv_usec, type_name) < 3) {
     fprintf(stderr, "Line {%s} is invalid.\n", text);
     exit(2);
   }
+  time->tv_usec = tv_usec;
   if (strcmp(type_name, "RTP") == 0) {
     length = rtp(strstr(text, "RTP") + 3, data);
     *type = 0;
