@@ -68,14 +68,16 @@ COMPAT_SRCS = \
 	compat-getopt.c		\
 	compat-gettimeofday.c	\
 	compat-progname.c	\
-	compat-strtonum.c
+	compat-strtonum.c \
+	winsocklib.c
 
 COMPAT_OBJS = \
 	compat-err.o		\
 	compat-getopt.o		\
 	compat-gettimeofday.o	\
 	compat-progname.o	\
-	compat-strtonum.o
+	compat-strtonum.o \
+	winsocklib.o
 
 OBJS =	$(rtpdump_OBJS) $(rtpplay_OBJS) $(rtpsend_OBJS) $(rtptrans_OBJS)
 OBJS +=	$(COMPAT_OBJS)
