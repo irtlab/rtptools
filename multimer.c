@@ -51,6 +51,7 @@
 
 #include "sysdep.h"
 #include "notify.h"
+#include "multimer.h"
 
 typedef struct TQE {
     struct TQE *link;           /* link to next timer */
@@ -92,7 +93,7 @@ static int timerless(struct timeval *a, struct timeval *b)
   return 0;
 } /* timerless */
 
-void timer_check(void)
+static void timer_check(void)
 {
   register struct TQE *np;
 

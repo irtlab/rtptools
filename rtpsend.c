@@ -402,7 +402,7 @@ static int rtcp_rr(node_t *list, char *packet)
  * 2^32/10^6 = 4096 + 256 - 1825/32 which results in a max conversion
  * error of 3 * 10^-7 and an average error of half that.
  */
-u_int usec2ntp(u_int usec)
+static u_int usec2ntp(u_int usec)
 {
   u_int t = (usec * 1825) >> 5;
   return ((usec << 12) + (usec << 8) - t);
@@ -745,12 +745,17 @@ static int generate(char *text, char *data, struct timeval *time, int *type)
 {
   int length;
   char type_name[100];
+  /* suseconds_t is int on some platforms, long on others, so it can't portably
+     be directly used in sscanf.  sscanf into a long and assign (which implicitly
+     casts) */
+  long tv_usec;
 
   if (verbose) printf("%s", text);
-  if (sscanf(text, "%ld.%ld %s", &(time->tv_sec), &(time->tv_usec), type_name) < 3) {
+  if (sscanf(text, "%ld.%ld %s", &(time->tv_sec), &tv_usec, type_name) < 3) {
     fprintf(stderr, "Line {%s} is invalid.\n", text);
     exit(2);
   }
+  time->tv_usec = tv_usec;
   if (strcmp(type_name, "RTP") == 0) {
     length = rtp(strstr(text, "RTP") + 3, data);
     *type = 0;
@@ -835,7 +840,7 @@ static Notify_value send_handler(Notify_client client)
   timersub(&next_tv, &this_tv, &past_tv);
   if (past_tv.tv_sec < 0) {
     fprintf(stderr, "Non-monotonic time %ld.%ld - sent immediately.\n", 
-            packet.time.tv_sec, packet.time.tv_usec);
+            packet.time.tv_sec, (long)packet.time.tv_usec);
     next_tv = this_tv;
   }
 

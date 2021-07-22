@@ -92,7 +92,7 @@ static stream *last;   /* Last seen stream, as the probability that the next
                         */
 static int list_len;
 
-int create_stream(int addr, int next)
+static int create_stream(int addr, int next)
 {
   stream *elem;
   int i;
@@ -148,7 +148,7 @@ int create_stream(int addr, int next)
 /*
  * Add a stream to the list.
  */
-int find_stream(int addr, int ts, int next, int m)
+static int find_stream(int addr, int ts, int next, int m)
 {
   stream *element;
   /* packet belongs to the last seen stream */
@@ -385,7 +385,7 @@ static Notify_value socket_handler(Notify_client client, int sock)
 } /* socket_handler */
 
 
-void usage(char *argv0)
+static void usage(char *argv0)
 {
   fprintf(stderr, "usage: %s address/port[/ttl] address/port[/ttl] [...]\n",
 	argv0);

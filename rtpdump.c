@@ -40,6 +40,7 @@
 #include <sys/select.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <err.h>
 #endif
 
 #include <signal.h>
@@ -284,7 +285,7 @@ static int parse_data(FILE *out, char *buf, int len)
       (unsigned long)ntohl(r->ts),
       (unsigned long)ntohl(r->ssrc));
     for (i = 0; i < r->cc; i++) {
-      fprintf(out, "csrc[%d]=0x%0lx ", i, r->csrc[i]);
+      fprintf(out, "csrc[%d]=0x%0lx ", i, (long)r->csrc[i]);
     }
     if (r->x) {  /* header extension */
       ext = (rtp_hdr_ext_t *)((char *)buf + hlen);
@@ -317,12 +318,12 @@ static void parse_short(FILE *out, struct timeval now, char *buf, int len)
   if (r->version == 0) {
     vat_hdr_t *v = (vat_hdr_t *)buf;
     fprintf(out, "%ld.%06ld %lu\n",
-      (v->flags ? -now.tv_sec : now.tv_sec), now.tv_usec,
+      (v->flags ? -now.tv_sec : now.tv_sec), (long)now.tv_usec,
       (unsigned long)ntohl(v->ts));
   }
   else if (r->version == 2) {
     fprintf(out, "%ld.%06ld %lu %u\n",
-      (r->m ? -now.tv_sec : now.tv_sec), now.tv_usec,
+      (r->m ? -now.tv_sec : now.tv_sec), (long)now.tv_usec,
       (unsigned long)ntohl(r->ts), ntohs(r->seq));
   }
   else {
@@ -334,7 +335,7 @@ static void parse_short(FILE *out, struct timeval now, char *buf, int len)
 /*
 * Show SDES information for one member.
 */
-void member_sdes(FILE *out, member_t m, rtcp_sdes_type_t t, char *b, int len)
+static void member_sdes(FILE *out, member_t m, rtcp_sdes_type_t t, char *b, int len)
 {
   static struct {
     rtcp_sdes_type_t t;
@@ -391,7 +392,7 @@ static char *rtp_read_sdes(FILE *out, char *b, int len)
   }
   b = (char *)rsp + 1;
   /* skip padding */
-  return b + ((4 - ((int)b & 0x3)) & 0x3);
+  return b + ((4 - ((intptr_t)b & 0x3)) & 0x3);
 } /* rtp_read_sdes */
 
 
@@ -522,7 +523,7 @@ static int parse_control(FILE *out, char *buf, int len)
 /*
 * Process one packet and write it to file 'out' using format 'format'.
 */
-void packet_handler(FILE *out, t_format format, int trunc,
+static void packet_handler(FILE *out, t_format format, int trunc,
   double dstart, struct timeval now, int ctrl,
   struct sockaddr_in sin, int len, RD_buffer_t *packet)
 {
@@ -576,7 +577,7 @@ void packet_handler(FILE *out, t_format format, int trunc,
     case F_ascii:
       if (ctrl == 0) {
         fprintf(out, "%ld.%06ld %s len=%d from=%s:%u ",
-                now.tv_sec, now.tv_usec, parse_type(ctrl, packet->p.data),
+                now.tv_sec, (long)now.tv_usec, parse_type(ctrl, packet->p.data),
                 len, inet_ntoa(sin.sin_addr), ntohs(sin.sin_port));
         parse_data(out, packet->p.data, len);
         if (format == F_hex) {
@@ -589,7 +590,7 @@ void packet_handler(FILE *out, t_format format, int trunc,
     case F_rtcp:
       if (ctrl == 1) {
         fprintf(out, "%ld.%06ld %s len=%d from=%s:%u ",
-                now.tv_sec, now.tv_usec, parse_type(ctrl, packet->p.data),
+                now.tv_sec, (long)now.tv_usec, parse_type(ctrl, packet->p.data),
                 len, inet_ntoa(sin.sin_addr), ntohs(sin.sin_port));
         parse_control(out, packet->p.data, len);
       }
