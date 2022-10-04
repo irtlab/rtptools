@@ -2,7 +2,7 @@
 
 #if HAVE_STRTONUM
 
-int dummy;
+int dummy_compat_strtonum;
 
 #else
 

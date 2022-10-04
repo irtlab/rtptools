@@ -2,7 +2,7 @@
 
 #if HAVE_PROGNAME
 
-int dummy;
+int dummy_compat_progname;
 
 #else
 
