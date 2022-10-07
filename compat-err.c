@@ -2,7 +2,7 @@
 
 #if HAVE_ERR
 
-int dummy;
+int dummy_compat_err;
 
 #else
 

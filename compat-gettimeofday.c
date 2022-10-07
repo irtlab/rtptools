@@ -2,7 +2,7 @@
 
 #if HAVE_GETTIMEOFDAY
 
-int dummy;
+int dummy_compat_gettimeofday;
 
 #else
 

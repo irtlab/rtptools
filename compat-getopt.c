@@ -2,7 +2,7 @@
 
 #if HAVE_GETOPT
 
-int dummy;
+int dummy_compat_getopt;
 
 #else
 
