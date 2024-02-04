@@ -58,12 +58,15 @@ extern int hpt(char*, struct sockaddr_in*, unsigned char*);
 extern struct pt payload[];
 
 static int verbose = 0;        /* be chatty about packets sent */
+static int progress = 0;       /* show progress */
 static int wallclock = 0;      /* use wallclock time rather than timestamps */
 static uint32_t begin = 0;      /* time of first packet to send */
 static uint32_t end = UINT32_MAX; /* when to stop sending */
 static FILE *in;               /* input file */
 static int sock[2];            /* output sockets */
 static int first = -1;         /* time offset of first packet */
+static uint32_t last = 0;      /* time offset of last  packet */
+static int progressValue = 0;  /* percent */
 static RD_buffer_t buffer[READAHEAD];
 
 struct rtts {
@@ -154,20 +157,30 @@ static Notify_value play_handler(Notify_client client)
   /* If we are done, skip rest. */
   if (end == 0) return NOTIFY_DONE;
 
-  if (verbose > 0 && b >= 0) {
-    printf("! %1.3f %s(%3d;%3d) t=%6lu",
-      tdbl(&now), buffer[b].p.hdr.plen ? "RTP " : "RTCP",
-      buffer[b].p.hdr.length, buffer[b].p.hdr.plen,
-      (unsigned long)buffer[b].p.hdr.offset);
-
-    if (buffer[b].p.hdr.plen) {
-      r = (rtp_hdr_t *)buffer[b].p.data;
-      printf(" pt=%u ssrc=%8lx %cts=%9lu seq=%5u",
-        (unsigned int)r->pt,
-        (unsigned long)ntohl(r->ssrc), r->m ? '*' : ' ',
-        (unsigned long)ntohl(r->ts), ntohs(r->seq));
+  if (b >= 0) {
+    if (progress > 0) {
+      int prg = ((double) buffer[b].p.hdr.offset / (last-first)) * 100;
+        if (prg != progressValue) {
+          progressValue = prg;
+          printf("%% %d\n", progressValue);
+          fflush(stdout);
+        }
     }
-    printf("\n");
+    if (verbose > 0) {
+      printf("! %1.3f %s(%3d;%3d) t=%6lu",
+        tdbl(&now), buffer[b].p.hdr.plen ? "RTP " : "RTCP",
+        buffer[b].p.hdr.length, buffer[b].p.hdr.plen,
+        (unsigned long)buffer[b].p.hdr.offset);
+
+      if (buffer[b].p.hdr.plen) {
+        r = (rtp_hdr_t *)buffer[b].p.data;
+        printf(" pt=%u ssrc=%8lx %cts=%9lu seq=%5u",
+          (unsigned int)r->pt,
+          (unsigned long)ntohl(r->ssrc), r->m ? '*' : ' ',
+          (unsigned long)ntohl(r->ts), ntohs(r->seq));
+      }
+      printf("\n");
+    }
   }
 
   /* Find available buffer. */
@@ -272,7 +285,7 @@ int main(int argc, char *argv[])
   in = stdin; /* Changed below if -f specified */
 
   /* parse command line arguments */
-  while ((c = getopt(argc, argv, "b:e:f:p:Ts:vh")) != EOF) {
+  while ((c = getopt(argc, argv, "b:e:f:p:Ts:vzh")) != EOF) {
     switch(c) {
     case 'b':
       begin = atof(optarg) * 1000;
@@ -295,6 +308,9 @@ int main(int argc, char *argv[])
     case 'v':
       verbose = 1;
       break;
+    case 'z':
+        progress = 1;
+        break;
     case '?':
     case 'h':
       usage(argv[0]);
@@ -326,6 +342,26 @@ int main(int argc, char *argv[])
   if (RD_header(in, &sin, &start, verbose) < 0) {
     fprintf(stderr, "Invalid header\n");
     exit(1);
+  }
+
+  /* find last offset */
+  fpos_t oldPos;
+  if (fgetpos(in, &oldPos) != 0) {
+      fprintf(stderr, "Failed to save file pos\n");
+      exit(1);
+  }
+  RD_buffer_t lastBuffer;
+  // printf("\n-------\n");
+  do {
+      if (RD_read(in, &lastBuffer) == 0) break;
+      if (lastBuffer.p.hdr.offset > last)
+        last = lastBuffer.p.hdr.offset;
+      // printf(" %d ", last);
+  } while ( 1 );
+  // printf("\n-------\n");
+  if (fsetpos(in, &oldPos) != 0) {
+      fprintf(stderr, "Failed to restore file pos\n");
+      exit(1);
   }
 
   /* create/connect sockets if they don't exist already */
