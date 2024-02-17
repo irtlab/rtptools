@@ -40,6 +40,7 @@
 .Op Fl o Ar outfile
 .Op Fl t Ar minutes
 .Op Fl x Ar bytes
+.Op Fl d Ar event_payload_id
 .Oo Ar address Oc Ns / Ns Ar port
 .Sh DESCRIPTION
 .Nm
@@ -225,6 +226,10 @@ This is only applicable for the
 and
 .Cm hex
 formats.
+.It Fl d Ar event_payload_id
+Consider the dynamic payload id
+.Ar event_payload_id
+as the payload id for RTP Events
 .El
 .Sh EXAMPLES
 .Bd -literal
